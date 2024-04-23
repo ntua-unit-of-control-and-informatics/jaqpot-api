@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: jaqpot-api-v2
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://login.jaqpot.org/auth/realms/jaqpot/
+
