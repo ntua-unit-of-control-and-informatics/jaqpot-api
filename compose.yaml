@@ -1,9 +1,25 @@
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:alpine3.19
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: jaqpot
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
       - '5432'
+    volumes:
+      - ./docker/db:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    command:
+      - "start-dev"
+      - "--http-port=8070"
+      - "--import-realm"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./docker/keycloak/imports:/opt/keycloak/data/import
+    ports:
+      - 8070:8070
