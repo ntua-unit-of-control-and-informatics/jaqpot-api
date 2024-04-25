@@ -1,4 +1,4 @@
-package org.jaqpot.jaqpotapiv2.controller
+package org.jaqpot.api.controller
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt

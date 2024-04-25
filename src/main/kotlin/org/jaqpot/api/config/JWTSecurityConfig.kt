@@ -1,4 +1,4 @@
-package org.jaqpot.jaqpotapiv2.config
+package org.jaqpot.api.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
