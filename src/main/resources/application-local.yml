@@ -1,7 +1,16 @@
 spring:
   application:
     name: jaqpot-api-v2
-
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jaqpot
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   security:
     oauth2:
       resourceserver:
