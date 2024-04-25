@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -40,10 +41,10 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.withType(KotlinCompile) {
-    kotlinOptions {
-        freeCompilerArgs += '-Xjsr305=strict'
-        jvmTarget = '21'
+tasks.withType(KotlinCompile).configureEach {
+    compilerOptions {
+        freeCompilerArgs.add('-Xjsr305=strict')
+        setJvmTarget(JvmTarget.JVM_21)
     }
 }
 
