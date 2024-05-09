@@ -10,6 +10,7 @@ services:
     volumes:
       - ./docker/db:/var/lib/postgresql/data
 
+
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.3
     command:
