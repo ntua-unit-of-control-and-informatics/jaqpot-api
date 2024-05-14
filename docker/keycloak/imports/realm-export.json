@@ -783,7 +783,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "MDOgE836RmNGmaHDhzH9rNjK2i4QB7ph",
       "redirectUris": [
         "http://localhost:3000/api/auth/callback/keycloak"
       ],
