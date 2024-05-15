@@ -10,7 +10,7 @@ info:
   description: 'A modern RESTful API for molecular modeling, built using Spring Boot and Kotlin. Supports model management, prediction services, and integrates seamlessly with machine learning workflows.'
   contact:
     name: Jaqpot
-    url: 'https://api.jaqpot.org'
+    url: 'https://jaqpot.org'
     email: upci.ntua@gmail.com
   license:
     name: Apache 2.0
