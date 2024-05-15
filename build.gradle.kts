@@ -52,6 +52,10 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
+    // flyway
+    implementation("org.flywaydb:flyway-core:10.12.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
+
     runtimeOnly("org.postgresql:postgresql")
 }
 
@@ -95,3 +99,5 @@ sourceSets {
         }
     }
 }
+
+

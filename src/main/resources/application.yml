@@ -19,4 +19,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8070/realms/jaqpot-local
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
