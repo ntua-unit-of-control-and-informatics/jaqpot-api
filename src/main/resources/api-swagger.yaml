@@ -15,9 +15,13 @@ info:
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - bearerAuth: []
 paths:
   /models:
     get:
+      security:
+        - bearerAuth: []
       tags:
         - model
       operationId: getModels
@@ -33,24 +37,24 @@ paths:
       summary: Get Models
       description: Get all models
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Model:
-      properties:
-        firstName:
-          type: string
-          description: First Name
-          example: John
-        lastName:
-          type: string
-          description: Last Name
-          example: Lim
-        age:
-          type: integer
-          description: Age
-          example: 28
+      type: object
+      x-examples:
+        Example 1:
+          id: 4
+          isPublic: true
       required:
-        - firstName
-        - lastName
-        - age
-      x-stoplight:
-        id: 7kdj5gxoqk6ra
+        - id
+        - isPublic
+      properties:
+        id:
+          type: integer
+        isPublic:
+          type: boolean
+      description: ''
