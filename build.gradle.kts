@@ -6,6 +6,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.9.23"
 
     id("org.openapi.generator") version "7.5.0"
+
+    id("org.flywaydb.flyway") version "10.13.0"
 }
 
 group = "org.jaqpot"
@@ -68,9 +70,9 @@ tasks.withType<Test> {
 openApiGenerate {
     generatorName.set("kotlin-spring")
     inputSpec.set("$projectDir/src/main/resources/api-swagger.yaml")
-    invokerPackage.set("org.jaqpot.api")
-    apiPackage.set("org.jaqpot.api")
-    modelPackage.set("org.jaqpot.api.model")
+    invokerPackage.set("org.jaqpot.openapi")
+    apiPackage.set("org.jaqpot.openapi")
+    modelPackage.set("org.jaqpot.openapi.model")
     outputDir.set("${buildDir}/openapi")
     modelNameSuffix.set("Dto")
     // config options: https://openapi-generator.tech/docs/generators/kotlin-spring/
@@ -89,7 +91,7 @@ openApiGenerate {
 sourceSets {
     main {
         kotlin {
-            srcDirs("${buildDir}/openapi")
+            srcDir("${buildDir}/openapi")
         }
     }
 }

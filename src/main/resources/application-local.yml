@@ -5,12 +5,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/jaqpot
     username: user
     password: password
+    driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
   security:
     oauth2:
       resourceserver:
