@@ -74,9 +74,9 @@ tasks.withType<Test> {
 openApiGenerate {
     generatorName.set("kotlin-spring")
     inputSpec.set("$projectDir/src/main/resources/api-swagger.yaml")
-    invokerPackage.set("org.jaqpot.openapi")
-    apiPackage.set("org.jaqpot.openapi")
-    modelPackage.set("org.jaqpot.openapi.model")
+    invokerPackage.set("org.jaqpot.api")
+    apiPackage.set("org.jaqpot.api")
+    modelPackage.set("org.jaqpot.api.model")
     outputDir.set("${buildDir}/openapi")
     modelNameSuffix.set("Dto")
     // config options: https://openapi-generator.tech/docs/generators/kotlin-spring/
