@@ -15,7 +15,15 @@ class SecurityConfig {
         http.authorizeHttpRequests { a ->
             a
                 // allow swagger for everyone
-                .requestMatchers("/v3/**", "/swagger/**", "/swagger-ui/**", "/models/**").permitAll()
+                .requestMatchers(
+                    "/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
+                )
+                .permitAll()
+                
+                .requestMatchers(
+                    "/models/**"
+                )
+                .permitAll()
 
                 .anyRequest()
                 .authenticated()

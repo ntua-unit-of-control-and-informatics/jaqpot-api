@@ -6,6 +6,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.9.23"
 
     id("org.openapi.generator") version "7.5.0"
+
+    id("org.flywaydb.flyway") version "10.13.0"
 }
 
 group = "org.jaqpot"
@@ -50,6 +52,10 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
+    // flyway
+    implementation("org.flywaydb:flyway-core:10.12.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
+
     runtimeOnly("org.postgresql:postgresql")
 }
 
@@ -89,7 +95,9 @@ openApiGenerate {
 sourceSets {
     main {
         kotlin {
-            srcDirs("${buildDir}/openapi")
+            srcDir("${buildDir}/openapi")
         }
     }
 }
+
+
