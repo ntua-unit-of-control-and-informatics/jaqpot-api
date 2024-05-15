@@ -1,6 +1,6 @@
 spring:
   application:
-    name: jaqpot-api-v2
+    name: jaqpot-api
   datasource:
     url: jdbc:postgresql://localhost:5432/jaqpot
     username: user

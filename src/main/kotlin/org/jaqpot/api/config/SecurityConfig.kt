@@ -8,14 +8,18 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
-class JWTSecurityConfig {
+class SecurityConfig {
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeHttpRequests { auth ->
-            auth
+        http.authorizeHttpRequests { a ->
+            a
+                // allow swagger for everyone
+                .requestMatchers("/v3/**", "/swagger/**", "/swagger-ui/**", "/models/**").permitAll()
+
                 .anyRequest()
                 .authenticated()
+
         }
             .oauth2ResourceServer { oauth2: OAuth2ResourceServerConfigurer<HttpSecurity?> -> oauth2.jwt(Customizer.withDefaults()) }
         return http.build()

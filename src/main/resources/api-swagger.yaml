@@ -1,0 +1,60 @@
+openapi: 3.0.3
+tags:
+  - name: model
+    description: model operations
+x-stoplight:
+  id: 4vb63zck1yndo
+info:
+  title: Jaqpot API
+  version: 1.0.0
+  description: 'A modern RESTful API for molecular modeling, built using Spring Boot and Kotlin. Supports model management, prediction services, and integrates seamlessly with machine learning workflows.'
+  contact:
+    name: Jaqpot
+    url: 'https://jaqpot.org'
+    email: upci.ntua@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - bearerAuth: []
+paths:
+  /models:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - model
+      operationId: getModels
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+      x-stoplight:
+        id: appgc5yaf4mfo
+      summary: Get Models
+      description: Get all models
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Model:
+      type: object
+      x-examples:
+        Example 1:
+          id: 4
+          isPublic: true
+      required:
+        - id
+        - isPublic
+      properties:
+        id:
+          type: integer
+        isPublic:
+          type: boolean
+      description: ''
