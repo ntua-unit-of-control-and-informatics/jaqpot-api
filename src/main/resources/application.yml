@@ -23,3 +23,6 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+jaqpot:
+  runtime:
+    jaqpotpy-pretrained: ${JAQPOT_RUNTIME_JAQPOTPY_PRETRAINED:http://localhost:8002}
