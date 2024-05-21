@@ -2,15 +2,16 @@ services:
   postgres:
     image: postgres:alpine3.19
     environment:
-      POSTGRES_DB: jaqpot
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: jaqpot
+      POSTGRES_PASSWORD: jaqpot
     ports:
       - '5432:5432'
     volumes:
+      - ./etc/init-db-scripts:/docker-entrypoint-initdb.d
       - ./docker/db:/var/lib/postgresql/data
 
   keycloak:
+    depends_on: [postgres]
     image: quay.io/keycloak/keycloak:24.0.3
     command:
       - "start-dev"
@@ -18,7 +19,12 @@ services:
       - "--import-realm"
     environment:
       KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN_PASSWORD: jaqpot
+      KC_DB: postgres
+      KC_DB_SCHEMA: keycloak
+      KC_DB_URL: jdbc:postgresql://postgres:5432/jaqpot
+      KC_DB_USERNAME: jaqpot
+      KC_DB_PASSWORD: jaqpot
     volumes:
       - ./docker/keycloak/imports:/opt/keycloak/data/import
     ports:

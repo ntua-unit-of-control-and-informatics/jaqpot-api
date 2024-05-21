@@ -3,8 +3,8 @@ spring:
     name: jaqpot-api
   datasource:
     url: jdbc:postgresql://localhost:5432/jaqpot
-    username: user
-    password: password
+    username: jaqpot
+    password: jaqpot
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
