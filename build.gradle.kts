@@ -1,8 +1,11 @@
 plugins {
+    val kotlinVersion = "1.9.24"
+
     java
     id("org.springframework.boot") version "3.2.5"
     id("io.spring.dependency-management") version "1.1.4"
-    id("org.jetbrains.kotlin.jvm") version "1.9.23"
+    id("org.jetbrains.kotlin.jvm") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version "1.9.23"
 
     id("org.openapi.generator") version "7.5.0"
@@ -40,6 +43,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 
+    // logger
+    implementation("org.slf4j:slf4j-api:2.0.13")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -55,6 +62,9 @@ dependencies {
     // flyway
     implementation("org.flywaydb:flyway-core:10.12.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
+
+    // keycloak admin client
+    implementation("org.keycloak:keycloak-admin-client:24.0.3")
 
     runtimeOnly("org.postgresql:postgresql")
 }

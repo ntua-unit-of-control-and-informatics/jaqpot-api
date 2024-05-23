@@ -1,4 +1,4 @@
-package org.jaqpot.api.service
+package org.jaqpot.api.service.model
 
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.model.ModelDto
