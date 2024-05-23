@@ -2,7 +2,7 @@ package org.jaqpot.api.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.annotations.Where
+import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
 
 @Entity
@@ -26,11 +26,11 @@ class Model(
     val libraries: Set<Library>,
 
     @OneToMany(mappedBy = "model")
-    @Where(clause = "featureType = 'DEPENDENT'")
+    @SQLRestriction("featureType = 'DEPENDENT'")
     val dependentFeatures: Set<Feature>,
 
     @OneToMany(mappedBy = "model")
-    @Where(clause = "featureType = 'INDEPENDENT'")
+    @SQLRestriction("featureType = 'INDEPENDENT'")
     val independentFeatures: Set<Feature>,
 
     val reliability: Int,
