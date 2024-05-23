@@ -23,6 +23,12 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+keycloak:
+  client-id: admin-cli
+  client-secret: 62r8Qm79gjwtA6wFMYt41InUK718nwzJ
+  realm: jaqpot-local
+  server-url: http://localhost:8070
+
 jaqpot:
   runtime:
-    jaqpotpy-pretrained: ${JAQPOT_RUNTIME_JAQPOTPY_PRETRAINED:http://localhost:8002}
+    jaqpotpy-pretrained: http://localhost:8002

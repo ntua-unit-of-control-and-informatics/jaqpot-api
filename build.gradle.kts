@@ -43,6 +43,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 
+    // logger
+    implementation("org.slf4j:slf4j-api:2.0.13")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -58,6 +62,9 @@ dependencies {
     // flyway
     implementation("org.flywaydb:flyway-core:10.12.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
+
+    // keycloak admin client
+    implementation("org.keycloak:keycloak-admin-client:24.0.3")
 
     runtimeOnly("org.postgresql:postgresql")
 }
