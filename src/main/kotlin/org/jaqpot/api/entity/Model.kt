@@ -10,15 +10,15 @@ class Model(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "model_id_seq")
     @SequenceGenerator(name = "model_id_seq", sequenceName = "model_id_seq", allocationSize = 1)
-    val id: Long = 0,
+    val id: Long? = 0,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb")
     val meta: Map<String, Any>,
 
-    val public: Boolean,
+    val public: Boolean?,
 
-    val type: String,
+    val type: String?,
 
     val jaqpotpyVersion: String,
 
@@ -35,9 +35,9 @@ class Model(
     @SQLRestriction("featureType = 'INDEPENDENT'")
     val independentFeatures: List<Feature>,
 
-    val reliability: Int,
+    val reliability: Int?,
 
-    val pretrained: Boolean,
+    val pretrained: Boolean?,
 
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)

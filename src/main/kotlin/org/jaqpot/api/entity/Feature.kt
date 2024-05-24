@@ -9,7 +9,7 @@ class Feature(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "feature_id_seq")
     @SequenceGenerator(name = "feature_id_seq", sequenceName = "feature_id_seq", allocationSize = 1)
-    val id: Long = 0,
+    val id: Long? = 0,
 
     @ManyToOne
     @JoinColumn(name = "model_id", insertable = false, updatable = false)
@@ -27,5 +27,5 @@ class Feature(
     val meta: Map<String, Any>,
 
     @Column
-    val visible: Boolean
+    val visible: Boolean?
 ) : BaseEntity()

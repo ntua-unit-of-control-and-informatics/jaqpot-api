@@ -68,6 +68,7 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql")
 
+
     // tests
     testImplementation("io.rest-assured:rest-assured:5.4.0")
     testImplementation("io.rest-assured:kotlin-extensions:5.4.0")
@@ -80,6 +81,7 @@ springBoot {
 tasks.compileKotlin {
     dependsOn(tasks.openApiGenerate)
 }
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
@@ -100,8 +102,9 @@ openApiGenerate {
             "library" to "spring-boot",
             "useBeanValidation" to "tr+ue",
             "useTags" to "true",
-            "delegatePattern" to "true",
-            "useSpringBoot3" to "true"
+            "useSpringBoot3" to "true",
+            "interfaceOnly" to "true",
+            "skipDefaultInterface" to "true"
         )
     )
 }
