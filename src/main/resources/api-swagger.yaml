@@ -16,12 +16,25 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 paths:
   /models:
+    post:
+      summary: "Create a new model"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Model'
+      responses:
+        '201':
+          description: "Model created successfully"
+        '400':
+          description: "Invalid input"
     get:
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       tags:
         - model
       operationId: getModels
@@ -45,16 +58,92 @@ components:
   schemas:
     Model:
       type: object
-      x-examples:
-        Example 1:
-          id: 4
-          isPublic: true
-      required:
-        - id
-        - isPublic
       properties:
         id:
           type: integer
-        isPublic:
+          format: int64
+          example: 0
+        meta:
+          type: object
+          additionalProperties: true
+          description: "A JSON object containing meta information."
+        public:
           type: boolean
-      description: ''
+          example: true
+        type:
+          type: string
+          example: "some type"
+        jaqpotpyVersion:
+          type: string
+          example: "1.0.0"
+        libraries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Library'
+        dependentFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        independentFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        reliability:
+          type: integer
+          example: 5
+        pretrained:
+          type: boolean
+          example: false
+        actualModel:
+          type: string
+          format: binary
+          description: "A binary representation of the actual model."
+
+    Library:
+      type: object
+      properties:
+        # Define the properties of Library here
+        # For example:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: "Library Name"
+        version:
+          type: string
+          example: "1.24.0"
+
+    Feature:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        meta:
+          type: object
+          additionalProperties: true
+          description: "A JSON object containing meta information."
+        name:
+          type: string
+          example: "Feature Name"
+        featureType:
+          type: string
+          enum:
+            - DEPENDENT
+            - INDEPENDENT
+          example: "DEPENDENT"
+        visible:
+          type: boolean
+          example: true
+        dateCreated:
+          type: string
+          format: date-time
+          description: "The date and time when the feature was created."
+          example: "2023-01-01T12:00:00Z"
+        dateUpdated:
+          type: string
+          format: date-time
+          description: "The date and time when the feature was last updated."
+          example: "2023-01-01T12:00:00Z"

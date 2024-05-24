@@ -67,6 +67,10 @@ dependencies {
     implementation("org.keycloak:keycloak-admin-client:24.0.3")
 
     runtimeOnly("org.postgresql:postgresql")
+
+    // tests
+    testImplementation("io.rest-assured:rest-assured:5.4.0")
+    testImplementation("io.rest-assured:kotlin-extensions:5.4.0")
 }
 
 springBoot {

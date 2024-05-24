@@ -23,15 +23,17 @@ class Model(
     val jaqpotpyVersion: String,
 
     @OneToMany(mappedBy = "model")
-    val libraries: Set<Library>,
+    val libraries: List<Library>,
 
     @OneToMany(mappedBy = "model")
+    @OrderColumn(name = "order")
     @SQLRestriction("featureType = 'DEPENDENT'")
-    val dependentFeatures: Set<Feature>,
+    val dependentFeatures: List<Feature>,
 
     @OneToMany(mappedBy = "model")
+    @OrderColumn(name = "order")
     @SQLRestriction("featureType = 'INDEPENDENT'")
-    val independentFeatures: Set<Feature>,
+    val independentFeatures: List<Feature>,
 
     val reliability: Int,
 
