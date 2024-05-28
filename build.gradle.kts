@@ -99,7 +99,6 @@ openApiGenerate {
             "library" to "spring-boot",
             "useBeanValidation" to "true",
             "useTags" to "true",
-            "useSpringBoot3" to "true",
             "delegatePattern" to "true",
             "useSpringBoot3" to "true"
         )
