@@ -9,7 +9,7 @@ fun Feature.toDto(): FeatureDto {
         this.name,
         this.featureType.toDto(),
         this.id,
-        this.featureType.toDto(),
+        this.meta,
         this.visible,
         this.createdAt,
         this.updatedAt

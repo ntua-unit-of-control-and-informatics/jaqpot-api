@@ -24,7 +24,7 @@ class Feature(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb")
-    val meta: Map<String, Any>,
+    val meta: Map<String, Any>?,
 
     @Column
     val visible: Boolean?

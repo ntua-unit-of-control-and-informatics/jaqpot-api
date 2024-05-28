@@ -1,6 +1,6 @@
 package org.jaqpot.api.service.model
 
-import org.jaqpot.api.ModelApi
+import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
@@ -15,7 +15,7 @@ import java.net.URI
 @Service
 class ModelService(
     private val modelRepository: ModelRepository
-) : ModelApi {
+) : ModelApiDelegate {
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
         val model = modelRepository.save(modelDto.toEntity())
         val location: URI = ServletUriComponentsBuilder

@@ -2,7 +2,6 @@ package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
-import org.springframework.core.io.InputStreamResource
 
 fun Model.toDto(): ModelDto {
     return ModelDto(
@@ -10,7 +9,7 @@ fun Model.toDto(): ModelDto {
         this.libraries.map { it.toDto() },
         this.dependentFeatures.map { it.toDto() },
         this.independentFeatures.map { it.toDto() },
-        InputStreamResource(this.actualModel.inputStream()),
+        byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         this.id,
         this.meta,
         this.public,
@@ -25,7 +24,7 @@ fun Model.toDto(): ModelDto {
 fun ModelDto.toEntity(): Model {
     return Model(
         this.id,
-        this.meta as Map<String, Any>,
+        this.meta,
         this.public,
         this.type,
         this.jaqpotpyVersion,
@@ -34,6 +33,6 @@ fun ModelDto.toEntity(): Model {
         this.independentFeatures.map { f -> f.toEntity(this) },
         this.reliability,
         this.pretrained,
-        this.actualModel.contentAsByteArray,
+        this.actualModel,
     )
 }

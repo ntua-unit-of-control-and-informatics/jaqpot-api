@@ -79,6 +79,8 @@ components:
         meta:
           type: object
           description: A JSON object containing meta information.
+          additionalProperties:
+            type: object
         public:
           type: boolean
           example: true
@@ -108,8 +110,9 @@ components:
           example: false
         actualModel:
           type: string
-          format: binary
-          description: A binary representation of the actual model.
+          format: byte
+          description: A base64 representation of the actual model.
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)"
         createdAt:
           type: LocalDateTime
           format: date-time
@@ -158,6 +161,8 @@ components:
         meta:
           type: object
           description: A JSON object containing meta information.
+          additionalProperties:
+            type: object
         name:
           type: string
           example: Feature Name

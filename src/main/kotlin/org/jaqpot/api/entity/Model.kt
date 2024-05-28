@@ -14,7 +14,7 @@ class Model(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb")
-    val meta: Map<String, Any>,
+    val meta: Map<String, Any>?,
 
     val public: Boolean?,
 
@@ -27,12 +27,12 @@ class Model(
 
     @OneToMany(mappedBy = "model")
     @OrderColumn(name = "order")
-    @SQLRestriction("featureType = 'DEPENDENT'")
+    @SQLRestriction("feature_type = 'DEPENDENT'")
     val dependentFeatures: List<Feature>,
 
     @OneToMany(mappedBy = "model")
     @OrderColumn(name = "order")
-    @SQLRestriction("featureType = 'INDEPENDENT'")
+    @SQLRestriction("feature_type = 'INDEPENDENT'")
     val independentFeatures: List<Feature>,
 
     val reliability: Int?,
