@@ -102,8 +102,8 @@ openApiGenerate {
             "useBeanValidation" to "true",
             "useTags" to "true",
             "useSpringBoot3" to "true",
-            "interfaceOnly" to "true",
-            "skipDefaultInterface" to "true"
+            "delegatePattern" to "true",
+            "useSpringBoot3" to "true"
         )
     )
 }

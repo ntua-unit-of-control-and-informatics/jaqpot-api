@@ -30,6 +30,7 @@ class SecurityConfig {
 
         }
             .oauth2ResourceServer { oauth2: OAuth2ResourceServerConfigurer<HttpSecurity?> -> oauth2.jwt(Customizer.withDefaults()) }
+            .csrf { csrf -> csrf.disable() }
         return http.build()
     }
 }
