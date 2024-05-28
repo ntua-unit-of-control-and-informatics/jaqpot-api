@@ -100,7 +100,7 @@ openApiGenerate {
         mapOf(
             "dateLibrary" to "java8",
             "library" to "spring-boot",
-            "useBeanValidation" to "tr+ue",
+            "useBeanValidation" to "true",
             "useTags" to "true",
             "useSpringBoot3" to "true",
             "interfaceOnly" to "true",
