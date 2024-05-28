@@ -23,6 +23,12 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
 keycloak:
   client-id: admin-cli
   client-secret: 62r8Qm79gjwtA6wFMYt41InUK718nwzJ

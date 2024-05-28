@@ -16,11 +16,16 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 security:
-  - bearerAuth: [ ]
+  - bearerAuth: []
 paths:
   /models:
     post:
-      summary: "Create a new model"
+      summary: Create a new model
+      security:
+        - bearerAuth: []
+      tags:
+        - model
+      operationId: createModel
       requestBody:
         required: true
         content:
@@ -29,12 +34,12 @@ paths:
               $ref: '#/components/schemas/Model'
       responses:
         '201':
-          description: "Model created successfully"
+          description: Model created successfully
         '400':
-          description: "Invalid input"
+          description: Invalid input
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       tags:
         - model
       operationId: getModels
@@ -44,7 +49,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Model'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Model'
       x-stoplight:
         id: appgc5yaf4mfo
       summary: Get Models
@@ -58,6 +65,12 @@ components:
   schemas:
     Model:
       type: object
+      required:
+        - jaqpotpyVersion
+        - libraries
+        - dependentFeatures
+        - independentFeatures
+        - actualModel
       properties:
         id:
           type: integer
@@ -65,17 +78,18 @@ components:
           example: 0
         meta:
           type: object
-          additionalProperties: true
-          description: "A JSON object containing meta information."
+          description: A JSON object containing meta information.
+          additionalProperties:
+            type: object
         public:
           type: boolean
           example: true
         type:
           type: string
-          example: "some type"
+          example: some type
         jaqpotpyVersion:
           type: string
-          example: "1.0.0"
+          example: 1.0.0
         libraries:
           type: array
           items:
@@ -96,26 +110,49 @@ components:
           example: false
         actualModel:
           type: string
-          format: binary
-          description: "A binary representation of the actual model."
-
+          format: byte
+          description: A base64 representation of the actual model.
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)"
+        createdAt:
+          type: LocalDateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: LocalDateTime
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
     Library:
       type: object
+      required:
+        - name
+        - version
       properties:
-        # Define the properties of Library here
         # For example:
+        # Define the properties of Library here
         id:
           type: integer
           format: int64
         name:
           type: string
-          example: "Library Name"
+          example: Library Name
         version:
           type: string
-          example: "1.24.0"
-
+          example: 1.24.0
+        createdAt:
+          type: LocalDateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: LocalDateTime
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
     Feature:
       type: object
+      required:
+        - name
+        - featureType
       properties:
         id:
           type: integer
@@ -123,27 +160,27 @@ components:
           example: 1
         meta:
           type: object
-          additionalProperties: true
-          description: "A JSON object containing meta information."
+          description: A JSON object containing meta information.
+          additionalProperties:
+            type: object
         name:
           type: string
-          example: "Feature Name"
+          example: Feature Name
         featureType:
           type: string
           enum:
             - DEPENDENT
             - INDEPENDENT
-          example: "DEPENDENT"
+          example: DEPENDENT
         visible:
           type: boolean
           example: true
-        dateCreated:
-          type: string
+        createdAt:
+          type: LocalDateTime
           format: date-time
-          description: "The date and time when the feature was created."
-          example: "2023-01-01T12:00:00Z"
-        dateUpdated:
-          type: string
-          format: date-time
-          description: "The date and time when the feature was last updated."
-          example: "2023-01-01T12:00:00Z"
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: LocalDateTime
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'

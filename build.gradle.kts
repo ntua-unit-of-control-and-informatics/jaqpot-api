@@ -87,7 +87,7 @@ tasks.withType<Test> {
 
 openApiGenerate {
     generatorName.set("kotlin-spring")
-    inputSpec.set("$projectDir/src/main/resources/api-swagger.yaml")
+    inputSpec.set("$projectDir/src/main/resources/openapi.yaml")
     invokerPackage.set("org.jaqpot.api")
     apiPackage.set("org.jaqpot.api")
     modelPackage.set("org.jaqpot.api.model")
@@ -96,9 +96,8 @@ openApiGenerate {
     // config options: https://openapi-generator.tech/docs/generators/kotlin-spring/
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8",
             "library" to "spring-boot",
-            "useBeanValidation" to "tr+ue",
+            "useBeanValidation" to "true",
             "useTags" to "true",
             "delegatePattern" to "true",
             "useSpringBoot3" to "true"

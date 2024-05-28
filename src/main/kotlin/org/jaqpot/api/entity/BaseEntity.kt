@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @MappedSuperclass
 open class BaseEntity(
     @CreationTimestamp
-    private val createdAt: LocalDateTime? = null,
+    val createdAt: LocalDateTime? = null,
     @UpdateTimestamp
-    private val updatedAt: LocalDateTime? = null
+    val updatedAt: LocalDateTime? = null
 )
