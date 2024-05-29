@@ -75,6 +75,7 @@ dependencies {
     testImplementation("io.rest-assured:kotlin-extensions:5.4.0")
     // testcontainers
     testImplementation("org.testcontainers:postgresql:1.19.8")
+    testImplementation("com.github.dasniko:testcontainers-keycloak:3.3.1")
     testImplementation("org.testcontainers:junit-jupiter:1.19.8")
 }
 
