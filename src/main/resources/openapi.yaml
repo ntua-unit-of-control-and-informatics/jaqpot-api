@@ -17,8 +17,11 @@ info:
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 security:
   - bearerAuth: []
+servers:
+  - url: 'https://api.jaqpot.org'
+    description: Jaqpot API
 paths:
-  /models:
+  /v1/models:
     post:
       summary: Create a new model
       security:
@@ -37,6 +40,8 @@ paths:
           description: Model created successfully
         '400':
           description: Invalid input
+      x-stoplight:
+        id: 9ffjy7o77jc41
     get:
       security:
         - bearerAuth: []
@@ -112,7 +117,7 @@ components:
           type: string
           format: byte
           description: A base64 representation of the actual model.
-          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)"
+          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
         createdAt:
           type: LocalDateTime
           format: date-time
@@ -184,3 +189,4 @@ components:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+
