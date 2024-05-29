@@ -12,7 +12,7 @@ class Feature(
     val id: Long? = 0,
 
     @ManyToOne
-    @JoinColumn(name = "model_id", insertable = false, updatable = false)
+    @JoinColumn(name = "model_id")
     val model: Model,
 
     @Column
@@ -27,5 +27,6 @@ class Feature(
     val meta: Map<String, Any>?,
 
     @Column
-    val visible: Boolean?
-) : BaseEntity()
+    val visible: Boolean?,
+
+    ) : BaseEntity()

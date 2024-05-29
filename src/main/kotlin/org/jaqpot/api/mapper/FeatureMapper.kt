@@ -1,8 +1,8 @@
 package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Feature
+import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.FeatureDto
-import org.jaqpot.api.model.ModelDto
 
 fun Feature.toDto(): FeatureDto {
     return FeatureDto(
@@ -16,13 +16,13 @@ fun Feature.toDto(): FeatureDto {
     )
 }
 
-fun FeatureDto.toEntity(modelDto: ModelDto): Feature {
+fun FeatureDto.toEntity(model: Model): Feature {
     return Feature(
         this.id,
-        modelDto.toEntity(),
+        model,
         this.name,
         this.featureType.toEntity(),
-        this.meta as Map<String, Any>,
-        this.visible
+        this.meta,
+        this.visible,
     )
 }

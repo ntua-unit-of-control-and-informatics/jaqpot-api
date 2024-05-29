@@ -10,7 +10,7 @@ class Library(
     val id: Long? = 0,
 
     @ManyToOne
-    @JoinColumn(name = "model_id", insertable = false, updatable = false)
+    @JoinColumn(name = "model_id", updatable = false)
     val model: Model,
 
     @Column
