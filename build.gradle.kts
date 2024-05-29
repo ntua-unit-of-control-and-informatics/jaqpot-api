@@ -42,6 +42,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
 
     // logger
     implementation("org.slf4j:slf4j-api:2.0.13")
@@ -69,8 +70,12 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     // tests
+    // rest assured
     testImplementation("io.rest-assured:rest-assured:5.4.0")
     testImplementation("io.rest-assured:kotlin-extensions:5.4.0")
+    // testcontainers
+    testImplementation("org.testcontainers:postgresql:1.19.8")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.8")
 }
 
 springBoot {
@@ -93,6 +98,7 @@ openApiGenerate {
     modelPackage.set("org.jaqpot.api.model")
     outputDir.set("${buildDir}/openapi")
     modelNameSuffix.set("Dto")
+    ignoreFileOverride.set("$projectDir/.openapi-generator-ignore")
     // config options: https://openapi-generator.tech/docs/generators/kotlin-spring/
     configOptions.set(
         mapOf(
