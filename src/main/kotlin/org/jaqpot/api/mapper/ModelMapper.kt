@@ -22,17 +22,23 @@ fun Model.toDto(): ModelDto {
 }
 
 fun ModelDto.toEntity(): Model {
-    return Model(
+    val m = Model(
         this.id,
         this.meta,
         this.public,
         this.type,
         this.jaqpotpyVersion,
-        this.libraries.map { l -> l.toEntity(this) },
-        this.dependentFeatures.map { f -> f.toEntity(this) },
-        this.independentFeatures.map { f -> f.toEntity(this) },
+        mutableListOf(),
+        mutableListOf(),
+        mutableListOf(),
         this.reliability,
         this.pretrained,
         this.actualModel,
     )
+
+    m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
+    m.dependentFeatures.addAll(this.dependentFeatures.map { it -> it.toEntity(m) })
+    m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m) })
+
+    return m
 }

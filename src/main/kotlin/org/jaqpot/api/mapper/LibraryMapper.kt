@@ -1,8 +1,8 @@
 package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Library
+import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.LibraryDto
-import org.jaqpot.api.model.ModelDto
 
 fun Library.toDto(): LibraryDto {
     return LibraryDto(
@@ -14,10 +14,10 @@ fun Library.toDto(): LibraryDto {
     )
 }
 
-fun LibraryDto.toEntity(model: ModelDto): Library {
+fun LibraryDto.toEntity(model: Model): Library {
     return Library(
         this.id,
-        model.toEntity(),
+        model,
         this.name,
         this.version
     )

@@ -22,18 +22,18 @@ class Model(
 
     val jaqpotpyVersion: String,
 
-    @OneToMany(mappedBy = "model")
-    val libraries: List<Library>,
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL])
+    val libraries: MutableList<Library>,
 
-    @OneToMany(mappedBy = "model")
-    @OrderColumn(name = "order")
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL])
+    @OrderColumn(name = "sort_order")
     @SQLRestriction("feature_type = 'DEPENDENT'")
-    val dependentFeatures: List<Feature>,
+    val dependentFeatures: MutableList<Feature>,
 
-    @OneToMany(mappedBy = "model")
-    @OrderColumn(name = "order")
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL])
+    @OrderColumn(name = "sort_order")
     @SQLRestriction("feature_type = 'INDEPENDENT'")
-    val independentFeatures: List<Feature>,
+    val independentFeatures: MutableList<Feature>,
 
     val reliability: Int?,
 
