@@ -32,7 +32,6 @@ abstract class AbstractIntegrationTest {
             val dbUrl =
                 "jdbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.firstMappedPort}/${TEST_DB_NAME}"
 
-            println(dbUrl)
             TestPropertyValues.of(
                 "spring.datasource.url= $dbUrl",
                 "spring.datasource.username=${postgreSQLContainer.username}",
