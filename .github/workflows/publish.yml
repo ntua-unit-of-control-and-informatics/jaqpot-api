@@ -3,6 +3,9 @@ name: Publish Docker image
 on:
   release:
     types: [ published ]
+  push:
+    branches:
+      - feat/JAQPOT-101/fix-sed
 
 env:
   IMAGE_NAME: upcintua/jaqpot-api
@@ -22,8 +25,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Update version in build.gradle.kts
-        run: >-
-          sed -i "s#{{VERSION_PLACEHOLDER}}#${{ steps.meta.outputs.tags }}#g" build.gradle.kts
+        run: sed -i "s#{{VERSION_PLACEHOLDER}}#${{ steps.meta.outputs.version }}#g" build.gradle.kts
 
       - name: Setup Java
         uses: actions/setup-java@v4
