@@ -122,7 +122,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     environment.set(
         mapOf("BP_JVM_VERSION" to "17")
     )
-    imageName = "upcintua/jaqpot-api"
+    imageName = "upcintua/jaqpot-test"
 }
 
 sourceSets {
