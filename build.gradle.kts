@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     val kotlinVersion = "1.9.24"
 
@@ -14,7 +16,7 @@ plugins {
 }
 
 group = "org.jaqpot"
-version = "0.0.1-SNAPSHOT"
+version = "{{VERSION_PLACEHOLDER}}"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -43,6 +45,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
+
+    // spring boot gradle plugin for dockerizing the app
+    implementation("org.springframework.boot:spring-boot-gradle-plugin:3.3.0")
 
     // logger
     implementation("org.slf4j:slf4j-api:2.0.13")
@@ -110,6 +115,11 @@ openApiGenerate {
             "useSpringBoot3" to "true"
         )
     )
+}
+
+// Dockerize
+tasks.named<BootBuildImage>("bootBuildImage") {
+    imageName = "upcintua/jaqpot-api"
 }
 
 sourceSets {
