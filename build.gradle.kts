@@ -120,7 +120,7 @@ openApiGenerate {
 // Dockerize
 tasks.named<BootBuildImage>("bootBuildImage") {
     environment.set(
-        mapOf("BP_JVM_VERSION" to "21")
+        mapOf("BP_JVM_VERSION" to "17")
     )
     imageName = "upcintua/jaqpot-api"
 }
