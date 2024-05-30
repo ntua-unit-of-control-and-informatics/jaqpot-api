@@ -3,9 +3,6 @@ name: Publish Docker image
 on:
   release:
     types: [ published ]
-  push:
-    branches:
-      - feat/JAQPOT-101/fix-sed
 
 env:
   IMAGE_NAME: upcintua/jaqpot-api
@@ -40,7 +37,7 @@ jobs:
         run: ./gradlew bootBuildImage
 
       - name: Tag docker image
-        run: docker tag ${{ env.IMAGE_NAME }} ${{ steps.meta.outputs.tags }}
+        run: docker tag ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -49,4 +46,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push docker image to DockerHub
-        run: docker push ${{ steps.meta.outputs.tags }}
+        run: docker push ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
