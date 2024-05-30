@@ -1,36 +1,38 @@
 CREATE TABLE model
 (
-    id               BIGSERIAL NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE,
-    updated_at       TIMESTAMP WITHOUT TIME ZONE,
+    id               BIGSERIAL                   NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    user_id          VARCHAR(255),
     meta             JSONB,
-    public           BOOLEAN   NOT NULL,
+    public           BOOLEAN,
     type             VARCHAR(255),
-    jaqpotpy_version VARCHAR(255),
-    reliability      INTEGER   NOT NULL,
-    pretrained       BOOLEAN   NOT NULL,
-    actual_model     bytea,
+    jaqpotpy_version VARCHAR(255)                NOT NULL,
+    reliability      INTEGER,
+    pretrained       BOOLEAN,
+    actual_model     bytea                       NOT NULL,
     CONSTRAINT pk_model PRIMARY KEY (id)
 );
 
 CREATE TABLE feature
 (
-    id           BIGSERIAL NOT NULL,
-    created_at   TIMESTAMP WITHOUT TIME ZONE,
-    updated_at   TIMESTAMP WITHOUT TIME ZONE,
+    id           BIGSERIAL                   NOT NULL,
+    created_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     model_id     BIGINT,
     name         VARCHAR(255),
     feature_type VARCHAR(255),
     meta         JSONB,
     visible      BOOLEAN,
+    sort_order   INTEGER,
     CONSTRAINT pk_feature PRIMARY KEY (id)
 );
 
 CREATE TABLE library
 (
-    id         BIGSERIAL NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    id         BIGSERIAL                   NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     model_id   BIGINT,
     name       VARCHAR(255),
     version    VARCHAR(255),

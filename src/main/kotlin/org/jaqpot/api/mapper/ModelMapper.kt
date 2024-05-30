@@ -21,9 +21,10 @@ fun Model.toDto(): ModelDto {
     )
 }
 
-fun ModelDto.toEntity(): Model {
+fun ModelDto.toEntity(userId: String): Model {
     val m = Model(
         this.id,
+        userId,
         this.meta,
         this.public,
         this.type,

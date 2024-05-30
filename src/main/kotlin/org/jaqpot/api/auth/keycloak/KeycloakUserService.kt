@@ -2,7 +2,7 @@ package org.jaqpot.api.auth.keycloak
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.auth.UserDto
-import org.jaqpot.api.auth.UserProvider
+import org.jaqpot.api.auth.UserService
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.KeycloakBuilder
 import org.springframework.stereotype.Component
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 private val logger = KotlinLogging.logger {}
 
 @Component
-class KeycloakUserProvider(private val keycloakConfig: KeycloakConfig) : UserProvider {
+class KeycloakUserService(private val keycloakConfig: KeycloakConfig) : UserService {
 
     private val keycloakClient = KeycloakBuilder.builder()
         .serverUrl(keycloakConfig.serverUrl)

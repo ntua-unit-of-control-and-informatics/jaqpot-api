@@ -12,6 +12,8 @@ class Model(
     @SequenceGenerator(name = "model_id_seq", sequenceName = "model_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
+    val userId: String,
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb")
     val meta: Map<String, Any>?,

@@ -61,6 +61,33 @@ paths:
         id: appgc5yaf4mfo
       summary: Get Models
       description: Get all models
+  /v1/models/{id}:
+    get:
+      summary: Get a Model
+      description: Retrieve a single model by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: getModelById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the model to retrieve
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '404':
+          description: Model not found
 components:
   securitySchemes:
     bearerAuth:
