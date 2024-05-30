@@ -61,4 +61,4 @@ jobs:
       - name: Push docker image to DockerHub
         run: |
           docker load < result
-          docker push ${IMAGE}:${{ steps.meta.outputs.tags }}
+          docker push ${IMAGE_NAME}:${{ steps.meta.outputs.tags }}
