@@ -22,6 +22,10 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
@@ -90,6 +94,10 @@ springBoot {
 
 tasks.compileKotlin {
     dependsOn(tasks.openApiGenerate)
+}
+
+tasks.bootJar {
+    archiveFileName.set("jaqpot-api.jar")
 }
 
 tasks.withType<Test> {
