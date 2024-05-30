@@ -26,7 +26,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: upcintua/jaqpot-test
 
@@ -35,7 +35,7 @@ jobs:
 
       - name: Update version in build.gradle.kts
         run: >-
-          sed -i "s/{{VERSION_PLACEHOLDER}}/${{ steps.meta.outputs.tags }}/g" build.gradle.kts
+          sed -i "s#{{VERSION_PLACEHOLDER}}#${{ steps.meta.outputs.tags }}#g" build.gradle.kts
 
       - name: Build docker image
         run: ./gradlew bootBuildImage
