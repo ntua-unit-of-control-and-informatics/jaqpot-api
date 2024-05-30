@@ -45,9 +45,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Build docker image
-        run: |
-          ./gradlew build
-          ./gradlew bootBuildImage
+        run: ./gradlew bootBuildImage
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

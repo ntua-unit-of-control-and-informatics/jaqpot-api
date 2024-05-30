@@ -19,7 +19,7 @@ group = "org.jaqpot"
 version = "{{VERSION_PLACEHOLDER}}"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 configurations {
