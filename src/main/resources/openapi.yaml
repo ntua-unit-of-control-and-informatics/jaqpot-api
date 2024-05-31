@@ -16,7 +16,7 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 servers:
   - url: 'https://api.jaqpot.org'
     description: Jaqpot API
@@ -25,7 +25,7 @@ paths:
     post:
       summary: Create a new model
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       tags:
         - model
       operationId: createModel
@@ -42,26 +42,7 @@ paths:
           description: Invalid input
       x-stoplight:
         id: 9ffjy7o77jc41
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - model
-      operationId: getModels
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Model'
-      x-stoplight:
-        id: appgc5yaf4mfo
-      summary: Get Models
-      description: Get all models
-  /v1/models/{id}:
+  '/v1/models/{id}':
     get:
       summary: Get a Model
       description: Retrieve a single model by its ID
@@ -145,6 +126,8 @@ components:
           format: byte
           description: A base64 representation of the actual model.
           x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
+        creator:
+          $ref: '#/components/schemas/User'
         createdAt:
           type: LocalDateTime
           format: date-time
@@ -216,4 +199,17 @@ components:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-
+    User:
+      title: User
+      x-stoplight:
+        id: 9md5jpvcelos8
+      type: object
+      properties:
+        id:
+          type: string
+          x-stoplight:
+            id: 0gri1l9rmiv13
+        name:
+          type: string
+          x-stoplight:
+            id: x0pm25vavfibz
