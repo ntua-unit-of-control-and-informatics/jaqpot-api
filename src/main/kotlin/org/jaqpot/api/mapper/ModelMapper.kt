@@ -2,8 +2,9 @@ package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
+import org.jaqpot.api.model.UserDto
 
-fun Model.toDto(): ModelDto {
+fun Model.toDto(userDto: UserDto): ModelDto {
     return ModelDto(
         this.jaqpotpyVersion,
         this.libraries.map { it.toDto() },
@@ -16,14 +17,16 @@ fun Model.toDto(): ModelDto {
         this.type,
         this.reliability,
         this.pretrained,
+        userDto,
         this.createdAt,
-        this.updatedAt
+        this.updatedAt,
     )
 }
 
-fun ModelDto.toEntity(): Model {
+fun ModelDto.toEntity(userId: String): Model {
     val m = Model(
         this.id,
+        userId,
         this.meta,
         this.public,
         this.type,
