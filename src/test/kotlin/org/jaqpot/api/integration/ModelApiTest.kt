@@ -3,23 +3,20 @@ package org.jaqpot.api.integration
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
-import org.jaqpot.api.model.ModelDto
 import org.junit.jupiter.api.Test
-import java.util.*
 
 
 class ModelApiTest : AbstractIntegrationTest() {
 
     @Test
-    fun testGetModelsEmpty() {
+    fun testGetNonExistingModel404() {
         val accessToken = getJaqpotUserAccessToken()
 
         given().contentType(ContentType.JSON)
             .header("Authorization", "Bearer $accessToken")
-            .get("/v1/models")
+            .get("/v1/models/100")
             .then()
-            .statusCode(200)
-            .body("", equalTo(Collections.emptyList<ModelDto>()))
+            .statusCode(404)
     }
 
     @Test
