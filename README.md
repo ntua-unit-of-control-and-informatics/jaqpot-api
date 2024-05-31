@@ -1,3 +1,4 @@
+[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml)
 
 # Jaqpot API v2
 
