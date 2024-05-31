@@ -86,6 +86,9 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.19.8")
     testImplementation("com.github.dasniko:testcontainers-keycloak:3.3.1")
     testImplementation("org.testcontainers:junit-jupiter:1.19.8")
+    // mockK
+    testImplementation("io.mockk:mockk:1.13.11")
+
 }
 
 springBoot {
