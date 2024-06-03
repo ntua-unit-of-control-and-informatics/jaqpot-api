@@ -21,5 +21,5 @@ class DataEntry(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "values", columnDefinition = "jsonb", nullable = false)
-    val values: Any,
+    val values: List<Any>,
 ) : BaseEntity()

@@ -21,5 +21,5 @@ class Dataset(
     val type: DatasetType = DatasetType.PREDICTION,
 
     @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val dataEntry: List<DataEntry>
+    val dataEntries: MutableList<DataEntry>
 ) : BaseEntity()
