@@ -10,12 +10,12 @@ class Library(
     val id: Long? = 0,
 
     @ManyToOne
-    @JoinColumn(name = "model_id", updatable = false)
+    @JoinColumn(name = "model_id", updatable = false, nullable = false)
     val model: Model,
 
-    @Column
+    @Column(nullable = false)
     val name: String,
 
-    @Column
+    @Column(nullable = false)
     val version: String,
 ) : BaseEntity()

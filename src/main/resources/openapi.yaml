@@ -94,9 +94,6 @@ components:
           description: A JSON object containing meta information.
           additionalProperties:
             type: object
-        public:
-          type: boolean
-          example: true
         type:
           type: string
           example: some type
