@@ -49,7 +49,7 @@ class ModelService(
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             val userId = authenticationFacade.userId
 
-            val predictionDataset = this.predictionService.createPrediction(model, userId, datasetDto)
+            val predictionDataset = this.predictionService.createAndPredictDataset(model, userId, datasetDto)
 
             val location: URI = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")

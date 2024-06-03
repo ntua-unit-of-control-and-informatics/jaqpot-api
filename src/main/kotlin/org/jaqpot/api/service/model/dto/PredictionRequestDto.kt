@@ -1,12 +1,12 @@
-package org.jaqpot.api.service.model
+package org.jaqpot.api.service.model.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import org.jaqpot.api.entity.Dataset
+import org.jaqpot.api.model.DatasetDto
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
 class PredictionRequestDto(
     val rawModel: List<String>,
-    val dataset: Dataset,
+    val dataset: DatasetDto,
     val additionalInfo: String? = null,
     val doaMatrix: String? = null
 )

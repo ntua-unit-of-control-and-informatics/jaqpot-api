@@ -17,7 +17,11 @@ class DataEntry(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val type: DataEntryType,
+    val type: DataEntryType = DataEntryType.ARRAY,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val role: DataEntryRole,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "values", columnDefinition = "jsonb", nullable = false)

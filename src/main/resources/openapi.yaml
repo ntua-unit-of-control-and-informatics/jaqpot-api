@@ -239,7 +239,7 @@ components:
       type: object
       required:
         - type
-        - dataEntries
+        - input
       properties:
         id:
           type: integer
@@ -250,7 +250,11 @@ components:
           enum:
             - PREDICTION
           example: "PREDICTION"
-        dataEntries:
+        input:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        results:
           type: array
           items:
             $ref: '#/components/schemas/DataEntry'

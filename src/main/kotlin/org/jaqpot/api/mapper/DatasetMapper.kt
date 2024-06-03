@@ -1,16 +1,17 @@
 package org.jaqpot.api.mapper
 
+import org.jaqpot.api.entity.DataEntryRole
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.DatasetDto
-import org.jaqpot.api.model.UserDto
 
 
-fun Dataset.toDto(userDto: UserDto): DatasetDto {
+fun Dataset.toDto(): DatasetDto {
     return DatasetDto(
         this.type.toDto(),
-        this.dataEntries.map { it.toDto(userDto) },
+        this.input.map { it.toDto() },
         this.id,
+        this.results.map { it.toDto() },
         this.createdAt,
         this.updatedAt
     )
@@ -22,10 +23,12 @@ fun DatasetDto.toEntity(model: Model, userId: String): Dataset {
         model,
         userId,
         this.type.toEntity(),
+        mutableListOf(),
         mutableListOf()
     )
 
-    d.dataEntries.addAll(this.dataEntries.map { it -> it.toEntity(d, userId) })
-    
-    return d;
+    d.input.addAll(this.input.map { it -> it.toEntity(d, DataEntryRole.INPUT) })
+    d.results.addAll(this.results?.map { it -> it.toEntity(d, DataEntryRole.RESULTS) } ?: emptyList())
+
+    return d
 }
