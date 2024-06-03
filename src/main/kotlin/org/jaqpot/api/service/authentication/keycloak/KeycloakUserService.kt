@@ -1,8 +1,8 @@
-package org.jaqpot.api.auth.keycloak
+package org.jaqpot.api.service.authentication.keycloak
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.jaqpot.api.auth.UserService
 import org.jaqpot.api.model.UserDto
+import org.jaqpot.api.service.authentication.UserService
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.KeycloakBuilder
 import org.springframework.stereotype.Component

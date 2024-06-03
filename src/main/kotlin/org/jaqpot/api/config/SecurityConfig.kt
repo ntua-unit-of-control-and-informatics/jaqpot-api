@@ -19,17 +19,12 @@ class SecurityConfig {
                     "/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
                 )
                 .permitAll()
-                
-                .requestMatchers(
-                    "/models/**"
-                )
-                .permitAll()
-
                 .anyRequest()
                 .authenticated()
-
         }
-            .oauth2ResourceServer { oauth2: OAuth2ResourceServerConfigurer<HttpSecurity?> -> oauth2.jwt(Customizer.withDefaults()) }
+            .oauth2ResourceServer { oauth2: OAuth2ResourceServerConfigurer<HttpSecurity?> ->
+                oauth2.jwt(Customizer.withDefaults())
+            }
             .csrf { csrf -> csrf.disable() }
         return http.build()
     }

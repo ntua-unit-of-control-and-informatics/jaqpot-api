@@ -1,4 +1,4 @@
-package org.jaqpot.api.auth
+package org.jaqpot.api.service.authentication
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
