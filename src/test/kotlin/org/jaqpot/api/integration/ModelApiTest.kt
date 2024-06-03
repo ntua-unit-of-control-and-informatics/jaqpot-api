@@ -36,7 +36,6 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "id": 3,
                         "test": "hello"
                     },
-                    "public": true,
                     "type": "some type",
                     "reliability": 5,
                     "pretrained": false,
@@ -96,7 +95,6 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "id": 3,
                         "test": "hello"
                     },
-                    "public": true,
                     "type": "some type",
                     "reliability": 5,
                     "pretrained": false,
