@@ -3,6 +3,7 @@ package org.jaqpot.api.service.model
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.auth.AuthenticationFacade
 import org.jaqpot.api.auth.UserService
+import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelDto
@@ -45,7 +46,7 @@ class ModelService(
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetDto.Type.PREDICTION) {
             val model = this.modelRepository.findByIdOrNull(modelId)
-                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found");
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             val userId = authenticationFacade.userId
 
             val predictionDataset = this.predictionService.createPrediction(model, userId, datasetDto)
@@ -56,7 +57,7 @@ class ModelService(
             return ResponseEntity.created(location).build()
         }
 
-        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null);
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
     }
 }
 
