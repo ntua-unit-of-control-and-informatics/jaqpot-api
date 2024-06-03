@@ -1,5 +1,6 @@
 package org.jaqpot.api.mapper
 
+import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
@@ -40,8 +41,8 @@ fun ModelDto.toEntity(userId: String): Model {
     )
 
     m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
-    m.dependentFeatures.addAll(this.dependentFeatures.map { it -> it.toEntity(m) })
-    m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m) })
+    m.dependentFeatures.addAll(this.dependentFeatures.map { it -> it.toEntity(m, FeatureDependency.DEPENDENT) })
+    m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m, FeatureDependency.INDEPENDENT) })
 
     return m
 }

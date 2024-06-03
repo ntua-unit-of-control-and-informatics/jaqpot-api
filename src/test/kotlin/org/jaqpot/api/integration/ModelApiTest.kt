@@ -34,7 +34,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                     "independentFeatures": [],
                     "meta": {
                         "id": 3,
-                        "mpampis": "hello"
+                        "test": "hello"
                     },
                     "public": true,
                     "type": "some type",
@@ -82,19 +82,19 @@ class ModelApiTest : AbstractIntegrationTest() {
                     ],
                     "dependentFeatures": [{
                         "name": "Y",
-                        "featureType": "DEPENDENT"
+                        "featureType": "NUMERICAL"
                     }],
                     "independentFeatures": [{
                         "name": "dose",
-                        "featureType": "INDEPENDENT"
+                        "featureType": "NUMERICAL"
                     },
                     {
                         "name": "liability",
-                        "featureType": "INDEPENDENT"
+                        "featureType": "NUMERICAL"
                     }],
                     "meta": {
                         "id": 3,
-                        "mpampis": "hello"
+                        "test": "hello"
                     },
                     "public": true,
                     "type": "some type",

@@ -8,6 +8,8 @@ package org.jaqpot.api.entity
 //    val id: Long,
 //
 //    @ManyToOne
-//    @JoinColumn(name = "model_id", insertable = false, updatable = false)
+//    @JoinColumn(name = "model_id", updatable = false)
 //    val model: Model,
+//
+//    val userId: String,
 //)

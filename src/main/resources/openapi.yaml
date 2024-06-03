@@ -184,6 +184,12 @@ components:
         featureType:
           type: string
           enum:
+            - NUMERICAL
+            - CATEGORICAL
+          example: NUMERICAL
+        featureDependency:
+          type: string
+          enum:
             - DEPENDENT
             - INDEPENDENT
           example: DEPENDENT
