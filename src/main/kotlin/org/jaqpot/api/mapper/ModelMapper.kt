@@ -14,7 +14,6 @@ fun Model.toDto(userDto: UserDto): ModelDto {
         byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         this.id,
         this.meta,
-        this.public,
         this.type,
         this.reliability,
         this.pretrained,
@@ -29,7 +28,6 @@ fun ModelDto.toEntity(userId: String): Model {
         this.id,
         userId,
         this.meta,
-        this.public,
         this.type,
         this.jaqpotpyVersion,
         mutableListOf(),

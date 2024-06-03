@@ -12,18 +12,18 @@ class Feature(
     val id: Long? = 0,
 
     @ManyToOne
-    @JoinColumn(name = "model_id")
+    @JoinColumn(name = "model_id", nullable = false)
     val model: Model,
 
-    @Column
+    @Column(nullable = false)
     val name: String,
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     val featureDependency: FeatureDependency,
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     val featureType: FeatureType,
 
     @JdbcTypeCode(SqlTypes.JSON)
