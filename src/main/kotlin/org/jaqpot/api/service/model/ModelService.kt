@@ -3,7 +3,6 @@ package org.jaqpot.api.service.model
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.auth.AuthenticationFacade
 import org.jaqpot.api.auth.UserService
-import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelDto

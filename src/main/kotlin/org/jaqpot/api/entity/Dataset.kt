@@ -9,7 +9,7 @@ class Dataset(
     @SequenceGenerator(name = "dataset_id_seq", sequenceName = "dataset_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", updatable = false, nullable = false)
     val model: Model,
 
