@@ -20,6 +20,10 @@ class Feature(
 
     @Enumerated(EnumType.STRING)
     @Column
+    val featureDependency: FeatureDependency,
+
+    @Enumerated(EnumType.STRING)
+    @Column
     val featureType: FeatureType,
 
     @JdbcTypeCode(SqlTypes.JSON)

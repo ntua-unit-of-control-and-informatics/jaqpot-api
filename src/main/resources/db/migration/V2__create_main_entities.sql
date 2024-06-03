@@ -16,15 +16,16 @@ CREATE TABLE model
 
 CREATE TABLE feature
 (
-    id           BIGSERIAL                   NOT NULL,
-    created_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    model_id     BIGINT,
-    name         VARCHAR(255),
-    feature_type VARCHAR(255),
-    meta         JSONB,
-    visible      BOOLEAN,
-    sort_order   INTEGER,
+    id                 BIGSERIAL                   NOT NULL,
+    created_at         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    model_id           BIGINT                      NOT NULL,
+    name               VARCHAR(255)                NOT NULL,
+    feature_dependency VARCHAR(255)                NOT NULL,
+    feature_type       VARCHAR(255)                NOT NULL,
+    meta               JSONB,
+    visible            BOOLEAN,
+    sort_order         INTEGER,
     CONSTRAINT pk_feature PRIMARY KEY (id)
 );
 

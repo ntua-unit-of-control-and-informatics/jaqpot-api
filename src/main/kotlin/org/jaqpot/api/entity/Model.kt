@@ -29,12 +29,12 @@ class Model(
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL])
     @OrderColumn(name = "sort_order")
-    @SQLRestriction("feature_type = 'DEPENDENT'")
+    @SQLRestriction("feature_dependency = 'DEPENDENT'")
     val dependentFeatures: MutableList<Feature>,
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL])
     @OrderColumn(name = "sort_order")
-    @SQLRestriction("feature_type = 'INDEPENDENT'")
+    @SQLRestriction("feature_dependency = 'INDEPENDENT'")
     val independentFeatures: MutableList<Feature>,
 
     val reliability: Int?,
