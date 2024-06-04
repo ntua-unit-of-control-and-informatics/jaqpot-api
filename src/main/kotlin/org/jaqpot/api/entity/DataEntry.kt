@@ -11,15 +11,19 @@ class DataEntry(
     @SequenceGenerator(name = "data_entry_id_seq", sequenceName = "data_entry_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dataset_id", updatable = false, nullable = false)
     val dataset: Dataset,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val type: DataEntryType,
+    val type: DataEntryType = DataEntryType.ARRAY,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val role: DataEntryRole,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "values", columnDefinition = "jsonb", nullable = false)
-    val values: Any,
+    val values: List<Any>,
 ) : BaseEntity()

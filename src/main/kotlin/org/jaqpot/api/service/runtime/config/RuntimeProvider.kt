@@ -1,4 +1,4 @@
-package org.jaqpot.api.service.runtime
+package org.jaqpot.api.service.runtime.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration

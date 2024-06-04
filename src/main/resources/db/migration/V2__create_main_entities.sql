@@ -57,6 +57,7 @@ CREATE TABLE data_entry
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     dataset_id BIGINT                      NOT NULL,
     type       VARCHAR(255)                NOT NULL,
+    role       VARCHAR(255)                NOT NULL,
     values     JSONB                       NOT NULL,
     CONSTRAINT pk_dataentry PRIMARY KEY (id)
 );

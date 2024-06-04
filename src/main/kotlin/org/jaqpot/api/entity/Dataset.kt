@@ -1,6 +1,7 @@
 package org.jaqpot.api.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 class Dataset(
@@ -9,7 +10,7 @@ class Dataset(
     @SequenceGenerator(name = "dataset_id_seq", sequenceName = "dataset_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", updatable = false, nullable = false)
     val model: Model,
 
@@ -21,5 +22,10 @@ class Dataset(
     val type: DatasetType = DatasetType.PREDICTION,
 
     @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val dataEntry: List<DataEntry>
+    @SQLRestriction("data_entry_role = 'INPUT'")
+    val input: MutableList<DataEntry>,
+
+    @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @SQLRestriction("data_entry_role = 'RESULTS'")
+    var results: MutableList<DataEntry>
 ) : BaseEntity()
