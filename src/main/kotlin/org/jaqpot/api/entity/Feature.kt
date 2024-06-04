@@ -18,6 +18,8 @@ class Feature(
     @Column(nullable = false)
     val name: String,
 
+    val description: String,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val featureDependency: FeatureDependency,
@@ -32,5 +34,9 @@ class Feature(
 
     @Column
     val visible: Boolean?,
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    val possibleValues: List<String>? = null,
 
     ) : BaseEntity()

@@ -22,11 +22,13 @@ CREATE TABLE feature
     updated_at         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     model_id           BIGINT                      NOT NULL,
     name               VARCHAR(255)                NOT NULL,
+    description        VARCHAR(2000)               NOT NULL,
     feature_dependency VARCHAR(255)                NOT NULL,
     feature_type       VARCHAR(255)                NOT NULL,
     meta               JSONB,
     visible            BOOLEAN,
     sort_order         INTEGER,
+    possible_values    JSONB,
     CONSTRAINT pk_feature PRIMARY KEY (id)
 );
 

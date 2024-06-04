@@ -207,6 +207,7 @@ components:
       type: object
       required:
         - name
+        - description
         - featureType
       properties:
         id:
@@ -221,6 +222,9 @@ components:
         name:
           type: string
           example: Feature Name
+        description:
+          type: string
+          maxLength: 2000
         featureType:
           type: string
           enum:
@@ -236,6 +240,10 @@ components:
         visible:
           type: boolean
           example: true
+        possibleValues:
+          type: array
+          items:
+            type: string
         createdAt:
           type: LocalDateTime
           format: date-time
