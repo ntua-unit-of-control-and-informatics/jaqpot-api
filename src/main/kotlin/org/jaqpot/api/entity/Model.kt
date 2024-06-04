@@ -19,6 +19,12 @@ class Model(
     @Column(name = "meta", columnDefinition = "jsonb")
     val meta: Map<String, Any>?,
 
+    @Column(nullable = false)
+    val name: String,
+
+    @Column(nullable = false)
+    val description: String,
+
     // TODO create specific model types
     val type: String?,
 

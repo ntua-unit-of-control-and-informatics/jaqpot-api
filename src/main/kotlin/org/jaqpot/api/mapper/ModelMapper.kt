@@ -7,6 +7,8 @@ import org.jaqpot.api.model.UserDto
 
 fun Model.toDto(userDto: UserDto): ModelDto {
     return ModelDto(
+        this.name,
+        this.description,
         this.jaqpotpyVersion,
         this.libraries.map { it.toDto() },
         this.dependentFeatures.map { it.toDto() },
@@ -28,6 +30,8 @@ fun ModelDto.toEntity(userId: String): Model {
         this.id,
         userId,
         this.meta,
+        this.name,
+        this.description,
         this.type,
         this.jaqpotpyVersion,
         mutableListOf(),
