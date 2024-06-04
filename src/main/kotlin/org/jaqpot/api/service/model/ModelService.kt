@@ -7,6 +7,7 @@ import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelDto
+import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -22,7 +23,7 @@ class ModelService(
     private val authenticationFacade: AuthenticationFacade,
     private val modelRepository: ModelRepository,
     private val userService: UserService,
-    private val predictionService: PredictionService
+    private val predictionService: PredictionService, private val datasetRepository: DatasetRepository
 ) : ModelApiDelegate {
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
         val userId = authenticationFacade.userId
@@ -48,12 +49,13 @@ class ModelService(
             val model = this.modelRepository.findByIdOrNull(modelId)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             val userId = authenticationFacade.userId
+            val dataset = this.datasetRepository.save(datasetDto.toEntity(model, userId))
 
-            val predictionDataset = this.predictionService.createAndPredictDataset(model, userId, datasetDto)
+            this.predictionService.executePredictionAndSaveResults(model, dataset)
 
             val location: URI = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(predictionDataset.id).toUri()
+                .buildAndExpand(dataset.id).toUri()
             return ResponseEntity.created(location).build()
         }
 

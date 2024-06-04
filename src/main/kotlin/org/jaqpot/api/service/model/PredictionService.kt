@@ -2,8 +2,6 @@ package org.jaqpot.api.service.model
 
 import org.jaqpot.api.entity.*
 import org.jaqpot.api.mapper.toDto
-import org.jaqpot.api.mapper.toEntity
-import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.dto.PredictionRequestDto
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
@@ -20,13 +18,6 @@ class PredictionService(
     private val datasetRepository: DatasetRepository,
     private val runtimeResolver: RuntimeResolver
 ) {
-
-    fun createAndPredictDataset(model: Model, userId: String, datasetDto: DatasetDto): Dataset {
-        val dataset = this.datasetRepository.save(datasetDto.toEntity(model, userId))
-        this.executePredictionAndSaveResults(model, dataset)
-
-        return dataset
-    }
 
     @Async
     fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
