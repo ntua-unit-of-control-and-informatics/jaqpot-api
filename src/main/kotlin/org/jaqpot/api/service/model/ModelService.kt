@@ -54,7 +54,7 @@ class ModelService(
             this.predictionService.executePredictionAndSaveResults(model, dataset)
 
             val location: URI = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
+                .fromCurrentContextPath().path("/datasets/{id}")
                 .buildAndExpand(dataset.id).toUri()
             return ResponseEntity.created(location).build()
         }

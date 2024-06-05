@@ -45,12 +45,14 @@ CREATE TABLE library
 
 CREATE TABLE dataset
 (
-    id         BIGSERIAL                   NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    model_id   BIGINT                      NOT NULL,
-    user_id    VARCHAR(255)                NOT NULL,
-    type       VARCHAR(255)                NOT NULL,
+    id             BIGSERIAL                   NOT NULL,
+    created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    model_id       BIGINT                      NOT NULL,
+    user_id        VARCHAR(255)                NOT NULL,
+    type           VARCHAR(255)                NOT NULL,
+    status         VARCHAR(255)                NOT NULL,
+    failure_reason VARCHAR(2000),
     CONSTRAINT pk_dataset PRIMARY KEY (id)
 );
 

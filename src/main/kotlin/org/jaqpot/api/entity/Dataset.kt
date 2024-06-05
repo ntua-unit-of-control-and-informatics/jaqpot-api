@@ -22,10 +22,15 @@ class Dataset(
     val type: DatasetType = DatasetType.PREDICTION,
 
     @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @SQLRestriction("data_entry_role = 'INPUT'")
+    @SQLRestriction("role = 'INPUT'")
     val input: MutableList<DataEntry>,
 
+    @Enumerated(EnumType.STRING)
+    var status: DatasetStatus = DatasetStatus.CREATED,
+
     @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @SQLRestriction("data_entry_role = 'RESULTS'")
-    var results: MutableList<DataEntry>
+    @SQLRestriction("role = 'RESULTS'")
+    var results: MutableList<DataEntry>,
+
+    var failureReason: String?
 ) : BaseEntity()

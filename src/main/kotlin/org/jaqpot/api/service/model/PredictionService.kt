@@ -1,5 +1,6 @@
 package org.jaqpot.api.service.model
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.*
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.repository.DatasetRepository
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.util.*
 
+private val logger = KotlinLogging.logger {}
 
 @Service
 class PredictionService(
@@ -25,12 +27,26 @@ class PredictionService(
         val request: HttpEntity<PredictionRequestDto> =
             HttpEntity(PredictionRequestDto(listOf(rawModel), dataset.toDto()))
 
-        val results: List<Any> = makePredictionRequest(model, request)
-
-        storeResults(dataset, results)
+        try {
+            datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)
+            val results: List<Any> = makePredictionRequest(model, request)
+            storeDatasetSuccess(dataset, results)
+        } catch (err: Exception) {
+            logger.error(err) { "Prediction for dataset with id ${dataset.id} failed" }
+            storeDatasetFailure(dataset)
+        }
     }
 
-    private fun storeResults(dataset: Dataset, results: List<Any>) {
+    private fun storeDatasetFailure(dataset: Dataset) {
+        dataset.status = DatasetStatus.FAILURE
+        // TODO Give some output for the user here
+        // dataset.failureReason = "Give some output for the user here"
+
+        datasetRepository.save(dataset)
+    }
+
+    private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
+        dataset.status = DatasetStatus.SUCCESS
         dataset.results.clear()
         dataset.results.addAll(
             listOf(

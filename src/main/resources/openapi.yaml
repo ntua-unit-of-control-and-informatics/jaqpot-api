@@ -102,6 +102,35 @@ paths:
           description: Model not found
         '500':
           description: Internal Server Error
+  '/v1/datasets/{id}':
+    get:
+      summary: Get a Dataset
+      description: Retrieve a single dataset by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      operationId: getDatasetById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the dataset to retrieve
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          description: Model not found
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -276,6 +305,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DataEntry'
+        status:
+          type: string
+          enum:
+            - CREATED
+            - EXECUTING
+            - FAILURE
+            - SUCCESS
+        failureReason:
+          type: string
         created_at:
           type: LocalDateTime
         updated_at:
