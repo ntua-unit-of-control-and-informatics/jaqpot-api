@@ -12,11 +12,14 @@ import org.springframework.security.web.util.matcher.DispatcherTypeRequestMatche
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(private val keycloakJwtConverter: KeycloakJwtConverter) {
+class SecurityConfig(
+    private val keycloakJwtConverter: KeycloakJwtConverter
+//    private val modelAuthorizationManager: ModelAuthorizationManager
+) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http {
-            authorizeRequests {
+            authorizeHttpRequests {
                 // TODO see if these 2 lines are needed @see https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html#_all_dispatches_are_authorized
                 authorize(DispatcherTypeRequestMatcher(DispatcherType.FORWARD), permitAll)
                 authorize(DispatcherTypeRequestMatcher(DispatcherType.ERROR), permitAll)
@@ -24,7 +27,7 @@ class SecurityConfig(private val keycloakJwtConverter: KeycloakJwtConverter) {
                 arrayOf("/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").map { it ->
                     authorize(it, permitAll)
                 }
-                authorize("/v1/datasets/{datasetId:[\\d+]}", hasAuthority("USER"))
+//                authorize("/v1/models/{modelId:[\\d+]}", modelAuthorizationManager)
 
                 authorize(anyRequest, authenticated)
             }

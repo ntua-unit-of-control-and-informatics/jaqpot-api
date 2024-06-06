@@ -7,10 +7,10 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -35,7 +35,7 @@ class ModelService(
         return ResponseEntity.created(location).build()
     }
 
-    @PreAuthorize(value = "")
+    @PreAuthorize("@authz.decide(#root)")
     override fun getModelById(id: Long): ResponseEntity<ModelDto> {
         val model = modelRepository.findById(id)
 
