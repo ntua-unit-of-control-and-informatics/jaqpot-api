@@ -69,6 +69,68 @@ paths:
                 $ref: '#/components/schemas/Model'
         '404':
           description: Model not found
+  /v1/models/{modelId}/predict:
+    post:
+      summary: Predict with Model
+      description: Submit a dataset for prediction using a specific model
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: predictWithModel
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model to use for prediction
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: Prediction created successfully
+        '400':
+          description: Invalid Request
+        '404':
+          description: Model not found
+        '500':
+          description: Internal Server Error
+  '/v1/datasets/{id}':
+    get:
+      summary: Get a Dataset
+      description: Retrieve a single dataset by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      operationId: getDatasetById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the dataset to retrieve
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          description: Model not found
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -84,6 +146,8 @@ components:
         - dependentFeatures
         - independentFeatures
         - actualModel
+        - name
+        - description
       properties:
         id:
           type: integer
@@ -94,9 +158,14 @@ components:
           description: A JSON object containing meta information.
           additionalProperties:
             type: object
-        public:
-          type: boolean
-          example: true
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          example: My Model
+        description:
+          type: string
+          example: A description of your model
         type:
           type: string
           example: some type
@@ -167,6 +236,7 @@ components:
       type: object
       required:
         - name
+        - description
         - featureType
       properties:
         id:
@@ -181,7 +251,16 @@ components:
         name:
           type: string
           example: Feature Name
+        description:
+          type: string
+          maxLength: 2000
         featureType:
+          type: string
+          enum:
+            - NUMERICAL
+            - CATEGORICAL
+          example: NUMERICAL
+        featureDependency:
           type: string
           enum:
             - DEPENDENT
@@ -190,6 +269,10 @@ components:
         visible:
           type: boolean
           example: true
+        possibleValues:
+          type: array
+          items:
+            type: string
         createdAt:
           type: LocalDateTime
           format: date-time
@@ -199,6 +282,65 @@ components:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    Dataset:
+      type: object
+      required:
+        - type
+        - input
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          enum:
+            - PREDICTION
+          example: "PREDICTION"
+        input:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        status:
+          type: string
+          enum:
+            - CREATED
+            - EXECUTING
+            - FAILURE
+            - SUCCESS
+        failureReason:
+          type: string
+        created_at:
+          type: LocalDateTime
+        updated_at:
+          type: LocalDateTime
+    DataEntry:
+      type: object
+      required:
+        - type
+        - values
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        created_at:
+          type: LocalDateTime
+        updated_at:
+          type: LocalDateTime
+        type:
+          type: string
+          enum:
+            - ARRAY
+          example: "ARRAY"
+        values:
+          type: array
+          items: { }
+
     User:
       title: User
       x-stoplight:
@@ -213,3 +355,5 @@ components:
           type: string
           x-stoplight:
             id: x0pm25vavfibz
+    AnyValue:
+      description: Can be any value - string, number, boolean, array or object.

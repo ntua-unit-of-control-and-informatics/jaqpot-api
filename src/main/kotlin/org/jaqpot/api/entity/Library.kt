@@ -9,13 +9,13 @@ class Library(
     @SequenceGenerator(name = "library_id_seq", sequenceName = "library_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
-    @ManyToOne
-    @JoinColumn(name = "model_id", updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "model_id", updatable = false, nullable = false)
     val model: Model,
 
-    @Column
+    @Column(nullable = false)
     val name: String,
 
-    @Column
+    @Column(nullable = false)
     val version: String,
 ) : BaseEntity()

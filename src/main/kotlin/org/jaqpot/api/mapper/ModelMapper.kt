@@ -1,11 +1,14 @@
 package org.jaqpot.api.mapper
 
+import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 
 fun Model.toDto(userDto: UserDto): ModelDto {
     return ModelDto(
+        this.name,
+        this.description,
         this.jaqpotpyVersion,
         this.libraries.map { it.toDto() },
         this.dependentFeatures.map { it.toDto() },
@@ -13,7 +16,6 @@ fun Model.toDto(userDto: UserDto): ModelDto {
         byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         this.id,
         this.meta,
-        this.public,
         this.type,
         this.reliability,
         this.pretrained,
@@ -28,7 +30,8 @@ fun ModelDto.toEntity(userId: String): Model {
         this.id,
         userId,
         this.meta,
-        this.public,
+        this.name,
+        this.description,
         this.type,
         this.jaqpotpyVersion,
         mutableListOf(),
@@ -40,8 +43,8 @@ fun ModelDto.toEntity(userId: String): Model {
     )
 
     m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
-    m.dependentFeatures.addAll(this.dependentFeatures.map { it -> it.toEntity(m) })
-    m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m) })
+    m.dependentFeatures.addAll(this.dependentFeatures.map { it -> it.toEntity(m, FeatureDependency.DEPENDENT) })
+    m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m, FeatureDependency.INDEPENDENT) })
 
     return m
 }

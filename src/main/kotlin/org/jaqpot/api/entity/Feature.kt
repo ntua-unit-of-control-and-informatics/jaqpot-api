@@ -11,15 +11,21 @@ class Feature(
     @SequenceGenerator(name = "feature_id_seq", sequenceName = "feature_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
-    @ManyToOne
-    @JoinColumn(name = "model_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "model_id", nullable = false)
     val model: Model,
 
-    @Column
+    @Column(nullable = false)
     val name: String,
 
+    val description: String,
+
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
+    val featureDependency: FeatureDependency,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     val featureType: FeatureType,
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -28,5 +34,9 @@ class Feature(
 
     @Column
     val visible: Boolean?,
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    val possibleValues: List<String>? = null,
 
     ) : BaseEntity()
