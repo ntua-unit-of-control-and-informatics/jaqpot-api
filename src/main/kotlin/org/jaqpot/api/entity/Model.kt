@@ -44,6 +44,10 @@ class Model(
     @SQLRestriction("feature_dependency = 'INDEPENDENT'")
     val independentFeatures: MutableList<Feature>,
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val visibility: ModelVisibility,
+
     val reliability: Int?,
 
     val pretrained: Boolean?,

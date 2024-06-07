@@ -9,6 +9,7 @@ CREATE TABLE model
     meta             JSONB,
     type             VARCHAR(255),
     jaqpotpy_version VARCHAR(255)                NOT NULL,
+    visibility       VARCHAR(255)                NOT NULL,
     reliability      INTEGER,
     pretrained       BOOLEAN,
     actual_model     bytea                       NOT NULL,

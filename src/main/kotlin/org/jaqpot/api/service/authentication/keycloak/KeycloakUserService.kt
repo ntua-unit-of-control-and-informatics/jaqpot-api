@@ -21,17 +21,35 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) : UserServ
         .build()
 
     override fun getUserById(id: String): UserDto {
-        val user = keycloakClient.realm(keycloakConfig.realm).users().get(id).toRepresentation()
-        return UserDto(user.id, "${user.firstName} ${user.lastName}")
+        try {
+            val user = keycloakClient.realm(keycloakConfig.realm).users().get(id).toRepresentation()
+            return UserDto(user.id, "${user.firstName} ${user.lastName}")
+        } catch (e: Exception) {
+            logger.error(e) { "Could not retrieve user by id: $id" }
+            return UserDto(id)
+        }
+
     }
 
     override fun getUserByUsername(username: String): UserDto {
-        val user = keycloakClient.realm(keycloakConfig.realm).users().searchByUsername(username, true).first()
-        return UserDto(user.id, "${user.firstName} ${user.lastName}")
+        try {
+            val user = keycloakClient.realm(keycloakConfig.realm).users().searchByUsername(username, true).first()
+            return UserDto(user.id, "${user.firstName} ${user.lastName}")
+        } catch (e: Exception) {
+            logger.error(e) { "Could not retrieve user by username: $username" }
+            return UserDto()
+        }
+
     }
 
     override fun getUserByEmail(email: String): UserDto {
-        val user = keycloakClient.realm(keycloakConfig.realm).users().searchByEmail(email, true).first()
-        return UserDto(user.id, "${user.firstName} ${user.lastName}")
+        try {
+            val user = keycloakClient.realm(keycloakConfig.realm).users().searchByEmail(email, true).first()
+            return UserDto(user.id, "${user.firstName} ${user.lastName}")
+        } catch (e: Exception) {
+            logger.error(e) { "Could not retrieve user by email: $email" }
+            return UserDto()
+        }
+
     }
 }
