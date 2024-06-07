@@ -159,10 +159,6 @@ paths:
       responses:
         '201':
           description: Organization created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Organization'
 
   /v1/organizations/{id}:
     get:
@@ -222,203 +218,215 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    Base:
+    Model:
       type: object
+      required:
+        - jaqpotpyVersion
+        - libraries
+        - dependentFeatures
+        - independentFeatures
+        - actualModel
+        - name
+        - description
+        - visibility
       properties:
+        id:
+          type: integer
+          format: int64
+          example: 0
+        meta:
+          type: object
+          description: A JSON object containing meta information.
+          additionalProperties:
+            type: object
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          example: My Model
+        description:
+          type: string
+          example: A description of your model
+        type:
+          type: string
+          example: some type
+        jaqpotpyVersion:
+          type: string
+          example: 1.0.0
+        libraries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Library'
+        dependentFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        independentFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        visibility:
+          type: string
+          enum:
+            - PUBLIC
+            - ORG_SHARED
+            - PRIVATE
+        reliability:
+          type: integer
+          example: 5
+        pretrained:
+          type: boolean
+          example: false
+        actualModel:
+          type: string
+          format: byte
+          description: A base64 representation of the actual model.
+          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
+        creator:
+          $ref: '#/components/schemas/User'
+        createdAt:
+          type: LocalDateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
         updatedAt:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    Library:
+      type: object
+      required:
+        - name
+        - version
+      properties:
+        # For example:
+        # Define the properties of Library here
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: Library Name
+        version:
+          type: string
+          example: 1.24.0
         createdAt:
+          type: LocalDateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-    Model:
-      allOf: # Inherits from Base
-        - $ref: '#/components/schemas/Base'
-        - type: object
-          required:
-            - jaqpotpyVersion
-            - libraries
-            - dependentFeatures
-            - independentFeatures
-            - actualModel
-            - name
-            - description
-            - visibility
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 0
-            meta:
-              type: object
-              description: A JSON object containing meta information.
-              additionalProperties:
-                type: object
-            name:
-              type: string
-              minLength: 3
-              maxLength: 255
-              example: My Model
-            description:
-              type: string
-              example: A description of your model
-            type:
-              type: string
-              example: some type
-            jaqpotpyVersion:
-              type: string
-              example: 1.0.0
-            libraries:
-              type: array
-              items:
-                $ref: '#/components/schemas/Library'
-            dependentFeatures:
-              type: array
-              items:
-                $ref: '#/components/schemas/Feature'
-            independentFeatures:
-              type: array
-              items:
-                $ref: '#/components/schemas/Feature'
-            visibility:
-              type: string
-              enum:
-                - PUBLIC
-                - ORG_SHARED
-                - PRIVATE
-            reliability:
-              type: integer
-              example: 5
-            pretrained:
-              type: boolean
-              example: false
-            actualModel:
-              type: string
-              format: byte
-              description: A base64 representation of the actual model.
-              x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
-            creator:
-              $ref: '#/components/schemas/User'
-    Library:
-      allOf: # Inherits from Base
-        - $ref: '#/components/schemas/Base'
-        - type: object
-          required:
-            - name
-            - version
-          properties:
-            # For example:
-            # Define the properties of Library here
-            id:
-              type: integer
-              format: int64
-            name:
-              type: string
-              example: Library Name
-            version:
-              type: string
-              example: 1.24.0
-
     Feature:
-      allOf: # Inherits from Base
-        - $ref: '#/components/schemas/Base'
-        - type: object
-          required:
-            - name
-            - description
-            - featureType
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 1
-            meta:
-              type: object
-              description: A JSON object containing meta information.
-              additionalProperties:
-                type: object
-            name:
-              type: string
-              example: Feature Name
-            description:
-              type: string
-              maxLength: 2000
-            featureType:
-              type: string
-              enum:
-                - NUMERICAL
-                - CATEGORICAL
-              example: NUMERICAL
-            featureDependency:
-              type: string
-              enum:
-                - DEPENDENT
-                - INDEPENDENT
-              example: DEPENDENT
-            visible:
-              type: boolean
-              example: true
-            possibleValues:
-              type: array
-              items:
-                type: string
-
+      type: object
+      required:
+        - name
+        - description
+        - featureType
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        meta:
+          type: object
+          description: A JSON object containing meta information.
+          additionalProperties:
+            type: object
+        name:
+          type: string
+          example: Feature Name
+        description:
+          type: string
+          maxLength: 2000
+        featureType:
+          type: string
+          enum:
+            - NUMERICAL
+            - CATEGORICAL
+          example: NUMERICAL
+        featureDependency:
+          type: string
+          enum:
+            - DEPENDENT
+            - INDEPENDENT
+          example: DEPENDENT
+        visible:
+          type: boolean
+          example: true
+        possibleValues:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: LocalDateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: LocalDateTime
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
     Dataset:
-      allOf: # Inherits from Base
-        - $ref: '#/components/schemas/Base'
-        - type: object
-          required:
-            - type
-            - input
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 1
-            type:
-              type: string
-              enum:
-                - PREDICTION
-              example: "PREDICTION"
-            input:
-              type: array
-              items:
-                $ref: '#/components/schemas/DataEntry'
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/DataEntry'
-            status:
-              type: string
-              enum:
-                - CREATED
-                - EXECUTING
-                - FAILURE
-                - SUCCESS
-            failureReason:
-              type: string
+      type: object
+      required:
+        - type
+        - input
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          enum:
+            - PREDICTION
+          example: "PREDICTION"
+        input:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        status:
+          type: string
+          enum:
+            - CREATED
+            - EXECUTING
+            - FAILURE
+            - SUCCESS
+        failureReason:
+          type: string
+        created_at:
+          type: LocalDateTime
+        updated_at:
+          type: LocalDateTime
     DataEntry:
-      allOf: # Inherits from Base
-        - $ref: '#/components/schemas/Base'
-        - type: object
-          required:
-            - type
-            - values
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 1
-            type:
-              type: string
-              enum:
-                - ARRAY
-              example: "ARRAY"
-            values:
-              type: array
-              items: { }
+      type: object
+      required:
+        - type
+        - values
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        created_at:
+          type: LocalDateTime
+        updated_at:
+          type: LocalDateTime
+        type:
+          type: string
+          enum:
+            - ARRAY
+          example: "ARRAY"
+        values:
+          type: array
+          items: { }
 
     User:
       title: User
@@ -435,54 +443,61 @@ components:
           x-stoplight:
             id: x0pm25vavfibz
     Organization:
-      allOf: # Inherits from Base
-        - $ref: '#/components/schemas/Base'
-        - type: object
-          required:
-            - name
-            - userIds
-            - models
-          properties:
-            id:
-              type: integer
-              format: int64
-            name:
-              type: string
-              pattern: '[\w\-_]+'
-              minLength: 3
-              maxLength: 200
-              example: "my-awesome-org"
-            adminUserId:
-              type: string
-            description:
-              type: string
-              minLength: 3
-              maxLength: 2000
-              nullable: true
-              example: "An awesome organization for managing models."
-            userIds:
-              type: array
-              items:
-                type: string
-            models:
-              type: array
-              items:
-                $ref: '#/components/schemas/Model'
-            contactEmail:
-              type: string
-              nullable: true
-              example: "contact@my-awesome-org.com"
-            contactPhone:
-              type: string
-              nullable: true
-              example: "+1234567890"
-            website:
-              type: string
-              nullable: true
-              example: "http://www.my-awesome-org.com"
-            address:
-              type: string
-              nullable: true
-              example: "123 Organization St., City, Country"
+      type: object
+      required:
+        - name
+        - userIds
+        - models
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          pattern: '[\w\-_]+'
+          minLength: 3
+          maxLength: 200
+          example: "my-awesome-org"
+        creatorId:
+          type: string
+        description:
+          type: string
+          minLength: 3
+          maxLength: 2000
+          nullable: true
+          example: "An awesome organization for managing models."
+        userIds:
+          type: array
+          items:
+            type: string
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/Model'
+        contactEmail:
+          type: string
+          nullable: true
+          example: "contact@my-awesome-org.com"
+        contactPhone:
+          type: string
+          nullable: true
+          example: "+1234567890"
+        website:
+          type: string
+          nullable: true
+          example: "http://www.my-awesome-org.com"
+        address:
+          type: string
+          nullable: true
+          example: "123 Organization St., City, Country"
+        createdAt:
+          type: LocalDateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: LocalDateTime
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.

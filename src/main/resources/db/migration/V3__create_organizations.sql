@@ -4,7 +4,7 @@ CREATE TABLE organization
     created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     name          VARCHAR(255) UNIQUE         NOT NULL,
-    admin_user_id VARCHAR(255)                NOT NULL,
+    creator_id    VARCHAR(255)                NOT NULL,
     description   TEXT,
     contact_email VARCHAR(255),
     contact_phone VARCHAR(255),

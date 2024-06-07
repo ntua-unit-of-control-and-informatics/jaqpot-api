@@ -1,6 +1,7 @@
 package org.jaqpot.api.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Size
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 
@@ -18,6 +19,7 @@ class Feature(
     @Column(nullable = false)
     val name: String,
 
+    @Size(min = 3, max = 5000)
     @Column(columnDefinition = "TEXT", nullable = false)
     val description: String,
 

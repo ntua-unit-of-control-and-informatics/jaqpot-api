@@ -3,7 +3,7 @@ CREATE TABLE model
     id               BIGSERIAL                   NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    user_id          VARCHAR(255)                NOT NULL,
+    creator_id       VARCHAR(255)                NOT NULL,
     name             VARCHAR(255)                NOT NULL,
     description      TEXT                        NOT NULL,
     meta             JSONB,

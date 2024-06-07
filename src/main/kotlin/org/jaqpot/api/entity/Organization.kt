@@ -1,6 +1,8 @@
 package org.jaqpot.api.entity;
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 
 @Entity
 class Organization(
@@ -9,12 +11,15 @@ class Organization(
     @SequenceGenerator(name = "organization_id_seq", sequenceName = "organization_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
+    @Size(min = 3, max = 255)
     @Column(unique = true, nullable = false)
+    @Pattern(regexp = "[\\w-_]+")
     val name: String,
 
     @Column(nullable = false)
-    val adminUserId: String,
+    val creatorId: String,
 
+    @Size(min = 3, max = 2000)
     @Column
     val description: String? = null,
 

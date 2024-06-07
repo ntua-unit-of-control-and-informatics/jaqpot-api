@@ -1,6 +1,7 @@
 package org.jaqpot.api.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Size
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
@@ -13,15 +14,17 @@ class Model(
     val id: Long? = 0,
 
     @Column(nullable = false)
-    val userId: String,
+    val creatorId: String,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb")
     val meta: Map<String, Any>?,
 
+    @Size(min = 3, max = 255)
     @Column(nullable = false)
     val name: String,
 
+    @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT", nullable = false)
     val description: String,
 
