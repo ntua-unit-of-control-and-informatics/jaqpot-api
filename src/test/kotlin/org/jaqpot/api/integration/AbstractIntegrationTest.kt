@@ -66,7 +66,7 @@ abstract class AbstractIntegrationTest {
         val accessToken = given()
             .spec(spec)
             .contentType(ContentType.URLENC)
-            .formParam("client_id", "jaqpot-frontend")
+            .formParam("client_id", "jaqpot-local-test")
             .formParam("grant_type", "password")
             .formParam("username", "jaqpot")
             .formParam("password", "jaqpot")
