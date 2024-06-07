@@ -507,8 +507,27 @@
       }
     },
     {
-      "username": "jaqpot",
-      "email": "jaqpot@jaqpot.org",
+      "username": "jaqpot2",
+      "email": "jaqpot2@jaqpot.org",
+      "firstName": "jaq2",
+      "lastName": "pot2",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "jaqpot"
+        }
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      }
+    },
+    {
+      "username": "jaqpot-admin",
+      "email": "jaqpot-admin@jaqpot.org",
       "firstName": "jaq",
       "lastName": "pot",
       "enabled": true,
@@ -523,7 +542,11 @@
           "view-profile",
           "manage-account"
         ]
-      }
+      },
+      "realmRoles": [
+        "default-roles-jaqpot-local",
+        "admin"
+      ]
     }
   ],
   "scopeMappings": [
@@ -788,7 +811,7 @@
     {
       "id": "40e0db1a-58ce-461a-8fbb-6a4451d8587a",
       "clientId": "jaqpot-local-test",
-      "name": "jaqpot test",
+      "name": "jaqpot test local",
       "description": "",
       "rootUrl": "http://localhost:4200",
       "adminUrl": "",

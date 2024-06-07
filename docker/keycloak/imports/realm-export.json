@@ -505,6 +505,48 @@
           "manage-account"
         ]
       }
+    },
+    {
+      "username": "jaqpot2",
+      "email": "jaqpot2@jaqpot.org",
+      "firstName": "jaq2",
+      "lastName": "pot2",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "jaqpot"
+        }
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      }
+    },
+    {
+      "username": "jaqpot-admin",
+      "email": "jaqpot-admin@jaqpot.org",
+      "firstName": "jaq",
+      "lastName": "pot",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "jaqpot"
+        }
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "realmRoles": [
+        "default-roles-jaqpot-local",
+        "admin"
+      ]
     }
   ],
   "scopeMappings": [

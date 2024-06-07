@@ -31,12 +31,13 @@ class KeycloakJwtConverter() : Converter<Jwt, AbstractAuthenticationToken> {
 
     private fun extractKeycloakAuthorities(jwt: Jwt): MutableCollection<GrantedAuthority> {
 
-        val realmAccess = jwt.getClaim<LinkedTreeMap<String, Any>>(REALM_ACCESS_KEY)
+        val realmAccess = jwt.getClaim<LinkedTreeMap<String, Any>>(REALM_ACCESS_KEY) ?: return mutableListOf()
 
-        val roles = realmAccess[ROLES_KEY] as List<String>
+        val roles = realmAccess[ROLES_KEY] ?: return mutableListOf()
+
         val keycloakAuthorities = mutableListOf<GrantedAuthority>()
 
-        roles.forEach { role ->
+        (roles as List<String>).forEach { role ->
             keycloakAuthorities.add(SimpleGrantedAuthority(role))
         }
 
