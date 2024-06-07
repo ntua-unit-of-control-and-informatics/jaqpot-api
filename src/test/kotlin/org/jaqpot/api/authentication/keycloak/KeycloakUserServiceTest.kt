@@ -1,7 +1,9 @@
-package org.jaqpot.api.auth.keycloak
+package org.jaqpot.api.authentication.keycloak
 
 import io.mockk.every
 import io.mockk.mockk
+import org.jaqpot.api.service.authentication.keycloak.KeycloakConfig
+import org.jaqpot.api.service.authentication.keycloak.KeycloakUserService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package org.jaqpot.api.auth
+package org.jaqpot.api.service.authentication
 
 import org.jaqpot.api.model.UserDto
 

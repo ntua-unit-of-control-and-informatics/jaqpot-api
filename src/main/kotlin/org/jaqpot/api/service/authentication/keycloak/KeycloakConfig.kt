@@ -1,4 +1,4 @@
-package org.jaqpot.api.auth.keycloak
+package org.jaqpot.api.service.authentication.keycloak
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

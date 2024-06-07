@@ -1,17 +1,19 @@
 package org.jaqpot.api.service.model
 
 import org.jaqpot.api.ModelApiDelegate
-import org.jaqpot.api.auth.AuthenticationFacade
-import org.jaqpot.api.auth.UserService
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
+import org.jaqpot.api.service.authentication.AuthenticationFacade
+import org.jaqpot.api.service.authentication.UserService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -26,6 +28,9 @@ class ModelService(
     private val predictionService: PredictionService, private val datasetRepository: DatasetRepository
 ) : ModelApiDelegate {
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
+        if (modelDto.id != null) {
+            throw IllegalStateException("ID should not be provided for resource creation.")
+        }
         val userId = authenticationFacade.userId
         val model = modelRepository.save(modelDto.toEntity(userId))
         val location: URI = ServletUriComponentsBuilder
@@ -34,6 +39,7 @@ class ModelService(
         return ResponseEntity.created(location).build()
     }
 
+    @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     override fun getModelById(id: Long): ResponseEntity<ModelDto> {
         val model = modelRepository.findById(id)
 
@@ -44,6 +50,7 @@ class ModelService(
             .orElse(ResponseEntity.notFound().build())
     }
 
+    @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetDto.Type.PREDICTION) {
             val model = this.modelRepository.findByIdOrNull(modelId)

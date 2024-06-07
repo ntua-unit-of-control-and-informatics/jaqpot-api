@@ -13,7 +13,8 @@ fun Model.toDto(userDto: UserDto): ModelDto {
         this.libraries.map { it.toDto() },
         this.dependentFeatures.map { it.toDto() },
         this.independentFeatures.map { it.toDto() },
-        byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
+        this.visibility.toDto(),
+        byteArrayOf(),// returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         this.id,
         this.meta,
         this.type,
@@ -37,6 +38,7 @@ fun ModelDto.toEntity(userId: String): Model {
         mutableListOf(),
         mutableListOf(),
         mutableListOf(),
+        this.visibility.toEntity(),
         this.reliability,
         this.pretrained,
         this.actualModel,

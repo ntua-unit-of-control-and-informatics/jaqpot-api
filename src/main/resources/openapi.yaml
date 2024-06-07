@@ -148,6 +148,7 @@ components:
         - actualModel
         - name
         - description
+        - visibility
       properties:
         id:
           type: integer
@@ -184,6 +185,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Feature'
+        visibility:
+          type: string
+          enum:
+            - PUBLIC
+            - ORG_SHARED
+            - PRIVATE
         reliability:
           type: integer
           example: 5

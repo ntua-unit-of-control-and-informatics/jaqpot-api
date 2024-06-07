@@ -1,36 +1,43 @@
 package org.jaqpot.api.config
 
+import jakarta.servlet.DispatcherType
+import org.jaqpot.api.service.authentication.keycloak.KeycloakJwtConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.util.matcher.DispatcherTypeRequestMatcher
 
 @Configuration
-class SecurityConfig {
+@EnableWebSecurity
+class SecurityConfig(
+    private val keycloakJwtConverter: KeycloakJwtConverter
+//    private val modelAuthorizationManager: ModelAuthorizationManager
+) {
     @Bean
-    @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeHttpRequests { a ->
-            a
-                // allow swagger for everyone
-                .requestMatchers(
-                    "/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
-                )
-                .permitAll()
-                
-                .requestMatchers(
-                    "/models/**"
-                )
-                .permitAll()
-
-                .anyRequest()
-                .authenticated()
-
+        http {
+            authorizeHttpRequests {
+                // TODO see if these 2 lines are needed @see https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html#_all_dispatches_are_authorized
+                authorize(DispatcherTypeRequestMatcher(DispatcherType.FORWARD), permitAll)
+                authorize(DispatcherTypeRequestMatcher(DispatcherType.ERROR), permitAll)
+                // allow all swagger urls
+                arrayOf("/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").map { it ->
+                    authorize(it, permitAll)
+                }
+                authorize("/v1/models/{modelId:[\\d+]}", permitAll)
+                authorize(anyRequest, authenticated)
+            }
+            oauth2ResourceServer {
+                jwt {
+                    jwtAuthenticationConverter = keycloakJwtConverter
+                }
+            }
+            csrf { disable() }
         }
-            .oauth2ResourceServer { oauth2: OAuth2ResourceServerConfigurer<HttpSecurity?> -> oauth2.jwt(Customizer.withDefaults()) }
-            .csrf { csrf -> csrf.disable() }
         return http.build()
     }
+
 }
