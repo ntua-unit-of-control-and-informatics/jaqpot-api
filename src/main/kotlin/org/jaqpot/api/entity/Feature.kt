@@ -18,6 +18,7 @@ class Feature(
     @Column(nullable = false)
     val name: String,
 
+    @Column(columnDefinition = "TEXT", nullable = false)
     val description: String,
 
     @Enumerated(EnumType.STRING)

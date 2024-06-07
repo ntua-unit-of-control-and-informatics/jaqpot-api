@@ -26,11 +26,13 @@ class Dataset(
     val input: MutableList<DataEntry>,
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     var status: DatasetStatus = DatasetStatus.CREATED,
 
     @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("role = 'RESULTS'")
     var results: MutableList<DataEntry>,
 
+    @Column(columnDefinition = "TEXT")
     var failureReason: String?
 ) : BaseEntity()

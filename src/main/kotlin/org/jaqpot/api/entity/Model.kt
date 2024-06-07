@@ -22,7 +22,7 @@ class Model(
     @Column(nullable = false)
     val name: String,
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     val description: String,
 
     // TODO create specific model types
