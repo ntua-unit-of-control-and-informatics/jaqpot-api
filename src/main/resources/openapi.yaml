@@ -210,6 +210,27 @@ paths:
                 $ref: '#/components/schemas/Organization'
         '404':
           description: Organization not found
+  /v1/organizations/{name}:
+    get:
+      summary: Get organization by name
+      operationId: getOrganizationByName
+      tags:
+        - Organization
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '404':
+          description: Organization not found
 
 components:
   securitySchemes:

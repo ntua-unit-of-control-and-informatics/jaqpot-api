@@ -7,11 +7,11 @@ import org.jaqpot.api.model.UserDto
 fun Organization.toDto(userDto: UserDto): OrganizationDto {
     return OrganizationDto(
         this.name,
-        this.userIds.toList(),
-        emptyList(),
         this.id,
         this.creatorId,
         this.description,
+        this.userIds.toList(),
+        emptyList(),
         this.contactEmail,
         this.contactPhone,
         this.website,
@@ -27,7 +27,7 @@ fun OrganizationDto.toEntity(adminUserId: String): Organization {
         this.name,
         adminUserId,
         this.description,
-        this.userIds.toSet(),
+        this.userIds?.toSet() ?: emptySet<String>(),
         mutableSetOf(),
         this.contactEmail,
         this.contactPhone,
