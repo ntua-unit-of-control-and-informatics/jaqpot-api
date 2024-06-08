@@ -2,9 +2,8 @@ package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.model.OrganizationDto
-import org.jaqpot.api.model.UserDto
 
-fun Organization.toDto(userDto: UserDto): OrganizationDto {
+fun Organization.toDto(): OrganizationDto {
     return OrganizationDto(
         this.name,
         this.contactEmail,

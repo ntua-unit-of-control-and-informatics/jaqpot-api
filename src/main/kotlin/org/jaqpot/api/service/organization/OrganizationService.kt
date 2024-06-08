@@ -41,7 +41,6 @@ class OrganizationService(
         val organization = organizationRepository.findByName(name)
             ?: throw NotFoundException("Organization with name $name not found.")
 
-        val creatorDto = userService.getUserById(organization.creatorId)
-        return ResponseEntity.ok(organization.toDto(creatorDto))
+        return ResponseEntity.ok(organization.toDto())
     }
 }

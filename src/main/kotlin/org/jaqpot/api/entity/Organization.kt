@@ -31,7 +31,6 @@ class Organization(
     @Column(name = "user_id", nullable = false)
     val userIds: Set<String> = mutableSetOf(),
 
-
     @ManyToMany
     @JoinTable(
         name = "organization_models",

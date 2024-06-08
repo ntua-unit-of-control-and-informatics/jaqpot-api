@@ -102,6 +102,44 @@ paths:
           description: Model not found
         '500':
           description: Internal Server Error
+  /v1/models/{modelId}/organizations:
+    put:
+      summary: Update organizations for a model
+      operationId: updateModelOrganizations
+      tags:
+        - Model
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationIds:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+      responses:
+        '200':
+          description: Organizations updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Organizations updated successfully
+        '404':
+          description: Model or Organization not found
   '/v1/datasets/{id}':
     get:
       summary: Get a Dataset
@@ -264,6 +302,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Feature'
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
         visibility:
           type: string
           enum:
