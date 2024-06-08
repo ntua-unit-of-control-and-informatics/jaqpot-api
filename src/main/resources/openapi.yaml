@@ -42,6 +42,49 @@ paths:
           description: Invalid input
       x-stoplight:
         id: 9ffjy7o77jc41
+    get:
+      x-spring-paginated: true
+      summary: Get paginated models
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: getModels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Paginated list of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '400':
+          description: Invalid input
   '/v1/models/{id}':
     get:
       summary: Get a Model

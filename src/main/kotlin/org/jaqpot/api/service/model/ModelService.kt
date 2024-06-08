@@ -4,15 +4,14 @@ import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
-import org.jaqpot.api.model.DatasetDto
-import org.jaqpot.api.model.ModelDto
-import org.jaqpot.api.model.UpdateModelOrganizations200ResponseDto
-import org.jaqpot.api.model.UpdateModelOrganizationsRequestDto
+import org.jaqpot.api.mapper.toGetModels200ResponseDto
+import org.jaqpot.api.model.*
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
@@ -32,6 +31,16 @@ class ModelService(
     private val datasetRepository: DatasetRepository,
     private val organizationRepository: OrganizationRepository,
 ) : ModelApiDelegate {
+
+    override fun getModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
+        val creatorId = authenticationFacade.userId
+        val pageable = PageRequest.of(page, size)
+        val modelsPage = modelRepository.findAllByCreatorId(creatorId, pageable)
+        val creator = userService.getUserById(creatorId)
+
+        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
+    }
+
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
         if (modelDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
