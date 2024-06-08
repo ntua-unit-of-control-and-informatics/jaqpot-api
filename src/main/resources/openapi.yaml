@@ -446,8 +446,6 @@ components:
       type: object
       required:
         - name
-        - userIds
-        - models
       properties:
         id:
           type: integer
