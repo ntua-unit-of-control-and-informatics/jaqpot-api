@@ -31,8 +31,8 @@ class ModelService(
         if (modelDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
         }
-        val userId = authenticationFacade.userId
-        val model = modelRepository.save(modelDto.toEntity(userId))
+        val creatorId = authenticationFacade.userId
+        val model = modelRepository.save(modelDto.toEntity(creatorId))
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(model.id).toUri()
@@ -44,7 +44,7 @@ class ModelService(
         val model = modelRepository.findById(id)
 
         return model.map {
-            val user = userService.getUserById(it.userId)
+            val user = userService.getUserById(it.creatorId)
             ResponseEntity.ok(it.toDto(user))
         }
             .orElse(ResponseEntity.notFound().build())

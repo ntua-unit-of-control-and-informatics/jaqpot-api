@@ -1,5 +1,6 @@
 package org.jaqpot.api.error
 
+import jakarta.ws.rs.BadRequestException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -25,5 +26,14 @@ class ExceptionControllerAdvice {
             ex.message
         )
         return ResponseEntity(errorMessage, HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler
+    fun handleBadRequestException(ex: BadRequestException): ResponseEntity<ApiErrorResponse> {
+        val errorMessage = ApiErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            ex.message
+        )
+        return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)
     }
 }

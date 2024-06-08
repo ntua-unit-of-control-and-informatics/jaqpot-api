@@ -26,10 +26,10 @@ fun Model.toDto(userDto: UserDto): ModelDto {
     )
 }
 
-fun ModelDto.toEntity(userId: String): Model {
+fun ModelDto.toEntity(creatorId: String): Model {
     val m = Model(
         this.id,
-        userId,
+        creatorId,
         this.meta,
         this.name,
         this.description,

@@ -1,6 +1,7 @@
 package org.jaqpot.api.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Size
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
@@ -26,11 +27,14 @@ class Dataset(
     val input: MutableList<DataEntry>,
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     var status: DatasetStatus = DatasetStatus.CREATED,
 
     @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("role = 'RESULTS'")
     var results: MutableList<DataEntry>,
 
+    @Size(min = 3, max = 15000)
+    @Column(columnDefinition = "TEXT")
     var failureReason: String?
 ) : BaseEntity()
