@@ -161,28 +161,6 @@ paths:
           description: Organization created successfully
 
   /v1/organizations/{id}:
-    get:
-      summary: Get organization by ID
-      operationId: getOrganizationById
-      tags:
-        - Organization
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Organization'
-        '404':
-          description: Organization not found
-
     put:
       summary: Update an existing organization
       operationId: updateOrganization
@@ -467,6 +445,7 @@ components:
       type: object
       required:
         - name
+        - contactEmail
       properties:
         id:
           type: integer
@@ -483,7 +462,6 @@ components:
           type: string
           minLength: 3
           maxLength: 2000
-          nullable: true
           example: "An awesome organization for managing models."
         userIds:
           type: array
@@ -495,28 +473,19 @@ components:
             $ref: '#/components/schemas/Model'
         contactEmail:
           type: string
-          nullable: true
           example: "contact@my-awesome-org.com"
         contactPhone:
           type: string
-          nullable: true
           example: "+1234567890"
         website:
           type: string
-          nullable: true
           example: "http://www.my-awesome-org.com"
         address:
           type: string
-          nullable: true
           example: "123 Organization St., City, Country"
-        createdAt:
+        created_at:
           type: LocalDateTime
-          format: date-time
-          description: The date and time when the feature was created.
-          example: '2023-01-01T12:00:00Z'
-        updatedAt:
+        updated_at:
           type: LocalDateTime
-          description: The date and time when the feature was last updated.
-          example: '2023-01-01T12:00:00Z'
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.

@@ -7,12 +7,12 @@ import org.jaqpot.api.model.UserDto
 fun Organization.toDto(userDto: UserDto): OrganizationDto {
     return OrganizationDto(
         this.name,
+        this.contactEmail,
         this.id,
         this.creatorId,
         this.description,
         this.userIds.toList(),
         emptyList(),
-        this.contactEmail,
         this.contactPhone,
         this.website,
         this.address,

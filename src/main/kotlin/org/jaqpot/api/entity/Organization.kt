@@ -40,8 +40,8 @@ class Organization(
     )
     val models: MutableSet<Model> = mutableSetOf(),
 
-    @Column
-    val contactEmail: String? = null,
+    @Column(nullable = false)
+    val contactEmail: String,
 
     @Column
     val contactPhone: String? = null,
