@@ -27,6 +27,7 @@ class SecurityConfig(
                 arrayOf("/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").map { it ->
                     authorize(it, permitAll)
                 }
+                authorize("/actuator/**", permitAll)
                 authorize("/v1/models/{modelId:[\\d+]}", permitAll)
                 authorize(anyRequest, authenticated)
             }
