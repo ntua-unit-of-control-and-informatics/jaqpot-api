@@ -47,6 +47,14 @@ class Model(
     @SQLRestriction("feature_dependency = 'INDEPENDENT'")
     val independentFeatures: MutableList<Feature>,
 
+    @ManyToMany
+    @JoinTable(
+        name = "organization_models",
+        joinColumns = [JoinColumn(name = "model_id")],
+        inverseJoinColumns = [JoinColumn(name = "organization_id")]
+    )
+    val organizations: MutableSet<Organization> = mutableSetOf(),
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val visibility: ModelVisibility,
