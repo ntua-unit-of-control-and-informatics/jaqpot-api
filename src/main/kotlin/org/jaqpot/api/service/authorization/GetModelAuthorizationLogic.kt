@@ -27,10 +27,19 @@ class GetModelAuthorizationLogic(private val authenticationFacade: Authenticatio
         } else if (modelDto.visibility === ModelVisibilityDto.PRIVATE) {
             return modelDto.creator?.id == authenticationFacade.userId
         } else if (modelDto.visibility === ModelVisibilityDto.ORG_SHARED) {
-            // TODO finish logic here after creating organizations
-            return false
+            if (modelDto.creator?.id == authenticationFacade.userId) {
+                return true
+            }
+
+            val userIdsFromSharedOrganizations =
+                getUserIdsFromSharedOrganizations(modelDto)
+
+            return userIdsFromSharedOrganizations.contains(authenticationFacade.userId)
         }
 
         throw JaqpotRuntimeException("Unexpected model visibility ${modelDto.visibility}")
     }
+
+    private fun getUserIdsFromSharedOrganizations(modelDto: ModelDto) =
+        modelDto.organizations?.flatMap { it -> it.userIds ?: emptyList() } ?: emptyList()
 }

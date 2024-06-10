@@ -7,6 +7,7 @@ fun Organization.toDto(): OrganizationDto {
     return OrganizationDto(
         this.name,
         this.contactEmail,
+        this.visibility.toDto(),
         this.id,
         this.creatorId,
         this.description,
@@ -29,6 +30,7 @@ fun OrganizationDto.toEntity(adminUserId: String): Organization {
         this.userIds?.toSet() ?: emptySet<String>(),
         mutableSetOf(),
         this.contactEmail,
+        this.visibility.toEntity(),
         this.contactPhone,
         this.website,
         this.address
