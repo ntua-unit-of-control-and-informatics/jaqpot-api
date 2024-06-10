@@ -368,6 +368,9 @@ components:
           x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
         creator:
           $ref: '#/components/schemas/User'
+        canEdit:
+          description: This is an internal api property, feel free to ignore it
+          type: boolean
         createdAt:
           type: LocalDateTime
           format: date-time

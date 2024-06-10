@@ -2,6 +2,7 @@ package org.jaqpot.api.service.model
 
 import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
+import org.jaqpot.api.entity.Model
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetModels200ResponseDto
@@ -58,10 +59,15 @@ class ModelService(
         val model = modelRepository.findById(id)
 
         return model.map {
+            val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
             val user = userService.getUserById(it.creatorId)
             ResponseEntity.ok(it.toDto(user))
         }
             .orElse(ResponseEntity.notFound().build())
+    }
+
+    private fun isCreator(authenticationFacade: AuthenticationFacade, model: Model): Boolean {
+        return authenticationFacade.userId == model.creatorId
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
