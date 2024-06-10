@@ -130,7 +130,7 @@ openApiGenerate {
     )
 }
 
-// Dockerize
+// Dockerize https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html
 tasks.named<BootBuildImage>("bootBuildImage") {
     environment.set(
         mapOf("BP_JVM_VERSION" to "17")
