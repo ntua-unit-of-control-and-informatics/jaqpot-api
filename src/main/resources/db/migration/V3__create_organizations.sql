@@ -6,6 +6,7 @@ CREATE TABLE organization
     name          VARCHAR(255) UNIQUE         NOT NULL,
     creator_id    VARCHAR(255)                NOT NULL,
     contact_email VARCHAR(255)                NOT NULL,
+    visibility    VARCHAR(255)                NOT NULL,
     description   TEXT,
     contact_phone VARCHAR(255),
     website       VARCHAR(255),

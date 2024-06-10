@@ -545,6 +545,7 @@ components:
       required:
         - name
         - contactEmail
+        - visibility
       properties:
         id:
           type: integer
@@ -576,6 +577,11 @@ components:
         contactPhone:
           type: string
           example: "+1234567890"
+        visibility:
+          type: string
+          enum:
+            - PUBLIC
+            - PRIVATE
         website:
           type: string
           example: "http://www.my-awesome-org.com"

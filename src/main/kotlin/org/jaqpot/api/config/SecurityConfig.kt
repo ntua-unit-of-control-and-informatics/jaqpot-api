@@ -29,6 +29,7 @@ class SecurityConfig(
                 }
                 authorize("/actuator/**", permitAll)
                 authorize("/v1/models/{modelId:[\\d+]}", permitAll)
+                authorize("/v1/organizations/{organizationId:[\\d+]}", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2ResourceServer {

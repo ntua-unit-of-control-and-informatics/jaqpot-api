@@ -42,6 +42,10 @@ class Organization(
     @Column(nullable = false)
     val contactEmail: String,
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var visibility: OrganizationVisibility = OrganizationVisibility.PUBLIC,
+
     @Column
     val contactPhone: String? = null,
 
