@@ -1,7 +1,7 @@
 package org.jaqpot.api.service.authorization
 
 import org.jaqpot.api.error.JaqpotNotFoundException
-import org.jaqpot.api.model.ModelDto
+import org.jaqpot.api.model.ModelVisibilityDto
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.model.ModelService
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations
@@ -22,11 +22,11 @@ class PredictModelAuthorizationLogic(
                 ?: throw JaqpotNotFoundException("No model with id $modelId found")
 
 
-        if (modelDto.visibility == ModelDto.Visibility.PUBLIC) {
+        if (modelDto.visibility == ModelVisibilityDto.PUBLIC) {
             return authenticationFacade.isLoggedIn
-        } else if (modelDto.visibility === ModelDto.Visibility.PRIVATE) {
+        } else if (modelDto.visibility === ModelVisibilityDto.PRIVATE) {
             return modelDto.creator?.id == authenticationFacade.userId
-        } else if (modelDto.visibility === ModelDto.Visibility.ORG_SHARED) {
+        } else if (modelDto.visibility === ModelVisibilityDto.ORG_SHARED) {
             // TODO finish logic here after creating organizations
             return false
         }

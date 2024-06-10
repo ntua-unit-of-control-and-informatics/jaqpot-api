@@ -145,14 +145,14 @@ paths:
           description: Model not found
         '500':
           description: Internal Server Error
-  /v1/models/{modelId}/organizations:
-    put:
-      summary: Update organizations for a model
-      operationId: updateModelOrganizations
+  /v1/models/{id}/partial:
+    patch:
+      summary: Partially update specific fields of a model
+      operationId: partiallyUpdateModel
       tags:
-        - Model
+        - model
       parameters:
-        - name: modelId
+        - name: id
           in: path
           required: true
           schema:
@@ -164,7 +164,14 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - name
+                - visibility
               properties:
+                name:
+                  type: string
+                visibility:
+                  $ref: '#/components/schemas/ModelVisibility'
                 organizationIds:
                   type: array
                   items:
@@ -172,17 +179,15 @@ paths:
                     format: int64
       responses:
         '200':
-          description: Organizations updated successfully
+          description: Model fields updated successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Organizations updated successfully
+                $ref: '#/components/schemas/Model'
         '404':
-          description: Model or Organization not found
+          description: Model not found
+        '400':
+          description: Invalid input
   '/v1/datasets/{id}':
     get:
       summary: Get a Dataset
@@ -350,11 +355,7 @@ components:
           items:
             $ref: '#/components/schemas/Organization'
         visibility:
-          type: string
-          enum:
-            - PUBLIC
-            - ORG_SHARED
-            - PRIVATE
+          $ref: '#/components/schemas/ModelVisibility'
         reliability:
           type: integer
           example: 5
@@ -380,6 +381,12 @@ components:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    ModelVisibility:
+      type: string
+      enum:
+        - PUBLIC
+        - ORG_SHARED
+        - PRIVATE
     Library:
       type: object
       required:

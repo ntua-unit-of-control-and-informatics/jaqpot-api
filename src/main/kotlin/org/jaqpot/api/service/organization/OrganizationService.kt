@@ -20,6 +20,10 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
     private val userService: UserService,
 ) : OrganizationApiDelegate {
+    override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
+        return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
+    }
+
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
