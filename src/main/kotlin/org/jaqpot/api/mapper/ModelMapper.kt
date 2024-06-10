@@ -9,15 +9,15 @@ fun Model.toDto(userDto: UserDto, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
         this.name,
         this.description,
+        this.type.toDto(),
         this.jaqpotpyVersion,
         this.libraries.map { it.toDto() },
         this.dependentFeatures.map { it.toDto() },
         this.independentFeatures.map { it.toDto() },
-        this.visibility.toDto(),
-        byteArrayOf(),// returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
+        this.visibility.toDto(),// returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
+        byteArrayOf(),
         this.id,
         this.meta,
-        this.type,
         this.organizations.map { it.toDto() },
         this.reliability,
         this.pretrained,
@@ -35,7 +35,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         this.meta,
         this.name,
         this.description,
-        this.type,
+        this.type.toEntity(),
         this.jaqpotpyVersion,
         mutableListOf(),
         mutableListOf(),

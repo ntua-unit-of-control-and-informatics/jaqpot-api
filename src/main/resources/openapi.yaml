@@ -314,6 +314,7 @@ components:
         - name
         - description
         - visibility
+        - type
       properties:
         id:
           type: integer
@@ -334,7 +335,10 @@ components:
           example: A description of your model
         type:
           type: string
-          example: some type
+          enum:
+            - SKLEARN
+            - TORCH
+            - R
         jaqpotpyVersion:
           type: string
           example: 1.0.0

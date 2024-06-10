@@ -28,8 +28,9 @@ class Model(
     @Column(columnDefinition = "TEXT", nullable = false)
     val description: String,
 
-    // TODO create specific model types
-    val type: String?,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val type: ModelType,
 
     @Column(nullable = false)
     val jaqpotpyVersion: String,
