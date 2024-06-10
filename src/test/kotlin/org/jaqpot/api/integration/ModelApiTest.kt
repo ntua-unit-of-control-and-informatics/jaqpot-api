@@ -38,7 +38,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "id": 3,
                         "test": "hello"
                     },
-                    "type": "some type",
+                    "type": "SKLEARN",
                     "visibility": "PRIVATE",
                     "reliability": 5,
                     "pretrained": false,
@@ -80,7 +80,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                     "name": "model name",
                     "libraries": [
                         {
-                            "name": "sklearn",
+                            "name": "torch",
                             "version": "0.20.1"
                         }
                     ],
@@ -103,7 +103,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "id": 3,
                         "test": "hello"
                     },
-                    "type": "some type",
+                    "type": "TORCH",
                     "visibility": "PRIVATE",
                     "reliability": 5,
                     "pretrained": false,
