@@ -22,7 +22,7 @@ class Model(
 
     @Size(min = 3, max = 255)
     @Column(nullable = false)
-    val name: String,
+    var name: String,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -57,7 +57,7 @@ class Model(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val visibility: ModelVisibility,
+    var visibility: ModelVisibility,
 
     val reliability: Int?,
 

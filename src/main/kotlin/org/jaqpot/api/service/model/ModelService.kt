@@ -61,7 +61,7 @@ class ModelService(
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
             val user = userService.getUserById(it.creatorId)
-            ResponseEntity.ok(it.toDto(user))
+            ResponseEntity.ok(it.toDto(user, userCanEdit))
         }
             .orElse(ResponseEntity.notFound().build())
     }
@@ -92,26 +92,32 @@ class ModelService(
 
     // TODO add authorization
     @Transactional
-    override fun updateModelOrganizations(
-        modelId: kotlin.Long,
-        updateModelOrganizationsRequestDto: UpdateModelOrganizationsRequestDto
-    ): ResponseEntity<UpdateModelOrganizations200ResponseDto> {
-        val model = modelRepository.findById(modelId).orElseThrow {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+    override fun partiallyUpdateModel(
+        id: Long,
+        partiallyUpdateModelRequestDto: PartiallyUpdateModelRequestDto
+    ): ResponseEntity<ModelDto> {
+        val existingModel = modelRepository.findById(id).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
+        }
+        partiallyUpdateModelRequestDto.name.let { existingModel.name = it }
+        partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
+        if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
+            partiallyUpdateModelRequestDto.organizationIds?.let {
+                val organizations = organizationRepository.findAllById(it)
+                existingModel.organizations.clear()
+                existingModel.organizations.addAll(organizations)
+            }
+        } else {
+            existingModel.organizations.clear()
         }
 
-        // Fetch the organizations to be associated
-        val organizations = organizationRepository.findAllById(updateModelOrganizationsRequestDto.organizationIds!!)
+        val model: Model = modelRepository.save(existingModel)
 
-        // Clear the current associations
-        model.organizations.clear()
-
-        // Update with new associations
-        model.organizations.addAll(organizations)
-
-        // Persist the changes
-        modelRepository.save(model)
-        return ResponseEntity.ok(UpdateModelOrganizations200ResponseDto("Organizations updated successfully!"))
+        val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, model)
+        val user = userService.getUserById(model.creatorId)
+        return ResponseEntity.ok(model.toDto(user, userCanEdit))
     }
+
+
 }
 

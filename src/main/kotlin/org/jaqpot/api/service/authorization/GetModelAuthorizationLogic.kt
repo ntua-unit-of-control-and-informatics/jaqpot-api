@@ -2,6 +2,7 @@ package org.jaqpot.api.service.authorization
 
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.model.ModelDto
+import org.jaqpot.api.model.ModelVisibilityDto
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations
@@ -21,11 +22,11 @@ class GetModelAuthorizationLogic(private val authenticationFacade: Authenticatio
 
         val modelDto: ModelDto = responseEntity.body as ModelDto
 
-        if (modelDto.visibility == ModelDto.Visibility.PUBLIC) {
+        if (modelDto.visibility == ModelVisibilityDto.PUBLIC) {
             return true
-        } else if (modelDto.visibility === ModelDto.Visibility.PRIVATE) {
+        } else if (modelDto.visibility === ModelVisibilityDto.PRIVATE) {
             return modelDto.creator?.id == authenticationFacade.userId
-        } else if (modelDto.visibility === ModelDto.Visibility.ORG_SHARED) {
+        } else if (modelDto.visibility === ModelVisibilityDto.ORG_SHARED) {
             // TODO finish logic here after creating organizations
             return false
         }
