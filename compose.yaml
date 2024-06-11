@@ -25,7 +25,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: jaqpot
       KC_DB: postgres
       KC_DB_SCHEMA: keycloak
-      KC_DB_URL: jdbc:postgresql://localhost:5432/jaqpot
+      KC_DB_URL: jdbc:postgresql://localhost.jaqpot.org:5432/jaqpot
       KC_DB_USERNAME: jaqpot
       KC_DB_PASSWORD: jaqpot
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true"
@@ -41,21 +41,21 @@ services:
     #      - 8080:8080
     environment:
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jaqpot
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: http://localhost:8070/realms/jaqpot-local
-      KEYCLOAK_SERVER-URL: http://localhost:8070
-      JAQPOT_RUNTIME_JAQPOTPY-PRETRAINED: http://localhost:8002
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost.jaqpot.org:5432/jaqpot
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: http://localhost.jaqpot.org:8070/realms/jaqpot-local
+      KEYCLOAK_SERVER-URL: http://localhost.jaqpot.org:8070
+      JAQPOT_RUNTIME_JAQPOTPY-PRETRAINED: http://localhost.jaqpot.org:8002
 
   #      - 8070:8070
   frontend:
     network_mode: 'host'
     image: upcintua/jaqpot-frontend:6.1.0
     environment:
-      KEYCLOAK_ISSUER: http://keycloak:8070/realms/jaqpot-local
+      KEYCLOAK_ISSUER: http://localhost.jaqpot.org:8070/realms/jaqpot-local
       KEYCLOAK_CLIENT_ID: nextjs
       KEYCLOAK_CLIENT_SECRET: MDOgE836RmNGmaHDhzH9rNjK2i4QB7ph
-      API_URL: http://keycloak:8080
-      AUTH_URL: http://localhost:3000
+      API_URL: http://localhost.jaqpot.org:8080
+      AUTH_URL: http://localhost.jaqpot.org:3000
       AUTH_SECRET: n43NFbC4xzE4LKcigNl6N353ouZcT5tHDh29ahw7/dg=
       NEXT_PUBLIC_GA_MEASUREMENT_ID: "G-VW0RC3JS55"
   #    ports:
