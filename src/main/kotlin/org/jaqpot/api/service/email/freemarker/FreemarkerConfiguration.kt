@@ -6,6 +6,7 @@ import freemarker.template.Configuration
 import org.springframework.context.annotation.Bean
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer
 
+@org.springframework.context.annotation.Configuration
 class FreemarkerConfiguration {
     @Bean
     fun freemarkerClassLoaderConfig(): FreeMarkerConfigurer {

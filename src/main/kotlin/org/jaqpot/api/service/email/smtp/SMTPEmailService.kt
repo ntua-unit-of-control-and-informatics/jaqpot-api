@@ -6,12 +6,16 @@ import org.jaqpot.api.service.email.freemarker.FreemarkerTemplate
 import org.jaqpot.api.service.email.freemarker.FreemarkerTemplateEngine
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.scheduling.annotation.Async
+import org.springframework.stereotype.Service
 
+@Service
 class SMTPEmailService(
     private val smtpConfig: SMTPConfig,
     private val templateEngine: FreemarkerTemplateEngine,
     private val javaMailSender: JavaMailSender
 ) : EmailService<FreemarkerTemplate> {
+    @Async
     override fun sendHTMLEmail(to: String, subject: String, template: FreemarkerTemplate, model: Map<String, Any>?) {
         val message: MimeMessage = javaMailSender.createMimeMessage()
         val helper = MimeMessageHelper(message, true, "UTF-8")
