@@ -13,6 +13,7 @@ services:
 
   keycloak:
     depends_on: [ postgres ]
+    restart: always
     network_mode: 'host'
     image: quay.io/keycloak/keycloak:24.0.3
     command:
@@ -63,6 +64,6 @@ services:
 
   inference:
     network_mode: 'host'
-    image: upcintua/jaqpot-inference:1.0.0
+    image: upcintua/jaqpotpy-inference:6.1.0
 #    ports:
 #      - "8002:8002"
