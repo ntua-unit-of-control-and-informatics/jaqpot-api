@@ -22,6 +22,15 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  mail:
+    host:
+    port: 587
+    username:
+    password:
+    from: info@jaqpot.org
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
 server:
   error:
@@ -38,3 +47,6 @@ keycloak:
 jaqpot:
   runtime:
     jaqpotpy-pretrained: http://localhost:8002
+
+
+

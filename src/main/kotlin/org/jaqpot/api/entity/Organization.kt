@@ -16,7 +16,7 @@ class Organization(
     @Pattern(regexp = "[\\w-_]+")
     val name: String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     val creatorId: String,
 
     @Size(min = 3, max = 2000)
