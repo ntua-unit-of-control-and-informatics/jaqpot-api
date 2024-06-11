@@ -39,6 +39,7 @@
 
         .content {
             padding: 20px;
+            min-height: 200px;
         }
 
         .content h2 {
@@ -46,7 +47,7 @@
             color: #333333;
         }
 
-        .content p{
+        .content p {
             font-size: 16px;
             line-height: 1.6;
             color: #666666;
@@ -56,7 +57,7 @@
             font-size: 16px;
         }
 
-          .footer {
+        .footer {
             background-color: #f4f4f4;
             color: #666666;
             text-align: center;
