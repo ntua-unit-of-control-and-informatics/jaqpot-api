@@ -2,7 +2,7 @@ spring:
   application:
     name: jaqpot-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/jaqpot
+    url: jdbc:postgresql://localhost.jaqpot.org:5432/jaqpot
     username: jaqpot
     password: jaqpot
     driverClassName: org.postgresql.Driver
@@ -18,7 +18,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8070/realms/jaqpot-local
+          issuer-uri: http://localhost.jaqpot.org:8070/realms/jaqpot-local
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -42,11 +42,11 @@ keycloak:
   client-id: admin-cli
   client-secret: 62r8Qm79gjwtA6wFMYt41InUK718nwzJ
   realm: jaqpot-local
-  server-url: http://localhost:8070
+  server-url: http://localhost.jaqpot.org:8070
 
 jaqpot:
   runtime:
-    jaqpotpy-pretrained: http://localhost:8002
+    jaqpotpy-pretrained: http://localhost.jaqpot.org:8002
 
 
 

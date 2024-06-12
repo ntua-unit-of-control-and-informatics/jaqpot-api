@@ -90,7 +90,7 @@ class ModelService(
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
     }
 
-    @PreAuthorize("@partialModelUpdateAuthorizationLogic.decide(#root, #modelId)")
+    @PreAuthorize("@partialModelUpdateAuthorizationLogic.decide(#root, #id)")
     @Transactional
     override fun partiallyUpdateModel(
         id: Long,
