@@ -1,3 +1,5 @@
+# To run you need to add an entry on your etc hosts file to map localhost.jaqpot.org to 127.0.0.1
+
 services:
   postgres:
     network_mode: 'host'
@@ -25,45 +27,11 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: jaqpot
       KC_DB: postgres
-      KC_DB_SCHEMA: keycloak
-      KC_DB_URL: jdbc:postgresql://localhost.jaqpot.org:5432/jaqpot
+      KC_DB_SCHEMA: public
+      KC_DB_URL: jdbc:postgresql://localhost.jaqpot.org:5432/keycloak
       KC_DB_USERNAME: jaqpot
       KC_DB_PASSWORD: jaqpot
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true"
     volumes:
       - ./docker/keycloak/imports:/opt/keycloak/data/import
   #    ports:
-
-  api:
-    depends_on: [ postgres ]
-    network_mode: 'host'
-    image: upcintua/jaqpot-api:6.1.0
-    #    ports:
-    #      - 8080:8080
-    environment:
-      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost.jaqpot.org:5432/jaqpot
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: http://localhost.jaqpot.org:8070/realms/jaqpot-local
-      KEYCLOAK_SERVER-URL: http://localhost.jaqpot.org:8070
-      JAQPOT_RUNTIME_JAQPOTPY-PRETRAINED: http://localhost.jaqpot.org:8002
-
-  #      - 8070:8070
-  frontend:
-    network_mode: 'host'
-    image: upcintua/jaqpot-frontend:6.1.0
-    environment:
-      KEYCLOAK_ISSUER: http://localhost.jaqpot.org:8070/realms/jaqpot-local
-      KEYCLOAK_CLIENT_ID: nextjs
-      KEYCLOAK_CLIENT_SECRET: MDOgE836RmNGmaHDhzH9rNjK2i4QB7ph
-      API_URL: http://localhost.jaqpot.org:8080
-      AUTH_URL: http://localhost.jaqpot.org:3000
-      AUTH_SECRET: n43NFbC4xzE4LKcigNl6N353ouZcT5tHDh29ahw7/dg=
-      NEXT_PUBLIC_GA_MEASUREMENT_ID: "G-VW0RC3JS55"
-  #    ports:
-  #      - 3000:3000
-
-  inference:
-    network_mode: 'host'
-    image: upcintua/jaqpotpy-inference:6.1.0
-#    ports:
-#      - "8002:8002"
