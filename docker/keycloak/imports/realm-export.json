@@ -5,7 +5,7 @@
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 86400,
+  "accessTokenLifespan": 2592000,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
@@ -927,10 +927,12 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "MDOgE836RmNGmaHDhzH9rNjK2i4QB7ph",
       "redirectUris": [
-        "http://localhost:3000/api/auth/callback/keycloak"
+        "http://localhost:3000/api/auth/callback/keycloak",
+        "http://localhost.jaqpot.org:3000/api/auth/callback/keycloak"
       ],
       "webOrigins": [
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://localhost.jaqpot.org:3000"
       ],
       "notBefore": 0,
       "bearerOnly": false,
