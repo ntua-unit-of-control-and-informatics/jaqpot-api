@@ -19,8 +19,8 @@ class Organization(
     @Column(nullable = false, updatable = false)
     val creatorId: String,
 
-    @Size(min = 3, max = 2000)
-    @Column
+    @Size(min = 3, max = 15000)
+    @Column(columnDefinition = "TEXT")
     val description: String? = null,
 
     @ElementCollection
@@ -38,6 +38,9 @@ class Organization(
         inverseJoinColumns = [JoinColumn(name = "model_id")]
     )
     val models: MutableSet<Model> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "organization", orphanRemoval = true)
+    val organizationInvitations: MutableList<OrganizationInvitation>,
 
     @Column(nullable = false)
     val contactEmail: String,

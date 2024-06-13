@@ -295,7 +295,91 @@ paths:
                 $ref: '#/components/schemas/Organization'
         '404':
           description: Organization not found
-
+  /v1/organizations/{name}/invitations:
+    post:
+      tags:
+        - "organizations"
+      summary: "Create new invitations for an organization"
+      description: "This endpoint allows an organization admin to create new invitations for users."
+      operationId: "createInvitations"
+      parameters:
+        - name: "name"
+          in: "path"
+          description: "Name of the organization"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: "Invitation request payload"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                emails:
+                  type: "array"
+                  items:
+                    type: "string"
+                  description: "List of email addresses to invite"
+                  example: [ "user1@example.com", "user2@example.com" ]
+      responses:
+        "201":
+          description: "Invitations created successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    invitationId:
+                      type: "string"
+                      description: "ID of the created invitation"
+                    email:
+                      type: "string"
+                      description: "Email address of the invited user"
+                    status:
+                      type: "string"
+                      enum: [ "PENDING", "REJECTED", "ACCEPTED" ]
+                      description: "Status of the invitation"
+        "400":
+          description: "Bad request, invalid input"
+        "401":
+          description: "Unauthorized, only admins can create invitations"
+        "429":
+          description: "Too many requests, rate limit exceeded"
+  /v1/organizations/{name}/invitations/{uuid}:
+    get:
+      tags:
+        - "organizations"
+      summary: "Get the status of an invitation"
+      description: "This endpoint allows a user to check the status of an invitation."
+      operationId: "getInvitation"
+      parameters:
+        - name: "name"
+          in: "path"
+          description: "Name of the organization"
+          required: true
+          schema:
+            type: "string"
+        - name: "uuid"
+          in: "path"
+          description: "UUID of the invitation"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Invitation status retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitationResponse'
+        "400":
+          description: "Bad request, invalid input"
+        "404":
+          description: "Invitation not found"
 components:
   securitySchemes:
     bearerAuth:
@@ -374,7 +458,7 @@ components:
         creator:
           $ref: '#/components/schemas/User'
         canEdit:
-          description: This is an internal api property, feel free to ignore it
+          description: If the current user can edit the model
           type: boolean
         createdAt:
           type: LocalDateTime
@@ -588,9 +672,38 @@ components:
         address:
           type: string
           example: "123 Organization St., City, Country"
+        canEdit:
+          description: If the current user can edit the organization
+          type: boolean
         created_at:
           type: LocalDateTime
         updated_at:
           type: LocalDateTime
+    OrganizationInvitationResponse:
+      type: "object"
+      required:
+        - userEmail
+        - status
+        - expirationDate
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          description: "ID of the invitation"
+        userEmail:
+          type: "string"
+          format: "email"
+          description: "Email address of the invited user"
+        status:
+          type: "string"
+          enum:
+            - "PENDING"
+            - "REJECTED"
+            - "ACCEPTED"
+          description: "Status of the invitation"
+        expirationDate:
+          type: LocalDateTime
+          description: "Expiration date of the invitation"
+
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.
