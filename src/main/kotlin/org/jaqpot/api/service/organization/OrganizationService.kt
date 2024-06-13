@@ -8,7 +8,6 @@ import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.OrganizationDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
-import org.jaqpot.api.service.authentication.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -18,7 +17,6 @@ import java.net.URI
 class OrganizationService(
     private val authenticationFacade: AuthenticationFacade,
     private val organizationRepository: OrganizationRepository,
-    private val userService: UserService,
 ) : OrganizationApiDelegate {
     override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
         return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
@@ -29,7 +27,7 @@ class OrganizationService(
             throw IllegalStateException("ID should not be provided for resource creation.")
         }
 
-        if (organizationRepository.findByName(organizationDto.name) != null) {
+        if (organizationRepository.findByName(organizationDto.name).isPresent) {
             throw BadRequestException("Organization with name ${organizationDto.name} already exists.")
         }
 
@@ -43,7 +41,7 @@ class OrganizationService(
 
     override fun getOrganizationByName(name: String): ResponseEntity<OrganizationDto> {
         val organization = organizationRepository.findByName(name)
-            ?: throw NotFoundException("Organization with name $name not found.")
+            .orElseThrow { NotFoundException("Organization with name $name not found.") }
 
         val userCanEdit = authenticationFacade.userId == organization.creatorId
         return ResponseEntity.ok(organization.toDto(userCanEdit))

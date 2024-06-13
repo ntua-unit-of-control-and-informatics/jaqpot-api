@@ -45,6 +45,8 @@ keycloak:
   server-url: http://localhost.jaqpot.org:8070
 
 jaqpot:
+  frontend:
+    url: http://localhost.jaqpot.org:3000
   runtime:
     jaqpotpy-pretrained: http://localhost.jaqpot.org:8002
 

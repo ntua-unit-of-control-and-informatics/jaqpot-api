@@ -10,8 +10,8 @@ class OrganizationInvitation(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID?,
 
-    @Column(nullable = false)
-    val userId: String,
+    @Column
+    val userId: String?,
 
     @Column(nullable = false)
     val userEmail: String,

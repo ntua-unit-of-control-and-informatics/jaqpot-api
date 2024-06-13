@@ -3,7 +3,7 @@ CREATE TABLE organization_invitation
     id              UUID                        NOT NULL,
     created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    user_id         VARCHAR(255)                NOT NULL,
+    user_id         VARCHAR(255),
     user_email      VARCHAR(255)                NOT NULL,
     organization_id BIGINT                      NOT NULL,
     status          VARCHAR(255)                NOT NULL,

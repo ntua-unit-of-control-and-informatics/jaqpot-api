@@ -220,7 +220,7 @@ paths:
       summary: Get all organizations
       operationId: getAllOrganizations
       tags:
-        - Organization
+        - organization
       responses:
         '200':
           description: Successful response
@@ -235,7 +235,7 @@ paths:
       summary: Create a new organization
       operationId: createOrganization
       tags:
-        - Organization
+        - organization
       requestBody:
         required: true
         content:
@@ -251,7 +251,7 @@ paths:
       summary: Update an existing organization
       operationId: updateOrganization
       tags:
-        - Organization
+        - organization
       parameters:
         - name: id
           in: path
@@ -279,7 +279,7 @@ paths:
       summary: Get organization by name
       operationId: getOrganizationByName
       tags:
-        - Organization
+        - organization
       parameters:
         - name: name
           in: path
@@ -295,15 +295,15 @@ paths:
                 $ref: '#/components/schemas/Organization'
         '404':
           description: Organization not found
-  /v1/organizations/{name}/invitations:
+  /v1/organizations/{orgName}/invitations:
     post:
       tags:
-        - "organizations"
+        - organization- invitation
       summary: "Create new invitations for an organization"
       description: "This endpoint allows an organization admin to create new invitations for users."
       operationId: "createInvitations"
       parameters:
-        - name: "name"
+        - name: "orgName"
           in: "path"
           description: "Name of the organization"
           required: true
@@ -326,23 +326,6 @@ paths:
       responses:
         "201":
           description: "Invitations created successfully"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    invitationId:
-                      type: "string"
-                      description: "ID of the created invitation"
-                    email:
-                      type: "string"
-                      description: "Email address of the invited user"
-                    status:
-                      type: "string"
-                      enum: [ "PENDING", "REJECTED", "ACCEPTED" ]
-                      description: "Status of the invitation"
         "400":
           description: "Bad request, invalid input"
         "401":
@@ -352,7 +335,7 @@ paths:
   /v1/organizations/{name}/invitations/{uuid}:
     get:
       tags:
-        - "organizations"
+        - organization-invitation
       summary: "Get the status of an invitation"
       description: "This endpoint allows a user to check the status of an invitation."
       operationId: "getInvitation"

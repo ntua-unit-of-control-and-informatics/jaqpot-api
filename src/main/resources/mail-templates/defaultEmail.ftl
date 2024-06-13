@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Jaqpot Email</title>
     <style>
-        body {
+        .email-body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #f4f4f4;
         }
 
@@ -67,23 +67,25 @@
     </style>
 </head>
 <body>
-<div class="email-container">
-    <div class="header">
-        <img src="https://i.imgur.com/6wiAkyL.png" alt="Logo">
-        <h1>${title}</h1>
-    </div>
-    <div class="content">
-        <h2>Hello, ${recipientName}</h2>
-        <p>
-            ${bodyContent}
-        </p>
-        <a href="${actionUrl}">${actionText}</a>
-    </div>
-    <div class="footer">
-        <p>
-            &copy; ${.now?string('yyyy')} <a href="https://app.jaqpot.org" target="_blank">Jaqpot</a>. All rights
-            reserved.
-        </p>
+<div class="email-body">
+    <div class="email-container">
+        <div class="header">
+            <img src="https://i.imgur.com/6wiAkyL.png" alt="Logo">
+            <h1>${title}</h1>
+        </div>
+        <div class="content">
+            <h2>Hello, ${recipientName}</h2>
+            <p>
+                ${bodyContent}
+            </p>
+            <a href="${actionUrl}">${actionText}</a>
+        </div>
+        <div class="footer">
+            <p>
+                &copy; ${.now?string('yyyy')} <a href="https://app.jaqpot.org" target="_blank">Jaqpot</a>. All rights
+                reserved.
+            </p>
+        </div>
     </div>
 </div>
 </body>

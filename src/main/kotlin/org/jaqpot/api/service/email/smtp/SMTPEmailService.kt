@@ -14,7 +14,7 @@ class SMTPEmailService(
     private val smtpConfig: SMTPConfig,
     private val templateEngine: FreemarkerTemplateEngine,
     private val javaMailSender: JavaMailSender
-) : EmailService<FreemarkerTemplate> {
+) : EmailService {
     @Async
     override fun sendHTMLEmail(to: String, subject: String, template: FreemarkerTemplate, model: Map<String, Any>?) {
         val message: MimeMessage = javaMailSender.createMimeMessage()
