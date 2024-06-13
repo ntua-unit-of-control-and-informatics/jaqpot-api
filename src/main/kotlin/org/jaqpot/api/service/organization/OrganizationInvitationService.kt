@@ -55,10 +55,10 @@ class OrganizationInvitationService(
                 )
             )
 
-            user to organizationInvitation
+            organizationInvitation to user
         }?.toMap() ?: emptyMap()
 
-        userOrganizationInvitationDictionary.forEach { (user, organizationInvitation) ->
+        userOrganizationInvitationDictionary.forEach { (organizationInvitation, user) ->
             val invitationActionUrl = generateInvitationActionUrl(
                 organization,
                 organizationInvitation,
@@ -66,6 +66,7 @@ class OrganizationInvitationService(
             )
             val model = EmailModelHelper.generateOrganizationInvitationEmailModel(
                 invitationActionUrl,
+                orgName,
                 user.map { it -> it.name.orEmpty() }.orElse("")
             )
             try {
