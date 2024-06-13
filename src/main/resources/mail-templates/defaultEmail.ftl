@@ -79,6 +79,9 @@
                 ${bodyContent}
             </p>
             <a href="${actionUrl}">${actionText}</a>
+            <br>
+            <br>
+            <p>Cheers,<br> The Jaqpot Team</p>
         </div>
         <div class="footer">
             <p>
