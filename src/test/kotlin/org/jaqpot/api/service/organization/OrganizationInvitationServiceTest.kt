@@ -173,7 +173,7 @@ class OrganizationInvitationServiceTest {
         }
 
         assertEquals(
-            "No user found with email ${invitation.userEmail}",
+            "It appears that you are currently logged in with an email address that does not match the one associated with this invitation. Please log in or sign up with the email address that received the invitation to proceed.",
             ex.message
         )
     }
@@ -208,9 +208,7 @@ class OrganizationInvitationServiceTest {
         }
 
         assertEquals(
-            "It appears that you are currently logged in with an email address that does " +
-                    "not match the one associated with this invitation. " +
-                    "Please log in with the email address that received the invitation to proceed.",
+            "It appears that you are currently logged in with an email address that does not match the one associated with this invitation. Please log in or sign up with the email address that received the invitation to proceed.",
             ex.message
         )
     }

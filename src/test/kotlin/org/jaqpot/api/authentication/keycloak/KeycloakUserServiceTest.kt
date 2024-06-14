@@ -30,9 +30,10 @@ class KeycloakUserServiceTest {
         every { userRepresentation.id } returns "id"
         every { userRepresentation.firstName } returns "firstName"
         every { userRepresentation.lastName } returns "lastName"
+        every { userRepresentation.isEmailVerified } returns true
         keycloakClient = mockk()
         keycloakUserService = KeycloakUserService(keycloakConfig)
-        ReflectionTestUtils.setField(keycloakUserService, "keycloakClient", keycloakClient)
+        ReflectionTestUtils.setField(keycloakUserService, "keycloakAdminClient", keycloakClient)
     }
 
     @Test
@@ -41,7 +42,6 @@ class KeycloakUserServiceTest {
         val user = keycloakUserService.getUserById("id")
 
         assertEquals(user.get().name, "firstName lastName")
-
     }
 
     @Test
