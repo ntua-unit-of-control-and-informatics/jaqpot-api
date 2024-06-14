@@ -1,6 +1,8 @@
 package org.jaqpot.api.service.organization
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.transaction.Transactional
+import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.NotFoundException
 import org.jaqpot.api.OrganizationInvitationApiDelegate
 import org.jaqpot.api.config.JaqpotConfig
@@ -8,10 +10,12 @@ import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.entity.OrganizationInvitation
 import org.jaqpot.api.entity.OrganizationInvitationStatus
 import org.jaqpot.api.mapper.toDto
+import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.CreateInvitationsRequestDto
 import org.jaqpot.api.model.OrganizationInvitationDto
 import org.jaqpot.api.repository.OrganizationInvitationRepository
 import org.jaqpot.api.repository.OrganizationRepository
+import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.email.EmailModelHelper
 import org.jaqpot.api.service.email.EmailService
@@ -30,7 +34,8 @@ class OrganizationInvitationService(
     private val organizationInvitationRepository: OrganizationInvitationRepository,
     private val emailService: EmailService,
     private val userService: UserService,
-    private val jaqpotConfig: JaqpotConfig
+    private val jaqpotConfig: JaqpotConfig,
+    private val authenticationFacade: AuthenticationFacade
 ) : OrganizationInvitationApiDelegate {
     companion object {
         const val ORGANIZATION_INVITATION_EMAIL_SUBJECT = "Jaqpot organization invitation"
@@ -44,6 +49,58 @@ class OrganizationInvitationService(
             .orElseThrow { NotFoundException("Invitation with id $uuid not found") }
 
         return ResponseEntity.ok(invitation.toDto())
+    }
+
+    @Transactional
+    override fun updateInvitation(
+        name: String,
+        uuid: UUID,
+        organizationInvitationDto: OrganizationInvitationDto
+    ): ResponseEntity<OrganizationInvitationDto> {
+        val organization = organizationRepository.findByName(name)
+            .orElseThrow { NotFoundException("Organization $name not found") }
+
+        val invitation = organizationInvitationRepository.findByIdAndOrganization(uuid, organization)
+            .orElseThrow { NotFoundException("Invitation with id $uuid not found") }
+
+        if (invitation.status == OrganizationInvitationStatus.ACCEPTED || invitation.status == OrganizationInvitationStatus.REJECTED) {
+            throw BadRequestException("This invitation has already status ${invitation.status}")
+        }
+
+        if (invitation.expirationDate.isBefore(LocalDateTime.now())) {
+            throw BadRequestException("This invitation has expired. Please ask the organization admin to generate a new invitation")
+        }
+
+        val user = userService.getUserByEmail(invitation.userEmail)
+            .orElseThrow { BadRequestException("No user found with email ${invitation.userEmail}") }
+
+        if (user.id != authenticationFacade.userId) {
+            throw BadRequestException(
+                "It appears that you are currently logged in with an email address that does " +
+                        "not match the one associated with this invitation. " +
+                        "Please log in with the email address that received the invitation to proceed."
+            )
+        }
+
+        if (user.emailVerified == null || user.emailVerified == false) {
+            throw BadRequestException(
+                "Your email needs to be verified before you can respond to the invitation and " +
+                        "potentially be added as a member of the organization."
+            )
+        }
+
+        invitation.userId = authenticationFacade.userId
+        invitation.status = organizationInvitationDto.status.toEntity()
+
+        val updatedInvitation = organizationInvitationRepository.save(invitation)
+
+        if (updatedInvitation.status == OrganizationInvitationStatus.ACCEPTED) {
+            organization.userIds.add(authenticationFacade.userId)
+
+            organizationRepository.save(organization)
+        }
+
+        return ResponseEntity.ok(updatedInvitation.toDto())
     }
 
     @PreAuthorize("@organizationInviteAuthorizationLogic.decide(#root, #orgName)")

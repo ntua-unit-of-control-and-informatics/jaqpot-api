@@ -40,7 +40,7 @@ class KeycloakUserServiceTest {
         every { keycloakClient.realm("realm").users().get("id").toRepresentation() } returns userRepresentation
         val user = keycloakUserService.getUserById("id")
 
-        assertEquals(user.name, "firstName lastName")
+        assertEquals(user.get().name, "firstName lastName")
 
     }
 
@@ -51,7 +51,7 @@ class KeycloakUserServiceTest {
         } returns listOf(userRepresentation)
         val user = keycloakUserService.getUserByUsername("username")
 
-        assertEquals(user.name, "firstName lastName")
+        assertEquals(user.get().name, "firstName lastName")
     }
 
     @Test
@@ -61,6 +61,6 @@ class KeycloakUserServiceTest {
         } returns listOf(userRepresentation)
         val user = keycloakUserService.getUserByEmail("email")
 
-        assertEquals(user.name, "firstName lastName")
+        assertEquals(user.get().name, "firstName lastName")
     }
 }

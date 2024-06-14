@@ -28,7 +28,7 @@ fun OrganizationDto.toEntity(adminUserId: String): Organization {
         this.name,
         adminUserId,
         this.description,
-        this.userIds?.toSet() ?: emptySet<String>(),
+        this.userIds?.toMutableSet() ?: mutableSetOf(),
         mutableSetOf(),
         mutableListOf(),
         this.contactEmail,

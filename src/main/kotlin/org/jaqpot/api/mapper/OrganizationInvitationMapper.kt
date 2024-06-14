@@ -11,4 +11,3 @@ fun OrganizationInvitation.toDto(): OrganizationInvitationDto {
         this.id
     )
 }
-

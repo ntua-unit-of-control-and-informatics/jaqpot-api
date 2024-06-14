@@ -1,4 +1,4 @@
-package org.jaqpot.api.entity;
+package org.jaqpot.api.entity
 
 import jakarta.persistence.*
 import jakarta.validation.constraints.Pattern
@@ -29,7 +29,7 @@ class Organization(
         joinColumns = [JoinColumn(name = "organization_id")]
     )
     @Column(name = "user_id", nullable = false)
-    val userIds: Set<String> = mutableSetOf(),
+    val userIds: MutableSet<String> = mutableSetOf(),
 
     @ManyToMany
     @JoinTable(

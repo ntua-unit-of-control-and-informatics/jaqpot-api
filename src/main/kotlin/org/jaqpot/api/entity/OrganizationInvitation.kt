@@ -11,7 +11,7 @@ class OrganizationInvitation(
     val id: UUID?,
 
     @Column
-    val userId: String?,
+    var userId: String?,
 
     @Column(nullable = false)
     val userEmail: String,
@@ -22,7 +22,7 @@ class OrganizationInvitation(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val status: OrganizationInvitationStatus = OrganizationInvitationStatus.PENDING,
+    var status: OrganizationInvitationStatus = OrganizationInvitationStatus.PENDING,
 
     @Column(updatable = false, nullable = false)
     val expirationDate: LocalDateTime
