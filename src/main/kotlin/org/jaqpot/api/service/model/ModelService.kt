@@ -37,7 +37,7 @@ class ModelService(
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size)
         val modelsPage = modelRepository.findAllByCreatorId(creatorId, pageable)
-        val creator = userService.getUserById(creatorId)
+        val creator = userService.getUserById(creatorId).orElse(UserDto(creatorId))
 
         return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
     }
@@ -60,7 +60,7 @@ class ModelService(
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
-            val user = userService.getUserById(it.creatorId)
+            val user = userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId))
             ResponseEntity.ok(it.toDto(user, userCanEdit))
         }
             .orElse(ResponseEntity.notFound().build())
@@ -114,7 +114,7 @@ class ModelService(
         val model: Model = modelRepository.save(existingModel)
 
         val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, model)
-        val user = userService.getUserById(model.creatorId)
+        val user = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
         return ResponseEntity.ok(model.toDto(user, userCanEdit))
     }
 

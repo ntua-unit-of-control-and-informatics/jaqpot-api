@@ -14,13 +14,14 @@ class SMTPEmailService(
     private val smtpConfig: SMTPConfig,
     private val templateEngine: FreemarkerTemplateEngine,
     private val javaMailSender: JavaMailSender
-) : EmailService<FreemarkerTemplate> {
+) : EmailService {
     @Async
     override fun sendHTMLEmail(to: String, subject: String, template: FreemarkerTemplate, model: Map<String, Any>?) {
         val message: MimeMessage = javaMailSender.createMimeMessage()
         val helper = MimeMessageHelper(message, true, "UTF-8")
         helper.setFrom(smtpConfig.from)
         helper.setTo(to)
+        helper.setReplyTo(smtpConfig.replyTo)
         helper.setSubject(subject)
 
         val htmlBody = templateEngine.convertToHTML(template, model)

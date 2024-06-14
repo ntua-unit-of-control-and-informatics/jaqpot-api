@@ -45,7 +45,7 @@ abstract class AbstractIntegrationTest {
 
             val keycloakUrl = "http://${keycloakContainer.host}:${keycloakContainer.firstMappedPort}"
             val dbUrl =
-                "jdbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.firstMappedPort}/${TEST_DB_NAME}"
+                "jdbc:postgresql://${postgreSQLContainer.host}:${postgreSQLContainer.firstMappedPort}/$TEST_DB_NAME"
 
             TestPropertyValues.of(
                 "spring.datasource.url= $dbUrl",

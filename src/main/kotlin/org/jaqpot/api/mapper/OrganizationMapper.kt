@@ -3,7 +3,7 @@ package org.jaqpot.api.mapper
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.model.OrganizationDto
 
-fun Organization.toDto(): OrganizationDto {
+fun Organization.toDto(userCanEdit: Boolean = false): OrganizationDto {
     return OrganizationDto(
         this.name,
         this.contactEmail,
@@ -16,6 +16,7 @@ fun Organization.toDto(): OrganizationDto {
         this.contactPhone,
         this.website,
         this.address,
+        userCanEdit,
         this.createdAt,
         this.updatedAt
     )
@@ -27,8 +28,9 @@ fun OrganizationDto.toEntity(adminUserId: String): Organization {
         this.name,
         adminUserId,
         this.description,
-        this.userIds?.toSet() ?: emptySet<String>(),
+        this.userIds?.toMutableSet() ?: mutableSetOf(),
         mutableSetOf(),
+        mutableListOf(),
         this.contactEmail,
         this.visibility.toEntity(),
         this.contactPhone,

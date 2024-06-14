@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class DatasetService(private val datasetRepository: DatasetRepository) : DatasetApiDelegate {
+    // TODO only allow access to the user that created the dataset
     override fun getDatasetById(id: Long): ResponseEntity<DatasetDto> {
         val dataset = datasetRepository.findById(id)
 
