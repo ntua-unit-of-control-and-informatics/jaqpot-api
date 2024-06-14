@@ -28,6 +28,7 @@ spring:
     username:
     password:
     from: info@jaqpot.org
+    reply-to:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true

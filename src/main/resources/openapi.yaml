@@ -352,17 +352,19 @@ paths:
           required: true
           schema:
             type: "string"
+            format: uuid
       responses:
         "200":
           description: "Invitation status retrieved successfully"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrganizationInvitationResponse'
+                $ref: '#/components/schemas/OrganizationInvitation'
         "400":
           description: "Bad request, invalid input"
         "404":
           description: "Invitation not found"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -662,7 +664,7 @@ components:
           type: LocalDateTime
         updated_at:
           type: LocalDateTime
-    OrganizationInvitationResponse:
+    OrganizationInvitation:
       type: "object"
       required:
         - userEmail

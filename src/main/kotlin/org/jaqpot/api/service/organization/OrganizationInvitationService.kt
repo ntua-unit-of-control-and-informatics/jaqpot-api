@@ -7,7 +7,9 @@ import org.jaqpot.api.config.JaqpotConfig
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.entity.OrganizationInvitation
 import org.jaqpot.api.entity.OrganizationInvitationStatus
+import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.model.CreateInvitationsRequestDto
+import org.jaqpot.api.model.OrganizationInvitationDto
 import org.jaqpot.api.repository.OrganizationInvitationRepository
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.UserService
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -31,6 +34,16 @@ class OrganizationInvitationService(
 ) : OrganizationInvitationApiDelegate {
     companion object {
         const val ORGANIZATION_INVITATION_EMAIL_SUBJECT = "Jaqpot organization invitation"
+    }
+
+    override fun getInvitation(name: String, uuid: UUID): ResponseEntity<OrganizationInvitationDto> {
+        val organization = organizationRepository.findByName(name)
+            .orElseThrow { NotFoundException("Organization $name not found") }
+
+        val invitation = organizationInvitationRepository.findByIdAndOrganization(uuid, organization)
+            .orElseThrow { NotFoundException("Invitation with id $uuid not found") }
+
+        return ResponseEntity.ok(invitation.toDto())
     }
 
     @PreAuthorize("@organizationInviteAuthorizationLogic.decide(#root, #orgName)")
@@ -89,6 +102,6 @@ class OrganizationInvitationService(
         organizationInvitation: OrganizationInvitation,
         jaqpotConfig: JaqpotConfig
     ): String {
-        return "${jaqpotConfig.frontendUrl}/organizations/${organization.name}/invitations/${organizationInvitation.id}"
+        return "${jaqpotConfig.frontendUrl}/dashboard/organizations/${organization.name}/invitations/${organizationInvitation.id}"
     }
 }

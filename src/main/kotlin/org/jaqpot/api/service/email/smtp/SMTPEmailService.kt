@@ -21,6 +21,7 @@ class SMTPEmailService(
         val helper = MimeMessageHelper(message, true, "UTF-8")
         helper.setFrom(smtpConfig.from)
         helper.setTo(to)
+        helper.setReplyTo(smtpConfig.replyTo)
         helper.setSubject(subject)
 
         val htmlBody = templateEngine.convertToHTML(template, model)

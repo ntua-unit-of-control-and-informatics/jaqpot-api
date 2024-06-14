@@ -1,20 +1,20 @@
 package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.OrganizationInvitationStatus
-import org.jaqpot.api.model.OrganizationInvitationResponseDto
+import org.jaqpot.api.model.OrganizationInvitationDto
 
-fun OrganizationInvitationResponseDto.Status.toEntity(): OrganizationInvitationStatus {
+fun OrganizationInvitationDto.Status.toEntity(): OrganizationInvitationStatus {
     return when (this) {
-        OrganizationInvitationResponseDto.Status.PENDING -> OrganizationInvitationStatus.PENDING
-        OrganizationInvitationResponseDto.Status.REJECTED -> OrganizationInvitationStatus.REJECTED
-        OrganizationInvitationResponseDto.Status.ACCEPTED -> OrganizationInvitationStatus.ACCEPTED
+        OrganizationInvitationDto.Status.PENDING -> OrganizationInvitationStatus.PENDING
+        OrganizationInvitationDto.Status.REJECTED -> OrganizationInvitationStatus.REJECTED
+        OrganizationInvitationDto.Status.ACCEPTED -> OrganizationInvitationStatus.ACCEPTED
     }
 }
 
-fun OrganizationInvitationStatus.toDto(): OrganizationInvitationResponseDto.Status {
+fun OrganizationInvitationStatus.toDto(): OrganizationInvitationDto.Status {
     return when (this) {
-        OrganizationInvitationStatus.PENDING -> OrganizationInvitationResponseDto.Status.PENDING
-        OrganizationInvitationStatus.REJECTED -> OrganizationInvitationResponseDto.Status.REJECTED
-        OrganizationInvitationStatus.ACCEPTED -> OrganizationInvitationResponseDto.Status.ACCEPTED
+        OrganizationInvitationStatus.PENDING -> OrganizationInvitationDto.Status.PENDING
+        OrganizationInvitationStatus.REJECTED -> OrganizationInvitationDto.Status.REJECTED
+        OrganizationInvitationStatus.ACCEPTED -> OrganizationInvitationDto.Status.ACCEPTED
     }
 }
