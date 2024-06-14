@@ -72,13 +72,19 @@ class OrganizationInvitationService(
         }
 
         val user = userService.getUserByEmail(invitation.userEmail)
-            .orElseThrow { BadRequestException("No user found with email ${invitation.userEmail}") }
+            .orElseThrow {
+                BadRequestException(
+                    "It appears that you are currently logged in with an email address that does " +
+                            "not match the one associated with this invitation. " +
+                            "Please log in or sign up with the email address that received the invitation to proceed."
+                )
+            }
 
         if (user.id != authenticationFacade.userId) {
             throw BadRequestException(
                 "It appears that you are currently logged in with an email address that does " +
                         "not match the one associated with this invitation. " +
-                        "Please log in with the email address that received the invitation to proceed."
+                        "Please log in or sign up with the email address that received the invitation to proceed."
             )
         }
 
