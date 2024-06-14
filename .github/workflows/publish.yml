@@ -3,9 +3,6 @@ name: Publish Docker image
 on:
   release:
     types: [ published ]
-  push:
-    branches:
-      - feat/JAQPOT-101/improve-deploy-for-latest
 
 env:
   IMAGE_NAME: upcintua/jaqpot-api
