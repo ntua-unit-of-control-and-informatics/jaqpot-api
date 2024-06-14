@@ -1,4 +1,4 @@
-[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml)
+[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml) [![Publish Docker image](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml)
 
 # Jaqpot API v2
 
