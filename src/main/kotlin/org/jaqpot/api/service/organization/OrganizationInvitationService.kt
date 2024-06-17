@@ -41,6 +41,14 @@ class OrganizationInvitationService(
         const val ORGANIZATION_INVITATION_EMAIL_SUBJECT = "Jaqpot organization invitation"
     }
 
+    @PreAuthorize("@organizationInviteAuthorizationLogic.decide(#root, #orgName)")
+    override fun getAllInvitations(orgName: String): ResponseEntity<List<OrganizationInvitationDto>> {
+        val organization = organizationRepository.findByName(orgName)
+            .orElseThrow { NotFoundException("Organization $orgName not found") }
+
+        return ResponseEntity.ok(organization.organizationInvitations.map { it.toDto() })
+    }
+
     override fun getInvitation(name: String, uuid: UUID): ResponseEntity<OrganizationInvitationDto> {
         val organization = organizationRepository.findByName(name)
             .orElseThrow { NotFoundException("Organization $name not found") }
