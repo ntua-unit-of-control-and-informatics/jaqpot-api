@@ -12,6 +12,7 @@ import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -71,6 +72,7 @@ class ModelService(
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetDto.Type.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {

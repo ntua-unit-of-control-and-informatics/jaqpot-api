@@ -82,6 +82,10 @@ dependencies {
     // keycloak admin client
     implementation("org.keycloak:keycloak-admin-client:24.0.3")
 
+    // bucket4j for rate limiting
+    implementation("com.bucket4j:bucket4j-core:8.10.1")
+
+
     runtimeOnly("org.postgresql:postgresql")
 
     // tests
