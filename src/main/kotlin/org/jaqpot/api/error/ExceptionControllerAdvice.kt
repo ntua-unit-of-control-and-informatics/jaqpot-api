@@ -1,6 +1,7 @@
 package org.jaqpot.api.error
 
 import jakarta.ws.rs.BadRequestException
+import org.jaqpot.api.service.ratelimit.RateLimitException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
@@ -37,6 +38,16 @@ class ExceptionControllerAdvice {
             ex.message
         )
         return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)
+    }
+
+
+    @ExceptionHandler
+    fun handleRateLimitException(ex: RateLimitException): ResponseEntity<ApiErrorResponse> {
+        val errorMessage = ApiErrorResponse(
+            HttpStatus.TOO_MANY_REQUESTS.value(),
+            "You have exceeded the maximum amount of requests allowed for this endpoint. Please try again in a few minutes"
+        )
+        return ResponseEntity(errorMessage, HttpStatus.TOO_MANY_REQUESTS)
     }
 
     @ExceptionHandler

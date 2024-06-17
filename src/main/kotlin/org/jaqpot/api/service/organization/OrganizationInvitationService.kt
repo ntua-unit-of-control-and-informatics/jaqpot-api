@@ -20,6 +20,7 @@ import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.email.EmailModelHelper
 import org.jaqpot.api.service.email.EmailService
 import org.jaqpot.api.service.email.freemarker.FreemarkerTemplate
+import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -117,6 +118,7 @@ class OrganizationInvitationService(
         return ResponseEntity.ok(updatedInvitation.toDto())
     }
 
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60 * 10)
     @PreAuthorize("@organizationInviteAuthorizationLogic.decide(#root, #orgName)")
     override fun createInvitations(
         orgName: String,
