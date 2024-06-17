@@ -25,7 +25,7 @@ class RateLimitAspect(
         val limit = annotation.limit
         val intervalInSeconds = annotation.intervalInSeconds
 
-        if (userRateLimitService.shouldLimitUserAccess("$className.$method.name", limit, intervalInSeconds)) {
+        if (userRateLimitService.shouldLimitUserAccess("$className.${method.name}", limit, intervalInSeconds)) {
             logger.warn { "Rate limit exceeded for method $method by user ${authenticationFacade.userId}" }
             throw RateLimitException("Rate limit exceeded for method $method by user ${authenticationFacade.userId}")
         }
