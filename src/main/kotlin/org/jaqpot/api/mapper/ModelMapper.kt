@@ -8,7 +8,6 @@ import org.jaqpot.api.model.UserDto
 fun Model.toDto(userDto: UserDto, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
         this.name,
-        this.description,
         this.type.toDto(),
         this.jaqpotpyVersion,
         this.libraries.map { it.toDto() },
@@ -18,6 +17,7 @@ fun Model.toDto(userDto: UserDto, userCanEdit: Boolean? = null): ModelDto {
         byteArrayOf(),
         this.id,
         this.meta,
+        this.description,
         this.organizations.map { it.toDto() },
         this.reliability,
         this.pretrained,
