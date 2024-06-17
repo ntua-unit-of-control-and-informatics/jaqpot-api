@@ -296,9 +296,49 @@ paths:
         '404':
           description: Organization not found
   /v1/organizations/{orgName}/invitations:
+    get:
+      tags:
+        - organization-invitation
+      summary: "Get all invitations for an organization"
+      description: "This endpoint allows an organization admin to get all invitations for their organization."
+      operationId: getAllInvitations
+      parameters:
+        - name: "orgName"
+          in: "path"
+          description: "Name of the organization"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Invitations retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/OrganizationInvitation'
+        "400":
+          description: "Bad request, invalid input"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: "Unauthorized, only admins can access this endpoint"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: "Organization not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-        - organization- invitation
+        - organization-invitation
       summary: "Create new invitations for an organization"
       description: "This endpoint allows an organization admin to create new invitations for users."
       operationId: "createInvitations"
@@ -322,6 +362,8 @@ paths:
                   items:
                     type: "string"
                     format: email
+                  minItems: 1
+                  maxItems: 10
                   description: "List of email addresses to invite"
                   example: [ "user1@example.com", "user2@example.com" ]
       responses:
@@ -421,7 +463,6 @@ components:
         - independentFeatures
         - actualModel
         - name
-        - description
         - visibility
         - type
       properties:
@@ -737,5 +778,14 @@ components:
             id: x0pm25vavfibz
         emailVerified:
           type: boolean
+    ErrorResponse:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+          description: "Error message"
+        code:
+          type: "integer"
+          description: "Error code"
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.
