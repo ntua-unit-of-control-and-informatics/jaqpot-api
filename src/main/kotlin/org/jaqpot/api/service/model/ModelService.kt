@@ -43,6 +43,7 @@ class ModelService(
         return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
     }
 
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
         if (modelDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
@@ -92,6 +93,7 @@ class ModelService(
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
     }
 
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
     @PreAuthorize("@partialModelUpdateAuthorizationLogic.decide(#root, #id)")
     @Transactional
     override fun partiallyUpdateModel(

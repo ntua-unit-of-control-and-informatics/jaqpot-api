@@ -8,6 +8,7 @@ import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.OrganizationDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
+import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -22,6 +23,7 @@ class OrganizationService(
         return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
     }
 
+    @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
@@ -45,5 +47,11 @@ class OrganizationService(
 
         val userCanEdit = authenticationFacade.userId == organization.creatorId
         return ResponseEntity.ok(organization.toDto(userCanEdit))
+    }
+
+    // TODO implement
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
+    override fun updateOrganization(id: Long, organizationDto: OrganizationDto): ResponseEntity<OrganizationDto> {
+        return super.updateOrganization(id, organizationDto)
     }
 }
