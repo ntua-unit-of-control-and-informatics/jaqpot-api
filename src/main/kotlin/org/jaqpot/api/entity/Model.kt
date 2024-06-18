@@ -26,7 +26,7 @@ class Model(
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
-    val description: String?,
+    var description: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

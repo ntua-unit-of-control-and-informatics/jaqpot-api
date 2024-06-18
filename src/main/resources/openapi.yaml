@@ -170,6 +170,12 @@ paths:
               properties:
                 name:
                   type: string
+                  minLength: 3
+                  maxLength: 255
+                description:
+                  type: string
+                  minLength: 3
+                  maxLength: 15000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
                 organizationIds:
@@ -482,6 +488,8 @@ components:
           example: My Model
         description:
           type: string
+          minLength: 3
+          maxLength: 15000
           example: A description of your model
         type:
           type: string
