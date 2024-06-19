@@ -85,6 +85,50 @@ paths:
                     type: integer
         '400':
           description: Invalid input
+  /v1/shared-models:
+    get:
+      x-spring-paginated: true
+      summary: Get paginated shared models
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: getSharedModels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Paginated list of shared models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '400':
+          description: Invalid input
   '/v1/models/{id}':
     get:
       summary: Get a Model

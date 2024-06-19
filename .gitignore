@@ -41,3 +41,6 @@ out/
 
 ### Docker local db data ###
 /docker/db/
+
+mongodb/**
+.mongodb
