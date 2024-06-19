@@ -8,10 +8,10 @@ import org.jaqpot.api.model.FeatureDto
 fun Feature.toDto(): FeatureDto {
     return FeatureDto(
         this.name,
-        this.description,
         this.featureType.toDto(),
         this.id,
         this.meta,
+        this.description,
         this.featureDependency.toDto(),
         this.visible,
         this.possibleValues,

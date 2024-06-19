@@ -579,7 +579,6 @@ components:
       type: object
       required:
         - name
-        - description
         - featureType
       properties:
         id:

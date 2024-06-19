@@ -21,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import org.springframework.web.util.HtmlUtils
 import java.net.URI
 
 
@@ -51,7 +50,7 @@ class ModelService(
         }
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
-        toEntity.description = toEntity.description?.let { HtmlUtils.htmlEscape(it) }
+        toEntity.description = toEntity.description
         val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
@@ -108,7 +107,7 @@ class ModelService(
         }
         partiallyUpdateModelRequestDto.name.let { existingModel.name = it }
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
-        partiallyUpdateModelRequestDto.description?.let { existingModel.description = HtmlUtils.htmlEscape(it) }
+        partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
         if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
             partiallyUpdateModelRequestDto.organizationIds?.let {
                 val organizations = organizationRepository.findAllById(it)

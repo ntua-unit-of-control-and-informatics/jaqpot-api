@@ -20,8 +20,8 @@ class Feature(
     val name: String,
 
     @Size(min = 3, max = 5000)
-    @Column(columnDefinition = "TEXT", nullable = false)
-    val description: String,
+    @Column(columnDefinition = "TEXT")
+    val description: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

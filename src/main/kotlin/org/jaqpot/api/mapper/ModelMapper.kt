@@ -31,6 +31,7 @@ fun Model.toDto(userDto: UserDto, userCanEdit: Boolean? = null): ModelDto {
 fun ModelDto.toEntity(creatorId: String): Model {
     val m = Model(
         this.id,
+        null,
         creatorId,
         this.meta,
         this.name,

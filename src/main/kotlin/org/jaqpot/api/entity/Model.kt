@@ -13,6 +13,9 @@ class Model(
     @SequenceGenerator(name = "model_id_seq", sequenceName = "model_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
+    @Column(updatable = false)
+    val legacyId: String?,
+
     @Column(nullable = false, updatable = false)
     val creatorId: String,
 
