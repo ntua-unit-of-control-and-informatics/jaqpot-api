@@ -21,7 +21,10 @@ class RuntimeResolver(
                 } else {
                     throw JaqpotRuntimeException("unknown runtime with predictionService ${model.legacyPredictionService}")
                 }
-            } else if (model.legacyPredictionService.contains("jaqpot-python")) {
+            } else if (model.legacyPredictionService.contains("jaqpot-python") || model.legacyPredictionService.contains(
+                    "jaqpot-inference.jaqpot"
+                )
+            ) {
                 return if (model.legacyPredictionService.contains("22")) {
                     runtimeProvider.jaqpotpyInferenceLegacy22
                 } else if (model.legacyPredictionService.contains("23")) {
