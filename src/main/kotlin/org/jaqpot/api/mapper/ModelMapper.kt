@@ -5,7 +5,7 @@ import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 
-fun Model.toDto(userDto: UserDto, userCanEdit: Boolean? = null): ModelDto {
+fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
         this.name,
         this.type.toDto(),

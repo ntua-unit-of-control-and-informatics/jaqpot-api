@@ -43,6 +43,15 @@ class ModelService(
         return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
     }
 
+    override fun getSharedModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
+        val creatorId = authenticationFacade.userId
+        val pageable = PageRequest.of(page, size)
+        val sharedModelsPage = modelRepository.findAllSharedWithUser(creatorId, pageable)
+        val creator = sharedModelsPage
+
+        return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
+    }
+
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
         if (modelDto.id != null) {
