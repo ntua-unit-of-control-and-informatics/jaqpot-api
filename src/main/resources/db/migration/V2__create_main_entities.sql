@@ -1,19 +1,19 @@
 CREATE TABLE model
 (
-    id               BIGSERIAL                   NOT NULL,
-    legacy_id        VARCHAR,
-    created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    creator_id       VARCHAR(255)                NOT NULL,
-    name             VARCHAR(255)                NOT NULL,
-    type             VARCHAR(255)                NOT NULL,
-    jaqpotpy_version VARCHAR(255)                NOT NULL,
-    visibility       VARCHAR(255)                NOT NULL,
-    description      TEXT,
-    meta             JSONB,
-    reliability      INTEGER,
-    pretrained       BOOLEAN,
-    actual_model     bytea                       NOT NULL,
+    id                        BIGSERIAL                   NOT NULL,
+    legacy_id                 VARCHAR,
+    created_at                TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at                TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    creator_id                VARCHAR(255)                NOT NULL,
+    name                      VARCHAR(255)                NOT NULL,
+    type                      VARCHAR(255)                NOT NULL,
+    jaqpotpy_version          VARCHAR(255)                NOT NULL,
+    visibility                VARCHAR(255)                NOT NULL,
+    description               TEXT,
+    meta                      JSONB,
+    legacy_prediction_service varchar,
+    pretrained                BOOLEAN,
+    actual_model              bytea                       NOT NULL,
     CONSTRAINT pk_model PRIMARY KEY (id)
 );
 

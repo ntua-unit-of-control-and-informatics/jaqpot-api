@@ -12,6 +12,7 @@ fun Dataset.toDto(): DatasetDto {
         this.type.toDto(),
         this.input.map { it.toDto() },
         this.id,
+        this.input.map { it.toDto() },// copy input values to data entry field
         this.results.map { it.toDto() },
         this.status.toDto(),
         this.failureReason,

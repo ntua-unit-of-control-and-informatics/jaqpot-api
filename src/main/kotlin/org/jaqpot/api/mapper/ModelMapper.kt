@@ -19,7 +19,6 @@ fun Model.toDto(userDto: UserDto, userCanEdit: Boolean? = null): ModelDto {
         this.meta,
         this.description,
         this.organizations.map { it.toDto() },
-        this.reliability,
         this.pretrained,
         userDto,
         userCanEdit,
@@ -43,7 +42,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         mutableListOf(),
         mutableSetOf(),
         this.visibility.toEntity(),
-        this.reliability,
+        null,
         this.pretrained,
         this.actualModel,
     )

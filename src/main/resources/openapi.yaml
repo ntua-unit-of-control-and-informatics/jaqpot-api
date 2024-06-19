@@ -518,9 +518,6 @@ components:
             $ref: '#/components/schemas/Organization'
         visibility:
           $ref: '#/components/schemas/ModelVisibility'
-        reliability:
-          type: integer
-          example: 5
         pretrained:
           type: boolean
           example: false
@@ -641,6 +638,11 @@ components:
           example: "PREDICTION"
         input:
           type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        dataEntry:
+          type: array
+          description: legacy field used for inference endpoint
           items:
             $ref: '#/components/schemas/DataEntry'
         results:

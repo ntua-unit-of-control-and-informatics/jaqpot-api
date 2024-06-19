@@ -33,14 +33,13 @@ class PredictionService(
             storeDatasetSuccess(dataset, results)
         } catch (err: Exception) {
             logger.error(err) { "Prediction for dataset with id ${dataset.id} failed" }
-            storeDatasetFailure(dataset)
+            storeDatasetFailure(dataset, err)
         }
     }
 
-    private fun storeDatasetFailure(dataset: Dataset) {
+    private fun storeDatasetFailure(dataset: Dataset, err: Exception) {
         dataset.status = DatasetStatus.FAILURE
-        // TODO Give some output for the user here
-        // dataset.failureReason = "Give some output for the user here"
+        dataset.failureReason = err.toString()
 
         datasetRepository.save(dataset)
     }
@@ -68,7 +67,7 @@ class PredictionService(
         request: HttpEntity<PredictionRequestDto>
     ): List<Any> {
         val restTemplate = RestTemplate()
-        val inferenceUrl = "${runtimeResolver.resolveRuntime(model)}/predict/"
+        val inferenceUrl = runtimeResolver.resolveRuntimeUrl(model)
         val response = restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 
         val results: List<Any> = response.body?.predictions ?: emptyList()

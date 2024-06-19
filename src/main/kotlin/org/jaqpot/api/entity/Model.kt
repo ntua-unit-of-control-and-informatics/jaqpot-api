@@ -63,7 +63,8 @@ class Model(
     @Column(nullable = false)
     var visibility: ModelVisibility,
 
-    val reliability: Int?,
+    @Column(updatable = false)
+    val legacyPredictionService: String?,
 
     val pretrained: Boolean?,
 

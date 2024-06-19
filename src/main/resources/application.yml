@@ -11,9 +11,8 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    show-sql: true
+    show-sql: false
   security:
     oauth2:
       resourceserver:
@@ -49,7 +48,11 @@ jaqpot:
   frontend:
     url: http://localhost.jaqpot.org:3000
   runtime:
-    jaqpotpy-pretrained: http://localhost.jaqpot.org:8002
+    jaqpotpy-inference-v6: http://localhost.jaqpot.org:8002/predict/
+    jaqpotpy-inference-legacy-22: http://localhost.jaqpot.org:8822/predict/sklearn/
+    jaqpotpy-inference-legacy-23: http://localhost.jaqpot.org:8823/predict/sklearn/
+    jaqpotpy-inference-legacy-24: http://localhost.jaqpot.org:8824/predict/sklearn/
+    jaqpotr: http://localhost.jaqpot.org:8004
 
 
 
