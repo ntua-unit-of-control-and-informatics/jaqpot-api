@@ -19,8 +19,17 @@ class OrganizationService(
     private val authenticationFacade: AuthenticationFacade,
     private val organizationRepository: OrganizationRepository,
 ) : OrganizationApiDelegate {
+
+    // TODO add cache
     override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
         return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
+    }
+
+    // TODO add cache
+    override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
+        val userId = authenticationFacade.userId
+        return ResponseEntity.ok(
+            organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
     }
 
     @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)

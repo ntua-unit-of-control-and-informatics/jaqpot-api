@@ -295,7 +295,21 @@ paths:
       responses:
         '201':
           description: Organization created successfully
-
+  /v1/organizations/user:
+    get:
+      summary: Get all user organizations
+      operationId: getAllOrganizationsByUser
+      tags:
+        - organization
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
   /v1/organizations/{id}:
     put:
       summary: Update an existing organization
