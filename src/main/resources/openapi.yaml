@@ -199,10 +199,6 @@ paths:
             type: integer
             format: int64
             example: 0
-        - in: query
-          name: predictionUrl
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -618,6 +614,8 @@ components:
         canEdit:
           description: If the current user can edit the model
           type: boolean
+        tags:
+          type: string
         createdAt:
           type: LocalDateTime
           format: date-time
@@ -727,13 +725,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DataEntry'
-        dataEntry:
-          description: legacy field used for inference endpoint
-          type: array
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/DataEntry'
         results:
           type: array
           items:

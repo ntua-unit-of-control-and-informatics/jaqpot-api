@@ -97,7 +97,7 @@ class ModelService(
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
-    override fun predictWithModel(modelId: Long, datasetDto: DatasetDto, predictionUrl: String?): ResponseEntity<Unit> {
+    override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetDto.Type.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
@@ -105,7 +105,7 @@ class ModelService(
             val userId = authenticationFacade.userId
             val dataset = this.datasetRepository.save(datasetDto.toEntity(model, userId))
 
-            this.predictionService.executePredictionAndSaveResults(model, dataset, predictionUrl)
+            this.predictionService.executePredictionAndSaveResults(model, dataset)
 
             val location: URI = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/datasets/{id}")

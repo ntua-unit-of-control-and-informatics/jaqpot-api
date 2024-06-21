@@ -22,6 +22,7 @@ fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null): ModelDto {
         this.pretrained,
         userDto,
         userCanEdit,
+        this.tags,
         this.createdAt,
         this.updatedAt,
     )
@@ -44,6 +45,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         this.visibility.toEntity(),
         null,
         this.pretrained,
+        this.tags,
         this.actualModel,
     )
 
