@@ -10,6 +10,7 @@ import org.jaqpot.api.model.*
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.repository.OrganizationRepository
+import org.jaqpot.api.repository.util.FullTextUtil
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
@@ -146,6 +147,11 @@ class ModelService(
         return ResponseEntity.ok(model.toDto(user, userCanEdit))
     }
 
-
+    override fun searchModels(query: String, page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
+        val transformedQuery = FullTextUtil.transformSearchQuery(query)
+        val pageable = PageRequest.of(page, size)
+        val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
+        return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
+    }
 }
 

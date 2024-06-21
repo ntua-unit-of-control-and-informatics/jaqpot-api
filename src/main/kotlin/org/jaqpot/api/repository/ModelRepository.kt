@@ -21,4 +21,19 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         """
     )
     fun findAllSharedWithUser(userId: String, pageable: Pageable): Page<Model>
+
+    @Query(
+        value = """
+            SELECT *, ts_rank_cd(textsearchable_index_col, query) AS rank 
+            FROM model, to_tsquery('Weighted | (dark & matter)') query
+            WHERE textsearchable_index_col @@ query
+            ORDER BY rank DESC
+            """,
+//        countQuery = """
+//            SELECT COUNT(*) FROM model
+//            WHERE textsearchable_index_col @@ to_tsquery(:queryString)
+//            """,
+        nativeQuery = true
+    )
+    fun searchModelsBy(query: String, pageable: Pageable): Page<Model>
 }

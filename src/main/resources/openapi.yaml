@@ -42,6 +42,7 @@ paths:
           description: Invalid input
       x-stoplight:
         id: 9ffjy7o77jc41
+  /v1/user/models:
     get:
       x-spring-paginated: true
       summary: Get paginated models
@@ -85,7 +86,56 @@ paths:
                     type: integer
         '400':
           description: Invalid input
-  /v1/shared-models:
+  /v1/models/search:
+    get:
+      x-spring-paginated: true
+      summary: Search for models
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: searchModels
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Paginated list of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '400':
+          description: Invalid input
+  /v1/user/shared-models:
     get:
       x-spring-paginated: true
       summary: Get paginated shared models
@@ -320,7 +370,7 @@ paths:
       responses:
         '201':
           description: Organization created successfully
-  /v1/organizations/user:
+  /v1/user/organizations:
     get:
       summary: Get all user organizations
       operationId: getAllOrganizationsByUser
