@@ -156,6 +156,31 @@ paths:
                 $ref: '#/components/schemas/Model'
         '404':
           description: Model not found
+  '/v1/models/legacy/{id}':
+    get:
+      summary: Get a legacy model
+      description: Retrieve a single model by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: getLegacyModelById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the model to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '404':
+          description: Model not found
   /v1/models/{modelId}/predict:
     post:
       summary: Predict with Model
@@ -174,6 +199,10 @@ paths:
             type: integer
             format: int64
             example: 0
+        - in: query
+          name: predictionUrl
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -699,10 +728,12 @@ components:
           items:
             $ref: '#/components/schemas/DataEntry'
         dataEntry:
-          type: array
           description: legacy field used for inference endpoint
+          type: array
           items:
-            $ref: '#/components/schemas/DataEntry'
+            type: array
+            items:
+              $ref: '#/components/schemas/DataEntry'
         results:
           type: array
           items:
