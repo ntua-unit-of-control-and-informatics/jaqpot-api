@@ -4,6 +4,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.*
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.repository.DatasetRepository
+import org.jaqpot.api.service.model.dto.AdditionalInfoDto
+import org.jaqpot.api.service.model.dto.FromUserDto
 import org.jaqpot.api.service.model.dto.PredictionRequestDto
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
 import org.jaqpot.api.service.runtime.RuntimeResolver
@@ -22,14 +24,21 @@ class PredictionService(
 ) {
 
     @Async
-    fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
+    fun executePredictionAndSaveResults(model: Model, dataset: Dataset, predictionUrl: String?) {
         val rawModel = Base64.getEncoder().encodeToString(model.actualModel)
+        val datasetDto = dataset.toDto()
         val request: HttpEntity<PredictionRequestDto> =
-            HttpEntity(PredictionRequestDto(listOf(rawModel), dataset.toDto()))
+            HttpEntity(
+                PredictionRequestDto(
+                    listOf(rawModel),
+                    datasetDto,
+                    AdditionalInfoDto(model.dependentFeatures.map { it.toDto() }, FromUserDto(datasetDto.input))
+                )
+            )
 
         try {
             datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)
-            val results: List<Any> = makePredictionRequest(model, request)
+            val results: List<Any> = makePredictionRequest(model, request, predictionUrl)
             storeDatasetSuccess(dataset, results)
         } catch (err: Exception) {
             logger.error(err) { "Prediction for dataset with id ${dataset.id} failed" }
@@ -64,11 +73,13 @@ class PredictionService(
 
     private fun makePredictionRequest(
         model: Model,
-        request: HttpEntity<PredictionRequestDto>
+        request: HttpEntity<PredictionRequestDto>,
+        predictionUrl: String?
     ): List<Any> {
         val restTemplate = RestTemplate()
         val inferenceUrl = runtimeResolver.resolveRuntimeUrl(model)
-        val response = restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
+        val response =
+            restTemplate.postForEntity(predictionUrl ?: inferenceUrl, request, PredictionResponseDto::class.java)
 
         val results: List<Any> = response.body?.predictions ?: emptyList()
         return results
