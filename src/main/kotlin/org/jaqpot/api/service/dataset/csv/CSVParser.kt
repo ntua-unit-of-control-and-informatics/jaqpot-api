@@ -10,11 +10,15 @@ private val logger = KotlinLogging.logger {}
 
 @Component
 class CSVParser {
+
+    private val csvParser = CSVFormat.Builder.create(CSVFormat.DEFAULT).apply {
+        setIgnoreSurroundingSpaces(true)
+    }.build()
+
     fun readCsv(inputStream: InputStream): List<DataEntryDto> {
         try {
-            val inputValues = CSVFormat.Builder.create(CSVFormat.DEFAULT).apply {
-                setIgnoreSurroundingSpaces(true)
-            }.build().parse(inputStream.reader())
+
+            val inputValues = csvParser.parse(inputStream.reader())
                 .drop(1) // Dropping the header
                 .map {
                     it.toList()
