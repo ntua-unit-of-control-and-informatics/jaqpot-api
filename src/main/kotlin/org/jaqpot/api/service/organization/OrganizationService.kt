@@ -9,6 +9,8 @@ import org.jaqpot.api.model.OrganizationDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -20,7 +22,7 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
 ) : OrganizationApiDelegate {
 
-    // TODO add cache
+    @Cacheable(cacheNames = ["allOrganizations"])
     override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
         return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
     }
@@ -32,6 +34,7 @@ class OrganizationService(
             organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
     }
 
+    @CacheEvict(cacheNames = ["allOrganizations"], allEntries = true)
     @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {
