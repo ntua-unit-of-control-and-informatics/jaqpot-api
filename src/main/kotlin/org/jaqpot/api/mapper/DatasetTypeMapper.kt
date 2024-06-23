@@ -1,16 +1,16 @@
 package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.DatasetType
-import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.DatasetTypeDto
 
-fun DatasetDto.Type.toEntity(): DatasetType {
+fun DatasetTypeDto.toEntity(): DatasetType {
     return when (this) {
-        DatasetDto.Type.PREDICTION -> DatasetType.PREDICTION
+        DatasetTypeDto.PREDICTION -> DatasetType.PREDICTION
     }
 }
 
-fun DatasetType.toDto(): DatasetDto.Type {
+fun DatasetType.toDto(): DatasetTypeDto {
     return when (this) {
-        DatasetType.PREDICTION -> DatasetDto.Type.PREDICTION
+        DatasetType.PREDICTION -> DatasetTypeDto.PREDICTION
     }
 }

@@ -264,6 +264,39 @@ paths:
           description: Model not found
         '500':
           description: Internal Server Error
+  /v1/models/{modelId}/predict/csv:
+    post:
+      summary: Predict using CSV with Model
+      description: Submit a dataset for prediction using a specific model
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: predictWithModelCSV
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model to use for prediction
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasetCSV'
+      responses:
+        '201':
+          description: Prediction created successfully
+        '400':
+          description: Invalid Request
+        '404':
+          description: Model not found
+        '500':
+          description: Internal Server Error
   /v1/models/{id}/partial:
     patch:
       summary: Partially update specific fields of a model
@@ -756,6 +789,11 @@ components:
           type: LocalDateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    DatasetType:
+      type: string
+      enum:
+        - PREDICTION
+      example: "PREDICTION"
     Dataset:
       type: object
       required:
@@ -767,14 +805,44 @@ components:
           format: int64
           example: 1
         type:
-          type: string
-          enum:
-            - PREDICTION
-          example: "PREDICTION"
+          $ref: '#/components/schemas/DatasetType'
         input:
           type: array
           items:
             $ref: '#/components/schemas/DataEntry'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataEntry'
+        status:
+          type: string
+          enum:
+            - CREATED
+            - EXECUTING
+            - FAILURE
+            - SUCCESS
+        failureReason:
+          type: string
+        created_at:
+          type: LocalDateTime
+        updated_at:
+          type: LocalDateTime
+    DatasetCSV:
+      type: object
+      required:
+        - type
+        - inputFile
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          $ref: '#/components/schemas/DatasetType'
+        inputFile:
+          type: string
+          format: byte
+          description: A base64 representation in CSV format of the input values.
         results:
           type: array
           items:
