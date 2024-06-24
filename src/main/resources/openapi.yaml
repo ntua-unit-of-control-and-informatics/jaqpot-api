@@ -700,12 +700,12 @@ components:
         tags:
           type: string
         createdAt:
-          type: LocalDateTime
+          type: DateTime
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: LocalDateTime
+          type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
     ModelVisibility:
@@ -732,12 +732,12 @@ components:
           type: string
           example: 1.24.0
         createdAt:
-          type: LocalDateTime
+          type: DateTime
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: LocalDateTime
+          type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
     Feature:
@@ -781,12 +781,12 @@ components:
           items:
             type: string
         createdAt:
-          type: LocalDateTime
+          type: DateTime
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: LocalDateTime
+          type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
     DatasetType:
@@ -824,9 +824,9 @@ components:
         failureReason:
           type: string
         created_at:
-          type: LocalDateTime
+          type: DateTime
         updated_at:
-          type: LocalDateTime
+          type: DateTime
     DatasetCSV:
       type: object
       required:
@@ -857,9 +857,9 @@ components:
         failureReason:
           type: string
         created_at:
-          type: LocalDateTime
+          type: DateTime
         updated_at:
-          type: LocalDateTime
+          type: DateTime
     DataEntry:
       type: object
       required:
@@ -871,9 +871,9 @@ components:
           format: int64
           example: 1
         created_at:
-          type: LocalDateTime
+          type: DateTime
         updated_at:
-          type: LocalDateTime
+          type: DateTime
         type:
           type: string
           enum:
@@ -936,9 +936,9 @@ components:
           description: If the current user can edit the organization
           type: boolean
         created_at:
-          type: LocalDateTime
+          type: DateTime
         updated_at:
-          type: LocalDateTime
+          type: DateTime
     OrganizationInvitation:
       type: "object"
       required:
@@ -965,7 +965,7 @@ components:
             - "ACCEPTED"
           description: "Status of the invitation"
         expirationDate:
-          type: LocalDateTime
+          type: DateTime
           description: "Expiration date of the invitation"
     User:
       title: User
