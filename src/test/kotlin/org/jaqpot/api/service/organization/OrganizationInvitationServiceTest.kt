@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 class OrganizationInvitationServiceTest {
@@ -127,7 +127,7 @@ class OrganizationInvitationServiceTest {
         val invitation = mockk<OrganizationInvitation>()
 
         every { invitation.status } returns OrganizationInvitationStatus.PENDING
-        every { invitation.expirationDate } returns LocalDateTime.now().minusDays(1L)
+        every { invitation.expirationDate } returns OffsetDateTime.now().minusDays(1L)
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
         every { organizationInvitationRepository.findByIdAndOrganization(any(), organization) } returns Optional.of(
@@ -155,7 +155,7 @@ class OrganizationInvitationServiceTest {
         val invitation = mockk<OrganizationInvitation>()
 
         every { invitation.status } returns OrganizationInvitationStatus.PENDING
-        every { invitation.expirationDate } returns LocalDateTime.now().plusDays(1L)
+        every { invitation.expirationDate } returns OffsetDateTime.now().plusDays(1L)
         every { invitation.userEmail } returns "email@email.com"
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
@@ -187,7 +187,7 @@ class OrganizationInvitationServiceTest {
         val userId = "userId"
 
         every { invitation.status } returns OrganizationInvitationStatus.PENDING
-        every { invitation.expirationDate } returns LocalDateTime.now().plusDays(1L)
+        every { invitation.expirationDate } returns OffsetDateTime.now().plusDays(1L)
         every { invitation.userEmail } returns "email@email.com"
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
@@ -222,7 +222,7 @@ class OrganizationInvitationServiceTest {
         val userId = "userId"
 
         every { invitation.status } returns OrganizationInvitationStatus.PENDING
-        every { invitation.expirationDate } returns LocalDateTime.now().plusDays(1L)
+        every { invitation.expirationDate } returns OffsetDateTime.now().plusDays(1L)
         every { invitation.userEmail } returns "email@email.com"
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
@@ -259,7 +259,7 @@ class OrganizationInvitationServiceTest {
             "email@email.com",
             organization,
             OrganizationInvitationStatus.PENDING,
-            LocalDateTime.now().plusDays(1L)
+            OffsetDateTime.now().plusDays(1L)
         )
         invitation.status = OrganizationInvitationStatus.PENDING
         val user = mockk<UserDto>()
@@ -313,7 +313,7 @@ class OrganizationInvitationServiceTest {
             "email@email.com",
             organization,
             OrganizationInvitationStatus.PENDING,
-            LocalDateTime.now().plusDays(1L)
+            OffsetDateTime.now().plusDays(1L)
         )
         invitation.status = OrganizationInvitationStatus.PENDING
         val user = mockk<UserDto>()

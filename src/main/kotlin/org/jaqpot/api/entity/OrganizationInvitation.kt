@@ -1,7 +1,7 @@
 package org.jaqpot.api.entity
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
@@ -25,6 +25,6 @@ class OrganizationInvitation(
     var status: OrganizationInvitationStatus = OrganizationInvitationStatus.PENDING,
 
     @Column(updatable = false, nullable = false)
-    val expirationDate: LocalDateTime
+    val expirationDate: OffsetDateTime
 
 ) : BaseEntity()
