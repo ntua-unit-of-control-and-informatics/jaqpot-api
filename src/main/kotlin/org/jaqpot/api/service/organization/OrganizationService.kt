@@ -3,6 +3,7 @@ package org.jaqpot.api.service.organization
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import org.jaqpot.api.OrganizationApiDelegate
+import org.jaqpot.api.cache.ALL_ORGANIZATIONS_CACHE_KEY
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.OrganizationDto
@@ -22,19 +23,18 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
 ) : OrganizationApiDelegate {
 
-    @Cacheable(cacheNames = ["allOrganizations"])
+    @Cacheable(cacheNames = [ALL_ORGANIZATIONS_CACHE_KEY])
     override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
         return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
     }
 
-    // TODO add cache
     override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
         val userId = authenticationFacade.userId
         return ResponseEntity.ok(
             organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
     }
 
-    @CacheEvict(cacheNames = ["allOrganizations"], allEntries = true)
+    @CacheEvict(cacheNames = [ALL_ORGANIZATIONS_CACHE_KEY], allEntries = true)
     @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {

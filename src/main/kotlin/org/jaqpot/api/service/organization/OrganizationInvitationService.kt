@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional
 import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.NotFoundException
 import org.jaqpot.api.OrganizationInvitationApiDelegate
+import org.jaqpot.api.cache.USER_ORGANIZATIONS_CACHE_KEY
 import org.jaqpot.api.config.JaqpotConfig
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.entity.OrganizationInvitation
@@ -21,6 +22,7 @@ import org.jaqpot.api.service.email.EmailModelHelper
 import org.jaqpot.api.service.email.EmailService
 import org.jaqpot.api.service.email.freemarker.FreemarkerTemplate
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -61,6 +63,7 @@ class OrganizationInvitationService(
     }
 
     @Transactional
+    @CacheEvict(cacheNames = [USER_ORGANIZATIONS_CACHE_KEY], allEntries = true)
     override fun updateInvitation(
         name: String,
         uuid: UUID,

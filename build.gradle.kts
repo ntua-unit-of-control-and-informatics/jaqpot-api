@@ -47,6 +47,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
+    // cache
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+
     // freemarker
     implementation("org.freemarker:freemarker:2.3.33")
 
