@@ -14,14 +14,37 @@ import java.util.concurrent.TimeUnit
 class CacheConfiguration {
     @Bean
     fun caffeineConfig(): Caffeine<Any, Any> {
-        return Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES)
+        return Caffeine.newBuilder().maximumWeight(1_000).expireAfterWrite(5, TimeUnit.MINUTES)
     }
 
     @Bean
     fun cacheManager(caffeine: Caffeine<Any, Any>): CacheManager {
-        val caffeineCacheManager = CaffeineCacheManager()
-        caffeineCacheManager.setCaffeine(caffeine)
-        return caffeineCacheManager
+        val manager = CaffeineCacheManager()
+
+        manager.registerCustomCache(
+            CacheKeys.ALL_ORGANIZATIONS,
+            Caffeine.newBuilder()
+                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .build()
+        )
+
+        manager.registerCustomCache(
+            CacheKeys.USER_ORGANIZATIONS,
+            Caffeine.newBuilder()
+                .maximumSize(2000)
+                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .build()
+        )
+
+        manager.registerCustomCache(
+            CacheKeys.SEARCH_MODELS,
+            Caffeine.newBuilder()
+                .maximumSize(500)
+                .expireAfterAccess(1, TimeUnit.HOURS)
+                .build()
+        )
+
+        return manager
     }
 
     @Bean("organizationsByUserKeyGenerator")

@@ -2,6 +2,7 @@ package org.jaqpot.api.service.model
 
 import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
+import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
@@ -15,6 +16,8 @@ import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -55,6 +58,7 @@ class ModelService(
         return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
     }
 
+    @CacheEvict("searchModels", allEntries = true)
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
     override fun createModel(modelDto: ModelDto): ResponseEntity<Unit> {
         if (modelDto.id != null) {
@@ -172,6 +176,7 @@ class ModelService(
         return ResponseEntity.ok(model.toDto(user, userCanEdit))
     }
 
+    @Cacheable(CacheKeys.SEARCH_MODELS)
     override fun searchModels(query: String, page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
         val transformedQuery = FullTextUtil.transformSearchQuery(query)
         val pageable = PageRequest.of(page, size)

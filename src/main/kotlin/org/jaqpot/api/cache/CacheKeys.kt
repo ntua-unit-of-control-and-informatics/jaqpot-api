@@ -1,6 +1,12 @@
 package org.jaqpot.api.cache
 
-const val ALL_ORGANIZATIONS_CACHE_KEY = "allOrganizations"
-const val USER_ORGANIZATIONS_CACHE_KEY = "userOrganizations"
+class CacheKeys {
+    companion object {
+        const val ALL_ORGANIZATIONS = "allOrganizations"
+        const val USER_ORGANIZATIONS = "userOrganizations"
+        const val SEARCH_MODELS = "searchModels"
+    }
+}
+
 
 
