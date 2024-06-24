@@ -34,6 +34,8 @@ spring:
   docker:
     compose:
       lifecycle-management: none
+#  cache:
+#    type: none
 
 server:
   error:
