@@ -61,7 +61,8 @@ class RuntimeResolver(
             } else if (legacyPredictionService.contains("24")) {
                 runtimeProvider.jaqpotpyInferenceLegacy24
             } else {
-                throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
+                runtimeProvider.jaqpotpyInferenceV6Url
+//                throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
             }
         } else {
             throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")

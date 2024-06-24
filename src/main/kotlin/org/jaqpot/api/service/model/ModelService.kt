@@ -13,6 +13,7 @@ import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.repository.util.FullTextUtil
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -33,6 +34,7 @@ class ModelService(
     private val predictionService: PredictionService,
     private val datasetRepository: DatasetRepository,
     private val organizationRepository: OrganizationRepository,
+    private val csvParser: CSVParser
 ) : ModelApiDelegate {
 
     override fun getModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
@@ -98,8 +100,31 @@ class ModelService(
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
+    override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
+        if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
+            val model = modelRepository.findById(modelId).orElseThrow {
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+            }
+            val userId = authenticationFacade.userId
+
+            val input = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
+            val dataset = this.datasetRepository.save(datasetCSVDto.toEntity(model, userId, input))
+
+            this.predictionService.executePredictionAndSaveResults(model, dataset)
+
+            val location: URI = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/datasets/{id}")
+                .buildAndExpand(dataset.id).toUri()
+            return ResponseEntity.created(location).build()
+        }
+
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
+    }
+
+    @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
-        if (datasetDto.type == DatasetDto.Type.PREDICTION) {
+        if (datasetDto.type == DatasetTypeDto.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
