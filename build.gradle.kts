@@ -45,6 +45,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
+    // cache
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     // freemarker
     implementation("org.freemarker:freemarker:2.3.33")
@@ -84,6 +88,9 @@ dependencies {
 
     // bucket4j for rate limiting
     implementation("com.bucket4j:bucket4j-core:8.10.1")
+
+    // apache csv parser
+    implementation("org.apache.commons:commons-csv:1.11.0")
 
 
     runtimeOnly("org.postgresql:postgresql")
