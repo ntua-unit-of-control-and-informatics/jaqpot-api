@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional
 import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.NotFoundException
 import org.jaqpot.api.OrganizationInvitationApiDelegate
+import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.config.JaqpotConfig
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.entity.OrganizationInvitation
@@ -21,10 +22,11 @@ import org.jaqpot.api.service.email.EmailModelHelper
 import org.jaqpot.api.service.email.EmailService
 import org.jaqpot.api.service.email.freemarker.FreemarkerTemplate
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -61,6 +63,7 @@ class OrganizationInvitationService(
     }
 
     @Transactional
+    @CacheEvict(cacheNames = [CacheKeys.USER_ORGANIZATIONS], allEntries = true)
     override fun updateInvitation(
         name: String,
         uuid: UUID,
@@ -76,7 +79,7 @@ class OrganizationInvitationService(
             throw BadRequestException("This invitation has already status ${invitation.status}")
         }
 
-        if (invitation.expirationDate.isBefore(LocalDateTime.now())) {
+        if (invitation.expirationDate.isBefore(OffsetDateTime.now())) {
             throw BadRequestException("This invitation has expired. Please ask the organization admin to generate a new invitation")
         }
 
@@ -137,7 +140,7 @@ class OrganizationInvitationService(
                     email,
                     organization,
                     OrganizationInvitationStatus.PENDING,
-                    LocalDateTime.now().plusWeeks(1)
+                    OffsetDateTime.now().plusWeeks(1)
                 )
             )
 

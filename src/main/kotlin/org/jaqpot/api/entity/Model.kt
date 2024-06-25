@@ -68,6 +68,10 @@ class Model(
 
     val pretrained: Boolean?,
 
+    @Size(min = 3, max = 300)
+    @Column(columnDefinition = "TEXT")
+    val tags: String?,
+
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column(nullable = false)

@@ -52,7 +52,7 @@ class RuntimeResolver(
                 throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
             }
         } else if (legacyPredictionService.contains("jaqpot-inference.jaqpot")) {
-            return runtimeProvider.jaqpotpyInferenceLegacyLatest
+            return runtimeProvider.jaqpotpyInferenceV6Url
         } else if (legacyPredictionService.contains("jaqpot-python")) {
             return if (legacyPredictionService.contains("22")) {
                 runtimeProvider.jaqpotpyInferenceLegacy22
@@ -61,7 +61,8 @@ class RuntimeResolver(
             } else if (legacyPredictionService.contains("24")) {
                 runtimeProvider.jaqpotpyInferenceLegacy24
             } else {
-                runtimeProvider.jaqpotpyInferenceLegacyLatest
+                runtimeProvider.jaqpotpyInferenceV6Url
+//                throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
             }
         } else {
             throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
