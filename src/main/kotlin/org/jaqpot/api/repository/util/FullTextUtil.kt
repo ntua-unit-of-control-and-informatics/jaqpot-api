@@ -7,7 +7,7 @@ class FullTextUtil {
          * is searched in the database but each word with an OR
          */
         fun transformSearchQuery(query: String): String {
-            return query.split("\\s+".toRegex())
+            return query.trim().split("\\s+".toRegex())
                 .joinToString(" | ") { it.trim() }
         }
     }
