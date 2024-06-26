@@ -24,21 +24,23 @@ class PredictionService(
 ) {
 
     @Async
-    fun executePredictionAndSaveResults(model: Model, dataset: Dataset, predictionUrl: String?) {
+    fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
         val rawModel = Base64.getEncoder().encodeToString(model.actualModel)
         val datasetDto = dataset.toDto()
+        val predictionRequestDto = PredictionRequestDto(
+            model.toDto(null, null, model.actualModel),
+            datasetDto,
+            AdditionalInfoDto(model.dependentFeatures.map { it.toDto() }, FromUserDto(datasetDto.input)),
+            model.actualModel.toString()
+        )
         val request: HttpEntity<PredictionRequestDto> =
             HttpEntity(
-                PredictionRequestDto(
-                    listOf(rawModel),
-                    datasetDto,
-                    AdditionalInfoDto(model.dependentFeatures.map { it.toDto() }, FromUserDto(datasetDto.input))
-                )
+                predictionRequestDto
             )
 
         try {
             datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)
-            val results: List<Any> = makePredictionRequest(model, request, predictionUrl)
+            val results: List<Any> = makePredictionRequest(model, request)
             storeDatasetSuccess(dataset, results)
         } catch (err: Exception) {
             logger.error(err) { "Prediction for dataset with id ${dataset.id} failed" }
@@ -74,12 +76,11 @@ class PredictionService(
     private fun makePredictionRequest(
         model: Model,
         request: HttpEntity<PredictionRequestDto>,
-        predictionUrl: String?
     ): List<Any> {
         val restTemplate = RestTemplate()
         val inferenceUrl = runtimeResolver.resolveRuntimeUrl(model)
         val response =
-            restTemplate.postForEntity(predictionUrl ?: inferenceUrl, request, PredictionResponseDto::class.java)
+            restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 
         val results: List<Any> = response.body?.predictions ?: emptyList()
         return results

@@ -59,7 +59,7 @@ jaqpot:
     jaqpotpy-inference-legacy-23: http://localhost.jaqpot.org:8823/predict/sklearn/
     jaqpotpy-inference-legacy-24: http://localhost.jaqpot.org:8824/predict/sklearn/
     jaqpotpy-inference-legacy-latest: http://localhost.jaqpot.org:8888/predict/sklearn/
-    jaqpotr: http://localhost.jaqpot.org:8004
+    jaqpotr: http://localhost:8004
 
 
 
