@@ -76,4 +76,8 @@ class Model(
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column(nullable = false)
     val actualModel: ByteArray,
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
+    val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 ) : BaseEntity()

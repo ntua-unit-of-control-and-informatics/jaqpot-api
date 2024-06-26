@@ -13,8 +13,8 @@ fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null): ModelDto {
         this.libraries.map { it.toDto() },
         this.dependentFeatures.map { it.toDto() },
         this.independentFeatures.map { it.toDto() },
-        this.visibility.toDto(),// returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
-        byteArrayOf(),
+        this.visibility.toDto(),
+        byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         this.id,
         this.meta,
         this.description,
