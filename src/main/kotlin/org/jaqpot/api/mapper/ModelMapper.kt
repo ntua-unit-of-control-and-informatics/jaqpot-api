@@ -5,7 +5,7 @@ import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 
-fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null, rawModel: ByteArray = byteArrayOf()): ModelDto {
+fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
         this.name,
         this.type.toDto(),
@@ -14,7 +14,7 @@ fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null, rawModel: ByteA
         this.dependentFeatures.map { it.toDto() },
         this.independentFeatures.map { it.toDto() },
         this.visibility.toDto(),
-        rawModel, // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
+        byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         this.id,
         this.meta,
         this.description,

@@ -4,8 +4,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.*
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.repository.DatasetRepository
-import org.jaqpot.api.service.model.dto.AdditionalInfoDto
-import org.jaqpot.api.service.model.dto.FromUserDto
 import org.jaqpot.api.service.model.dto.PredictionRequestDto
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
 import org.jaqpot.api.service.runtime.RuntimeResolver
@@ -13,7 +11,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -25,13 +22,13 @@ class PredictionService(
 
     @Async
     fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
-        val rawModel = Base64.getEncoder().encodeToString(model.actualModel)
         val datasetDto = dataset.toDto()
+
         val predictionRequestDto = PredictionRequestDto(
-            model.toDto(null, null, model.actualModel),
+            model.toDto(null, null),
             datasetDto,
-            AdditionalInfoDto(model.dependentFeatures.map { it.toDto() }, FromUserDto(datasetDto.input)),
-            model.actualModel.toString()
+            model.legacyAdditionalInfo,
+            model.actualModel.decodeToString()
         )
         val request: HttpEntity<PredictionRequestDto> =
             HttpEntity(
