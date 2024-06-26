@@ -34,7 +34,7 @@ class OrganizationService(
             organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
     }
 
-    @CacheEvict(cacheNames = [CacheKeys.ALL_ORGANIZATIONS], allEntries = true)
+    @CacheEvict(cacheNames = [CacheKeys.ALL_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
     @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {
