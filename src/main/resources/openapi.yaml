@@ -994,5 +994,13 @@ components:
         code:
           type: "integer"
           description: "Error code"
+    ErrorCode:
+      type: string
+      enum:
+        - '1001'
+      x-enum-varnames:
+        - EMAIL_NOT_VERIFIED
+      x-enum-descriptions:
+        - User email is not verified
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.
