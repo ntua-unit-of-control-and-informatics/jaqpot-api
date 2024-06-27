@@ -17,18 +17,14 @@ class CSVParser {
 
     fun readCsv(inputStream: InputStream): List<DataEntryDto> {
         try {
-
-            val inputValues = csvParser.parse(inputStream.reader())
+            return csvParser.parse(inputStream.reader())
                 .drop(1) // Dropping the header
                 .map {
-                    it.toList()
+                    DataEntryDto(
+                        DataEntryDto.Type.ARRAY,
+                        it.toList()
+                    )
                 }
-            return listOf(
-                DataEntryDto(
-                    DataEntryDto.Type.ARRAY,
-                    inputValues
-                )
-            )
         } catch (e: Exception) {
             logger.error { "Error while parsing CSV $e" }
             throw CSVParserException("Error while parsing CSV", e)

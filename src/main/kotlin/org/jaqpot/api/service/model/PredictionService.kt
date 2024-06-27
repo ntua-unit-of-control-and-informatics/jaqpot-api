@@ -11,7 +11,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -23,9 +22,9 @@ class PredictionService(
 
     @Async
     fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
-        val rawModel = Base64.getEncoder().encodeToString(model.actualModel)
+        val rawModel = model.actualModel.decodeToString()
         val request: HttpEntity<PredictionRequestDto> =
-            HttpEntity(PredictionRequestDto(listOf(rawModel), dataset.toDto()))
+            HttpEntity(PredictionRequestDto(rawModel, dataset.toDto()))
 
         try {
             datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)

@@ -5,7 +5,7 @@ import org.jaqpot.api.model.DatasetDto
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
 class PredictionRequestDto(
-    val rawModel: List<String>,
+    val rawModel: String,
     val dataset: DatasetDto,
     val additionalInfo: String? = null,
     val doaMatrix: String? = null
