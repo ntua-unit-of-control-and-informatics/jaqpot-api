@@ -54,19 +54,13 @@ class PredictionService(
 
     private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
         dataset.status = DatasetStatus.SUCCESS
-        dataset.results.clear()
-        dataset.results.addAll(
-            listOf(
-                DataEntry(
-                    null,
-                    dataset,
-                    DataEntryType.ARRAY,
-                    DataEntryRole.RESULTS,
-                    results
-                )
-            )
+        dataset.results = DataEntry(
+            null,
+            dataset,
+            DataEntryType.ARRAY,
+            DataEntryRole.RESULTS,
+            results
         )
-
         datasetRepository.save(dataset)
     }
 

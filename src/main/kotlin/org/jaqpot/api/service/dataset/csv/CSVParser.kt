@@ -2,7 +2,6 @@ package org.jaqpot.api.service.dataset.csv
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.apache.commons.csv.CSVFormat
-import org.jaqpot.api.model.DataEntryDto
 import org.springframework.stereotype.Component
 import java.io.InputStream
 
@@ -15,20 +14,14 @@ class CSVParser {
         setIgnoreSurroundingSpaces(true)
     }.build()
 
-    fun readCsv(inputStream: InputStream): List<DataEntryDto> {
+    fun readCsv(inputStream: InputStream): List<List<String>> {
         try {
 
-            val inputValues = csvParser.parse(inputStream.reader())
+            return csvParser.parse(inputStream.reader())
                 .drop(1) // Dropping the header
                 .map {
                     it.toList()
                 }
-            return listOf(
-                DataEntryDto(
-                    DataEntryDto.Type.ARRAY,
-                    inputValues
-                )
-            )
         } catch (e: Exception) {
             logger.error { "Error while parsing CSV $e" }
             throw CSVParserException("Error while parsing CSV", e)
