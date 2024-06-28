@@ -493,6 +493,7 @@
       "firstName": "jaq",
       "lastName": "pot",
       "enabled": true,
+      "emailVerified": true,
       "credentials": [
         {
           "type": "password",
@@ -512,6 +513,7 @@
       "firstName": "jaq2",
       "lastName": "pot2",
       "enabled": true,
+      "emailVerified": true,
       "credentials": [
         {
           "type": "password",
@@ -531,6 +533,7 @@
       "firstName": "jaq",
       "lastName": "pot",
       "enabled": true,
+      "emailVerified": true,
       "credentials": [
         {
           "type": "password",
