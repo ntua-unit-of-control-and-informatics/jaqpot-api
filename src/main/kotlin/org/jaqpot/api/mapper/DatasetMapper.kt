@@ -38,7 +38,7 @@ fun DatasetCSVDto.toEntity(
     model: Model,
     userId: String,
     entryType: DatasetEntryType,
-    values: List<Any>
+    input: List<Any>
 ): Dataset {
     return Dataset(
         id = this.id,
@@ -47,7 +47,7 @@ fun DatasetCSVDto.toEntity(
         entryType = entryType,
         type = this.type.toEntity(),
         status = DatasetStatus.CREATED,
-        input = values,
+        input = input,
         failureReason = this.failureReason
     )
 }

@@ -116,13 +116,13 @@ class ModelService(
             val userId = authenticationFacade.userId
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
-            val values = csvDataConverter.convertCsvContentToDataEntry(model, csvData)
+            val input = csvDataConverter.convertCsvContentToDataEntry(model, csvData)
             val dataset = this.datasetRepository.save(
                 datasetCSVDto.toEntity(
                     model,
                     userId,
                     DatasetEntryType.ARRAY,
-                    values
+                    input
                 )
             )
 
