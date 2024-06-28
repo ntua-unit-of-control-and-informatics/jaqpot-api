@@ -3,10 +3,12 @@ package org.jaqpot.api.service.model
 import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.cache.CacheKeys
+import org.jaqpot.api.entity.DatasetEntryType
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetModels200ResponseDto
+import org.jaqpot.api.mapper.toPredictionModelDto
 import org.jaqpot.api.model.*
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
@@ -114,10 +116,17 @@ class ModelService(
             val userId = authenticationFacade.userId
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
-            val input = csvDataConverter.convertCsvContentToDataEntry(model, csvData)
-            val dataset = this.datasetRepository.save(datasetCSVDto.toEntity(model, userId, input))
+            val values = csvDataConverter.convertCsvContentToDataEntry(model, csvData)
+            val dataset = this.datasetRepository.save(
+                datasetCSVDto.toEntity(
+                    model,
+                    userId,
+                    DatasetEntryType.ARRAY,
+                    values
+                )
+            )
 
-            this.predictionService.executePredictionAndSaveResults(model, dataset)
+            this.predictionService.executePredictionAndSaveResults(model.toPredictionModelDto(), dataset)
 
             val location: URI = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/datasets/{id}")
@@ -136,9 +145,15 @@ class ModelService(
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
             val userId = authenticationFacade.userId
-            val dataset = this.datasetRepository.save(datasetDto.toEntity(model, userId))
+            val dataset = this.datasetRepository.save(
+                datasetDto.toEntity(
+                    model,
+                    userId,
+                    DatasetEntryType.ARRAY
+                )
+            )
 
-            this.predictionService.executePredictionAndSaveResults(model, dataset)
+            this.predictionService.executePredictionAndSaveResults(model.toPredictionModelDto(), dataset)
 
             val location: URI = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/datasets/{id}")

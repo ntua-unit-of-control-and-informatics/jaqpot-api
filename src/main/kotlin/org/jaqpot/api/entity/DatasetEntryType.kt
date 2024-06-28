@@ -1,5 +1,5 @@
 package org.jaqpot.api.entity
 
-enum class DataEntryType {
+enum class DatasetEntryType {
     ARRAY
 }

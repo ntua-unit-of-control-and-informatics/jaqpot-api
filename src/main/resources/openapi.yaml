@@ -817,10 +817,17 @@ components:
           example: 1
         type:
           $ref: '#/components/schemas/DatasetType'
+        entryType:
+          type: string
+          enum:
+            - ARRAY
+          example: "ARRAY"
         input:
-          $ref: '#/components/schemas/DataEntry'
-        results:
-          $ref: '#/components/schemas/DataEntry'
+          type: array
+          items: { }
+        result:
+          type: array
+          items: { }
         status:
           type: string
           enum:
@@ -850,10 +857,9 @@ components:
           type: string
           format: byte
           description: A base64 representation in CSV format of the input values.
-        results:
+        values:
           type: array
-          items:
-            $ref: '#/components/schemas/DataEntry'
+          items: { }
         status:
           type: string
           enum:
@@ -867,28 +873,6 @@ components:
           type: DateTime
         updated_at:
           type: DateTime
-    DataEntry:
-      type: object
-      required:
-        - type
-        - values
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        created_at:
-          type: DateTime
-        updated_at:
-          type: DateTime
-        type:
-          type: string
-          enum:
-            - ARRAY
-          example: "ARRAY"
-        values:
-          type: array
-          items: { }
 
 
     Organization:

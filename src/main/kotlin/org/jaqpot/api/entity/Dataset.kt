@@ -2,7 +2,8 @@ package org.jaqpot.api.entity
 
 import jakarta.persistence.*
 import jakarta.validation.constraints.Size
-import org.hibernate.annotations.SQLRestriction
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 
 @Entity
 class Dataset(
@@ -22,17 +23,21 @@ class Dataset(
     @Column(nullable = false)
     val type: DatasetType = DatasetType.PREDICTION,
 
-    @OneToOne(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @SQLRestriction("role = 'INPUT'")
-    var input: DataEntry?,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var status: DatasetStatus = DatasetStatus.CREATED,
 
-    @OneToOne(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @SQLRestriction("role = 'RESULTS'")
-    var results: DataEntry?,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val entryType: DatasetEntryType = DatasetEntryType.ARRAY,
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "input", columnDefinition = "jsonb", nullable = false)
+    var input: List<Any>,
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "result", columnDefinition = "jsonb", nullable = false)
+    var result: List<Any>? = null,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")

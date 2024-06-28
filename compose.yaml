@@ -13,17 +13,6 @@ services:
       - ./etc/init-db-scripts:/docker-entrypoint-initdb.d
       - ./docker/db:/var/lib/postgresql/data
 
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./mongodb:/data/db:rw
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-
   keycloak:
     depends_on: [ postgres ]
     restart: always
@@ -46,27 +35,3 @@ services:
     volumes:
       - ./docker/keycloak/imports:/opt/keycloak/data/import
   #    ports:
-
-  r-inference:
-    image: upcintua/jpdi-r:1.1.9
-    ports:
-      - "8004:8004"
-
-  python-generic-22:
-    #    network_mode: 'host'
-    image: euclia/jaqpot-python-generic:0.22
-    ports:
-      - 8822:8002
-
-  python-generic-23:
-    #    network_mode: 'host'
-    image: euclia/jaqpot-python-generic:0.23.1
-    ports:
-      - 8823:8002
-
-
-  python-generic-24:
-    #    network_mode: 'host'
-    image: euclia/jaqpot-python-generic:0.24.1
-    ports:
-      - 8824:8002

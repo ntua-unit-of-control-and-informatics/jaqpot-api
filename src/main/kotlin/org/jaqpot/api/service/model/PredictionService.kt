@@ -1,7 +1,9 @@
 package org.jaqpot.api.service.model
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.jaqpot.api.entity.*
+import org.jaqpot.api.dto.prediction.PredictionModelDto
+import org.jaqpot.api.entity.Dataset
+import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.dto.PredictionRequestDto
@@ -21,14 +23,12 @@ class PredictionService(
 ) {
 
     @Async
-    fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
+    fun executePredictionAndSaveResults(modelDto: PredictionModelDto, dataset: Dataset) {
         val datasetDto = dataset.toDto()
 
         val predictionRequestDto = PredictionRequestDto(
-            model.toDto(null, null),
+            modelDto,
             datasetDto,
-            model.legacyAdditionalInfo,
-            model.actualModel.decodeToString()
         )
         val request: HttpEntity<PredictionRequestDto> =
             HttpEntity(
@@ -37,11 +37,11 @@ class PredictionService(
 
         try {
             datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)
-            val results: List<Any> = makePredictionRequest(model, request)
+            val results: List<Any> = makePredictionRequest(modelDto, request)
             storeDatasetSuccess(dataset, results)
-        } catch (err: Exception) {
-            logger.error(err) { "Prediction for dataset with id ${dataset.id} failed" }
-            storeDatasetFailure(dataset, err)
+        } catch (e: Exception) {
+            logger.error(e) { "Prediction for dataset with id ${dataset.id} failed" }
+            storeDatasetFailure(dataset, e)
         }
     }
 
@@ -54,22 +54,16 @@ class PredictionService(
 
     private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
         dataset.status = DatasetStatus.SUCCESS
-        dataset.results = DataEntry(
-            null,
-            dataset,
-            DataEntryType.ARRAY,
-            DataEntryRole.RESULTS,
-            results
-        )
+        dataset.result = results
         datasetRepository.save(dataset)
     }
 
     private fun makePredictionRequest(
-        model: Model,
+        modelDto: PredictionModelDto,
         request: HttpEntity<PredictionRequestDto>,
     ): List<Any> {
         val restTemplate = RestTemplate()
-        val inferenceUrl = runtimeResolver.resolveRuntimeUrl(model)
+        val inferenceUrl = runtimeResolver.resolveRuntimeUrl(modelDto)
         val response =
             restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 

@@ -1,11 +1,12 @@
 package org.jaqpot.api.mapper
 
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 
-fun Model.toDto(userDto: UserDto?, userCanEdit: Boolean? = null): ModelDto {
+fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
         this.name,
         this.type.toDto(),
@@ -54,4 +55,16 @@ fun ModelDto.toEntity(creatorId: String): Model {
     m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m, FeatureDependency.INDEPENDENT) })
 
     return m
+}
+
+fun Model.toPredictionModelDto(): PredictionModelDto {
+    return PredictionModelDto(
+        id = this.id,
+        dependentFeatures = this.dependentFeatures.map { it.toDto() },
+        independentFeatures = this.independentFeatures.map { it.toDto() },
+        type = this.type.toDto(),
+        rawModel = this.actualModel.decodeToString(),
+        legacyAdditionalInfo = this.legacyAdditionalInfo,
+        legacyPredictionService = this.legacyPredictionService
+    )
 }

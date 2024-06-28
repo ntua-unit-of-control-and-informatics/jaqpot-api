@@ -1,8 +1,8 @@
 package org.jaqpot.api.service.runtime
 
-import org.jaqpot.api.entity.Model
-import org.jaqpot.api.entity.ModelType
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.error.JaqpotRuntimeException
+import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.service.runtime.config.RuntimeProvider
 import org.springframework.stereotype.Component
 import java.util.*
@@ -12,16 +12,16 @@ class RuntimeResolver(
     val runtimeProvider: RuntimeProvider
 ) {
 
-    fun resolveRuntimeUrl(model: Model): String {
-        val legacyResolveRuntime = legacyResolveRuntime(model)
+    fun resolveRuntimeUrl(modelDto: PredictionModelDto): String {
+        val legacyResolveRuntime = legacyResolveRuntime(modelDto)
 
         return legacyResolveRuntime.orElse(
-            when (model.type) {
-                ModelType.R -> {
+            when (modelDto.type) {
+                ModelDto.Type.R -> {
                     runtimeProvider.jaqpotRUrl
                 }
 
-                ModelType.SKLEARN -> {
+                ModelDto.Type.SKLEARN -> {
                     runtimeProvider.jaqpotpyInferenceV6Url
                 }
 
@@ -32,17 +32,17 @@ class RuntimeResolver(
         )
     }
 
-    private fun legacyResolveRuntime(model: Model): Optional<String> {
-        val legacyPredictionService = model.legacyPredictionService
+    private fun legacyResolveRuntime(modelDto: PredictionModelDto): Optional<String> {
+        val legacyPredictionService = modelDto.legacyPredictionService
 
         if (legacyPredictionService != null) {
-            return Optional.of(resolveRuntimeWithPredictionService(legacyPredictionService, model))
+            return Optional.of(resolveRuntimeWithPredictionService(legacyPredictionService))
         }
 
         return Optional.empty()
     }
 
-    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String, model: Model): String {
+    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String): String {
         if (legacyPredictionService.contains("jaqpot-r")) {
             return if (legacyPredictionService.contains("predict.pbpk")) {
                 "${runtimeProvider.jaqpotRUrl}/predict.pbpk"
