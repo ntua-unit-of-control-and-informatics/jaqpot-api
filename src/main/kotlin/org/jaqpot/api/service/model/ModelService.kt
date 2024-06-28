@@ -14,6 +14,7 @@ import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.repository.util.FullTextUtil
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
@@ -37,7 +38,8 @@ class ModelService(
     private val predictionService: PredictionService,
     private val datasetRepository: DatasetRepository,
     private val organizationRepository: OrganizationRepository,
-    private val csvParser: CSVParser
+    private val csvParser: CSVParser,
+    private val csvDataConverter: CSVDataConverter
 ) : ModelApiDelegate {
 
     override fun getModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
@@ -111,7 +113,8 @@ class ModelService(
             }
             val userId = authenticationFacade.userId
 
-            val input = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
+            val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
+            val input = csvDataConverter.convertCsvContentToDataEntry(model, csvData)
             val dataset = this.datasetRepository.save(datasetCSVDto.toEntity(model, userId, input))
 
             this.predictionService.executePredictionAndSaveResults(model, dataset)

@@ -764,9 +764,11 @@ components:
         featureType:
           type: string
           enum:
-            - NUMERICAL
+            - INTEGER
+            - FLOAT
             - CATEGORICAL
-          example: NUMERICAL
+            - TEXT
+          example: FLOAT
         featureDependency:
           type: string
           enum:
@@ -807,13 +809,9 @@ components:
         type:
           $ref: '#/components/schemas/DatasetType'
         input:
-          type: array
-          items:
-            $ref: '#/components/schemas/DataEntry'
+          $ref: '#/components/schemas/DataEntry'
         results:
-          type: array
-          items:
-            $ref: '#/components/schemas/DataEntry'
+          $ref: '#/components/schemas/DataEntry'
         status:
           type: string
           enum:

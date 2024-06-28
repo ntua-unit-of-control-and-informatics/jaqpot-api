@@ -11,7 +11,7 @@ class DataEntry(
     @SequenceGenerator(name = "data_entry_id_seq", sequenceName = "data_entry_id_seq", allocationSize = 1)
     val id: Long? = 0,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dataset_id", updatable = false, nullable = false)
     val dataset: Dataset,
 

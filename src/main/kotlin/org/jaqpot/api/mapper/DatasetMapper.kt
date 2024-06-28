@@ -12,9 +12,9 @@ import org.jaqpot.api.model.DatasetDto
 fun Dataset.toDto(): DatasetDto {
     return DatasetDto(
         this.type.toDto(),
-        this.input.map { it.toDto() },
+        this.input!!.toDto(),
         this.id,
-        this.results.map { it.toDto() },
+        this.results?.toDto(),
         this.status.toDto(),
         this.failureReason,
         this.createdAt,
@@ -28,32 +28,31 @@ fun DatasetDto.toEntity(model: Model, userId: String): Dataset {
         model,
         userId,
         this.type.toEntity(),
-        mutableListOf(),
+        null,
         DatasetStatus.CREATED,
-        mutableListOf(),
+        null,
         this.failureReason
     )
 
-    d.input.addAll(this.input.map { it -> it.toEntity(d, DataEntryRole.INPUT) })
-    d.results.addAll(this.results?.map { it -> it.toEntity(d, DataEntryRole.RESULTS) } ?: emptyList())
+    d.input = this.input.toEntity(d, DataEntryRole.INPUT)
+    d.results = this.results?.toEntity(d, DataEntryRole.RESULTS)
 
     return d
 }
 
-fun DatasetCSVDto.toEntity(model: Model, userId: String, input: List<DataEntryDto>): Dataset {
+fun DatasetCSVDto.toEntity(model: Model, userId: String, input: DataEntryDto): Dataset {
     val d = Dataset(
         this.id,
         model,
         userId,
         this.type.toEntity(),
-        mutableListOf(),
+        null,
         DatasetStatus.CREATED,
-        mutableListOf(),
+        null,
         this.failureReason
     )
 
-    d.input.addAll(input.map { it -> it.toEntity(d, DataEntryRole.INPUT) })
-    d.results.addAll(this.results?.map { it -> it.toEntity(d, DataEntryRole.RESULTS) } ?: emptyList())
+    d.input = input.toEntity(d, DataEntryRole.INPUT)
 
     return d
 }

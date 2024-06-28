@@ -22,17 +22,17 @@ class Dataset(
     @Column(nullable = false)
     val type: DatasetType = DatasetType.PREDICTION,
 
-    @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("role = 'INPUT'")
-    val input: MutableList<DataEntry>,
+    var input: DataEntry?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var status: DatasetStatus = DatasetStatus.CREATED,
 
-    @OneToMany(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "dataset", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("role = 'RESULTS'")
-    var results: MutableList<DataEntry>,
+    var results: DataEntry?,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
