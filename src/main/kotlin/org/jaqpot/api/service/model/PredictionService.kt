@@ -22,9 +22,18 @@ class PredictionService(
 
     @Async
     fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
-        val rawModel = model.actualModel.decodeToString()
+        val datasetDto = dataset.toDto()
+
+        val predictionRequestDto = PredictionRequestDto(
+            model.toDto(null, null),
+            datasetDto,
+            model.legacyAdditionalInfo,
+            model.actualModel.decodeToString()
+        )
         val request: HttpEntity<PredictionRequestDto> =
-            HttpEntity(PredictionRequestDto(rawModel, dataset.toDto()))
+            HttpEntity(
+                predictionRequestDto
+            )
 
         try {
             datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)
@@ -45,29 +54,24 @@ class PredictionService(
 
     private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
         dataset.status = DatasetStatus.SUCCESS
-        dataset.results.clear()
-        dataset.results.addAll(
-            listOf(
-                DataEntry(
-                    null,
-                    dataset,
-                    DataEntryType.ARRAY,
-                    DataEntryRole.RESULTS,
-                    results
-                )
-            )
+        dataset.results = DataEntry(
+            null,
+            dataset,
+            DataEntryType.ARRAY,
+            DataEntryRole.RESULTS,
+            results
         )
-
         datasetRepository.save(dataset)
     }
 
     private fun makePredictionRequest(
         model: Model,
-        request: HttpEntity<PredictionRequestDto>
+        request: HttpEntity<PredictionRequestDto>,
     ): List<Any> {
         val restTemplate = RestTemplate()
         val inferenceUrl = runtimeResolver.resolveRuntimeUrl(model)
-        val response = restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
+        val response =
+            restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 
         val results: List<Any> = response.body?.predictions ?: emptyList()
         return results

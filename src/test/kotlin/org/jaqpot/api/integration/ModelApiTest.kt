@@ -87,17 +87,17 @@ class ModelApiTest : AbstractIntegrationTest() {
                     "dependentFeatures": [{
                         "name": "Y",
                         "description": "dependent feature description",
-                        "featureType": "NUMERICAL"
+                        "featureType": "FLOAT"
                     }],
                     "independentFeatures": [{
                         "name": "dose",
                         "description": "independent feature description",
-                        "featureType": "NUMERICAL"
+                        "featureType": "FLOAT"
                     },
                     {
                         "name": "liability",
                         "description": "independent feature description",
-                        "featureType": "NUMERICAL"
+                        "featureType": "FLOAT"
                     }],
                     "meta": {
                         "id": 3,
