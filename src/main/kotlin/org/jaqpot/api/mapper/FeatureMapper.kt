@@ -7,6 +7,7 @@ import org.jaqpot.api.model.FeatureDto
 
 fun Feature.toDto(): FeatureDto {
     return FeatureDto(
+        this.key,
         this.name,
         this.featureType.toDto(),
         this.id,
@@ -24,6 +25,7 @@ fun FeatureDto.toEntity(model: Model, featureDependency: FeatureDependency): Fea
     return Feature(
         this.id,
         model,
+        this.key,
         this.name,
         this.description,
         featureDependency,

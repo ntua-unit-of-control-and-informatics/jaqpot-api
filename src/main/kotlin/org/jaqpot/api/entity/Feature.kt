@@ -1,6 +1,7 @@
 package org.jaqpot.api.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
@@ -15,6 +16,13 @@ class Feature(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", nullable = false)
     val model: Model,
+
+    @Pattern(
+        regexp = "^[a-zA-Z][a-zA-Z0-9_-]*\$",
+        message = "Feature key must start with a letter and can only contain letters, digits, hyphens, and underscores."
+    )
+    @Column(nullable = false)
+    val key: String,
 
     @Column(nullable = false)
     val name: String,

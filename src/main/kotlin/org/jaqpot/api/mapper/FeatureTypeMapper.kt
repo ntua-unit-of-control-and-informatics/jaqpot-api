@@ -9,6 +9,7 @@ fun FeatureDto.FeatureType.toEntity(): FeatureType {
         FeatureDto.FeatureType.FLOAT -> FeatureType.FLOAT
         FeatureDto.FeatureType.CATEGORICAL -> FeatureType.CATEGORICAL
         FeatureDto.FeatureType.TEXT -> FeatureType.TEXT
+        FeatureDto.FeatureType.SMILES -> FeatureType.SMILES
     }
 }
 
@@ -18,6 +19,7 @@ fun FeatureType.toDto(): FeatureDto.FeatureType {
         FeatureType.FLOAT -> FeatureDto.FeatureType.FLOAT
         FeatureType.CATEGORICAL -> FeatureDto.FeatureType.CATEGORICAL
         FeatureType.TEXT -> FeatureDto.FeatureType.TEXT
+        FeatureType.SMILES -> FeatureDto.FeatureType.SMILES
     }
 }
 

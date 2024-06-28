@@ -12,7 +12,7 @@ class CSVDataConverter {
                 {
                     val inputObject = HashMap<String, String>()
 
-                    inputObject.put(model.independentFeatures[idx].name, value)
+                    inputObject.put(model.independentFeatures[idx].key, value)
                 }
             }
         }

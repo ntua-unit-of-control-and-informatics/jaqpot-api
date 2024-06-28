@@ -743,6 +743,7 @@ components:
     Feature:
       type: object
       required:
+        - key
         - name
         - featureType
       properties:
@@ -755,9 +756,16 @@ components:
           description: A JSON object containing meta information.
           additionalProperties:
             type: object
+        key:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*$"
+          description: A key that must start with a letter, followed by any combination of letters, digits, hyphens, or underscores. For example, 'abc123', 'abc-test', or 'Abc_test'. It cannot start with a digit.
+          example: feature-key
         name:
           type: string
-          example: Feature Name
+          description: A name for the feature
+          maxLength: 255
+          example: A feature name
         description:
           type: string
           maxLength: 2000
@@ -767,6 +775,7 @@ components:
             - INTEGER
             - FLOAT
             - CATEGORICAL
+            - SMILES
             - TEXT
           example: FLOAT
         featureDependency:
