@@ -25,7 +25,7 @@ class Feature(
     val key: String,
 
     @Column(nullable = false)
-    val label: String,
+    val name: String,
 
     @Size(min = 3, max = 5000)
     @Column(columnDefinition = "TEXT")
