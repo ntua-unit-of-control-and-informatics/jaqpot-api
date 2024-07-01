@@ -753,7 +753,7 @@ components:
       type: object
       required:
         - key
-        - name
+        - label
         - featureType
       properties:
         id:
@@ -770,9 +770,9 @@ components:
           pattern: "^[a-zA-Z][a-zA-Z0-9_-]*$"
           description: A key that must start with a letter, followed by any combination of letters, digits, hyphens, or underscores. For example, 'abc123', 'abc-test', or 'Abc_test'. It cannot start with a digit.
           example: feature-key
-        name:
+        label:
           type: string
-          description: A name for the feature
+          description: A label for the feature that will appear on top of the form field
           maxLength: 255
           example: A feature name
         description:
