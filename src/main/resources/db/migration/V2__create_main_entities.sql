@@ -23,7 +23,8 @@ CREATE TABLE feature
     created_at         TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at         TIMESTAMP WITH TIME ZONE NOT NULL,
     model_id           BIGINT                   NOT NULL,
-    name               VARCHAR(255)             NOT NULL,
+    key                VARCHAR(255)             NOT NULL,
+    label              VARCHAR(255)             NOT NULL,
     description        TEXT,
     feature_dependency VARCHAR(255)             NOT NULL,
     feature_type       VARCHAR(255)             NOT NULL,
@@ -53,21 +54,12 @@ CREATE TABLE dataset
     model_id       BIGINT                   NOT NULL,
     user_id        VARCHAR(255)             NOT NULL,
     type           VARCHAR(255)             NOT NULL,
+    entry_type     VARCHAR(255)             NOT NULL,
     status         VARCHAR(255)             NOT NULL,
+    input          JSONB                    NOT NULL,
+    result         JSONB,
     failure_reason TEXT,
     CONSTRAINT pk_dataset PRIMARY KEY (id)
-);
-
-CREATE TABLE data_entry
-(
-    id         BIGSERIAL                NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    dataset_id BIGINT                   NOT NULL,
-    type       VARCHAR(255)             NOT NULL,
-    role       VARCHAR(255)             NOT NULL,
-    values     JSONB                    NOT NULL,
-    CONSTRAINT pk_dataentry PRIMARY KEY (id)
 );
 
 ALTER TABLE feature
@@ -79,5 +71,3 @@ ALTER TABLE library
 ALTER TABLE dataset
     ADD CONSTRAINT FK_DATASET_ON_MODEL FOREIGN KEY (model_id) REFERENCES model (id);
 
-ALTER TABLE data_entry
-    ADD CONSTRAINT FK_DATAENTRY_ON_DATASET FOREIGN KEY (dataset_id) REFERENCES dataset (id);

@@ -1,5 +1,5 @@
 package org.jaqpot.api.entity
 
 enum class FeatureType {
-    INTEGER, FLOAT, CATEGORICAL, TEXT
+    INTEGER, FLOAT, CATEGORICAL, TEXT, SMILES
 }

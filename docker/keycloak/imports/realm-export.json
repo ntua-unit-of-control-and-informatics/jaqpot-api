@@ -530,8 +530,8 @@
     {
       "username": "jaqpot-admin",
       "email": "jaqpot-admin@jaqpot.org",
-      "firstName": "jaq",
-      "lastName": "pot",
+      "firstName": "jaqpot",
+      "lastName": "admin",
       "enabled": true,
       "emailVerified": true,
       "credentials": [

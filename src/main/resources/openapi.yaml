@@ -662,7 +662,16 @@ components:
           enum:
             - SKLEARN
             - TORCH
-            - R
+            - R_BNLEARN_DISCRETE
+            - R_CARET
+            - R_GBM
+            - R_NAIVE_BAYES
+            - R_PBPK
+            - R_RF
+            - R_RPART
+            - R_SVM
+            - R_TREE_CLASS
+            - R_TREE_REGR
         jaqpotpyVersion:
           type: string
           example: 1.0.0
@@ -743,7 +752,8 @@ components:
     Feature:
       type: object
       required:
-        - name
+        - key
+        - label
         - featureType
       properties:
         id:
@@ -755,9 +765,16 @@ components:
           description: A JSON object containing meta information.
           additionalProperties:
             type: object
-        name:
+        key:
           type: string
-          example: Feature Name
+          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*$"
+          description: A key that must start with a letter, followed by any combination of letters, digits, hyphens, or underscores. For example, 'abc123', 'abc-test', or 'Abc_test'. It cannot start with a digit.
+          example: feature-key
+        label:
+          type: string
+          description: A label for the feature that will appear on top of the form field
+          maxLength: 255
+          example: A feature name
         description:
           type: string
           maxLength: 2000
@@ -767,6 +784,7 @@ components:
             - INTEGER
             - FLOAT
             - CATEGORICAL
+            - SMILES
             - TEXT
           example: FLOAT
         featureDependency:
@@ -801,6 +819,7 @@ components:
       required:
         - type
         - input
+        - entryType
       properties:
         id:
           type: integer
@@ -808,10 +827,17 @@ components:
           example: 1
         type:
           $ref: '#/components/schemas/DatasetType'
+        entryType:
+          type: string
+          enum:
+            - ARRAY
+          example: "ARRAY"
         input:
-          $ref: '#/components/schemas/DataEntry'
-        results:
-          $ref: '#/components/schemas/DataEntry'
+          type: array
+          items: { }
+        result:
+          type: array
+          items: { }
         status:
           type: string
           enum:
@@ -841,10 +867,9 @@ components:
           type: string
           format: byte
           description: A base64 representation in CSV format of the input values.
-        results:
+        values:
           type: array
-          items:
-            $ref: '#/components/schemas/DataEntry'
+          items: { }
         status:
           type: string
           enum:
@@ -858,28 +883,6 @@ components:
           type: DateTime
         updated_at:
           type: DateTime
-    DataEntry:
-      type: object
-      required:
-        - type
-        - values
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        created_at:
-          type: DateTime
-        updated_at:
-          type: DateTime
-        type:
-          type: string
-          enum:
-            - ARRAY
-          example: "ARRAY"
-        values:
-          type: array
-          items: { }
 
 
     Organization:

@@ -54,10 +54,12 @@ jaqpot:
     url: http://localhost.jaqpot.org:3000
   runtime:
     jaqpotpy-inference-v6: http://localhost.jaqpot.org:8002/predict/
+    jaqpotpy-inference-legacy-legacy: http://localhost.jaqpot.org:8820/predict/pipeline/
     jaqpotpy-inference-legacy-22: http://localhost.jaqpot.org:8822/predict/sklearn/
     jaqpotpy-inference-legacy-23: http://localhost.jaqpot.org:8823/predict/sklearn/
     jaqpotpy-inference-legacy-24: http://localhost.jaqpot.org:8824/predict/sklearn/
-    jaqpotr: http://localhost.jaqpot.org:8004
+    jaqpotpy-inference-legacy-latest: http://localhost.jaqpot.org:8888/predict/sklearn/
+    jaqpotr: http://localhost:8004
 
 
 

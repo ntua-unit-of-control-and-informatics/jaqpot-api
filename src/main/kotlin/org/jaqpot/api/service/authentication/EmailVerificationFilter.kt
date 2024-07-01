@@ -17,7 +17,7 @@ class EmailVerificationFilter(private val authenticationFacade: AuthenticationFa
     override fun doFilter(request: ServletRequest, response: ServletResponse?, chain: FilterChain) {
         val authentication = authenticationFacade.authentication
 
-        if (authentication != null && authentication.isAuthenticated) {
+        if (authentication.isAuthenticated) {
             val principal = authentication.principal
 
             if (principal is org.springframework.security.oauth2.jwt.Jwt) {

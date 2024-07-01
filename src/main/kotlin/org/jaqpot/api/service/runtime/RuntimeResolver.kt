@@ -1,8 +1,8 @@
 package org.jaqpot.api.service.runtime
 
-import org.jaqpot.api.entity.Model
-import org.jaqpot.api.entity.ModelType
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.error.JaqpotRuntimeException
+import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.service.runtime.config.RuntimeProvider
 import org.springframework.stereotype.Component
 import java.util.*
@@ -11,43 +11,72 @@ import java.util.*
 class RuntimeResolver(
     val runtimeProvider: RuntimeProvider
 ) {
-
-    fun resolveRuntimeUrl(model: Model): String {
-        val legacyResolveRuntime = legacyResolveRuntime(model)
-
-        return legacyResolveRuntime.orElse(
-            when (model.type) {
-                ModelType.R -> {
-                    runtimeProvider.jaqpotRUrl
-                }
-
-                ModelType.SKLEARN -> {
-                    runtimeProvider.jaqpotpyInferenceV6Url
-                }
-
-                else -> {
-                    throw JaqpotRuntimeException("Model type is not yet supported")
-                }
-            }
+    companion object {
+        val R_RUNTIMES = mapOf(
+            ModelDto.Type.R_BNLEARN_DISCRETE to "predict_bnlearn_discrete",
+            ModelDto.Type.R_CARET to "predict_caret",
+            ModelDto.Type.R_GBM to "predict_gbm",
+            ModelDto.Type.R_NAIVE_BAYES to "predict_naive_bayess",
+            ModelDto.Type.R_PBPK to "predict_pbpk",
+            ModelDto.Type.R_RF to "predict_rf",
+            ModelDto.Type.R_RPART to "predict_rpart",
+            ModelDto.Type.R_SVM to "predict_svm",
+            ModelDto.Type.R_TREE_CLASS to "predict_tree_class",
+            ModelDto.Type.R_TREE_REGR to "predict_tree_regr",
         )
     }
 
-    private fun legacyResolveRuntime(model: Model): Optional<String> {
-        val legacyPredictionService = model.legacyPredictionService
+
+    fun resolveRuntimeUrl(modelDto: PredictionModelDto): String {
+        val legacyResolveRuntime = legacyResolveRuntime(modelDto)
+        if (legacyResolveRuntime.isPresent) {
+            return legacyResolveRuntime.get()
+        }
+
+        val rRuntime = resolveRRuntime(modelDto)
+        if (rRuntime.isPresent) {
+            return rRuntime.get()
+        }
+
+        return when (modelDto.type) {
+            ModelDto.Type.SKLEARN -> {
+                runtimeProvider.jaqpotpyInferenceV6Url
+            }
+
+            ModelDto.Type.TORCH -> {
+                runtimeProvider.jaqpotpyInferenceV6Url
+            }
+
+            else -> {
+                throw JaqpotRuntimeException("Model type is not yet supported")
+            }
+        }
+    }
+
+    private fun resolveRRuntime(modelDto: PredictionModelDto): Optional<String> {
+        if (!R_RUNTIMES.contains(modelDto.type)) {
+            return Optional.empty()
+        }
+
+        return Optional.of(R_RUNTIMES[modelDto.type]!!)
+    }
+
+    private fun legacyResolveRuntime(modelDto: PredictionModelDto): Optional<String> {
+        val legacyPredictionService = modelDto.legacyPredictionService
 
         if (legacyPredictionService != null) {
-            return Optional.of(resolveRuntimeWithPredictionService(legacyPredictionService, model))
+            return Optional.of(resolveRuntimeWithPredictionService(legacyPredictionService))
         }
 
         return Optional.empty()
     }
 
-    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String, model: Model): String {
+    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String): String {
         if (legacyPredictionService.contains("jaqpot-r")) {
             return if (legacyPredictionService.contains("predict.pbpk")) {
-                "${runtimeProvider.jaqpotRUrl}/ocpu/library/GenericR/R/predict.pbpk/json"
-            } else if (legacyPredictionService.contains("jaqpot.predict.caret")) {
-                "${runtimeProvider.jaqpotRUrl}/ocpu/library/GenericR/R/jaqpot.predict.caret/json"
+                "${runtimeProvider.jaqpotRUrl}/predict.pbpk"
+            } else if (legacyPredictionService.contains("predict.caret")) {
+                "${runtimeProvider.jaqpotRUrl}/predict.caret"
             } else {
                 throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
             }
