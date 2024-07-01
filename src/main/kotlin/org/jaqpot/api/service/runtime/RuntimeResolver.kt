@@ -74,9 +74,9 @@ class RuntimeResolver(
     private fun resolveRuntimeWithPredictionService(legacyPredictionService: String): String {
         if (legacyPredictionService.contains("jaqpot-r")) {
             return if (legacyPredictionService.contains("predict.pbpk")) {
-                "${runtimeProvider.jaqpotRUrl}/predict.pbpk"
+                "${runtimeProvider.jaqpotRUrl}/${R_RUNTIMES[ModelDto.Type.R_PBPK]}"
             } else if (legacyPredictionService.contains("predict.caret")) {
-                "${runtimeProvider.jaqpotRUrl}/predict.caret"
+                "${runtimeProvider.jaqpotRUrl}/${R_RUNTIMES[ModelDto.Type.R_CARET]}"
             } else {
                 throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
             }
