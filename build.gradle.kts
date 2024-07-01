@@ -92,8 +92,12 @@ dependencies {
     // apache csv parser
     implementation("org.apache.commons:commons-csv:1.11.0")
 
-
     runtimeOnly("org.postgresql:postgresql")
+
+    // aws
+    implementation(platform("software.amazon.awssdk:bom:2.21.1"))
+    // With the bom declared, you specify individual SDK dependencies without a version.
+    implementation("software.amazon.awssdk:s3")
 
     // tests
     // rest assured

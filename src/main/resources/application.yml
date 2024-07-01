@@ -37,6 +37,16 @@ spring:
 #  cache:
 #    type: none
 
+aws:
+  s3:
+    endpoint: http://localhost:4566
+    region: eu-central-1
+  credentials:
+    access-key: none
+    secret-key: none
+  region:
+    static: eu-central-1
+
 server:
   error:
     include-message: always
