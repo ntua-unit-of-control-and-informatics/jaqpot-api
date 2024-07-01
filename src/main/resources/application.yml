@@ -44,8 +44,7 @@ aws:
   credentials:
     access-key: none
     secret-key: none
-  region:
-    static: eu-central-1
+  region: eu-central-1
 
 server:
   error:

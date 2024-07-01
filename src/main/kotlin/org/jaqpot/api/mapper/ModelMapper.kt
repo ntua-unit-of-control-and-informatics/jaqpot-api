@@ -5,6 +5,7 @@ import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
+import java.util.*
 
 fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
@@ -47,7 +48,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         null,
         this.pretrained,
         this.tags,
-        this.actualModel,
+        Base64.getDecoder().decode(this.actualModel),
     )
 
     m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
@@ -57,13 +58,13 @@ fun ModelDto.toEntity(creatorId: String): Model {
     return m
 }
 
-fun Model.toPredictionModelDto(): PredictionModelDto {
+fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
-        rawModel = this.actualModel.decodeToString(),
+        rawModel = actualModel.decodeToString(),
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )

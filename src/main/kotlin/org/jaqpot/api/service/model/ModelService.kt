@@ -1,10 +1,13 @@
 package org.jaqpot.api.service.model
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.cache.CacheKeys
+import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetEntryType
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetModels200ResponseDto
@@ -19,6 +22,7 @@ import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
+import org.jaqpot.api.storage.Storage
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageRequest
@@ -31,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
+private val logger = KotlinLogging.logger {}
 
 @Service
 class ModelService(
@@ -41,8 +46,10 @@ class ModelService(
     private val datasetRepository: DatasetRepository,
     private val organizationRepository: OrganizationRepository,
     private val csvParser: CSVParser,
-    private val csvDataConverter: CSVDataConverter
+    private val csvDataConverter: CSVDataConverter,
+    private val storage: Storage
 ) : ModelApiDelegate {
+
 
     override fun getModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
@@ -57,7 +64,6 @@ class ModelService(
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size)
         val sharedModelsPage = modelRepository.findAllSharedWithUser(creatorId, pageable)
-        val creator = sharedModelsPage
 
         return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
     }
@@ -69,13 +75,26 @@ class ModelService(
             throw IllegalStateException("ID should not be provided for resource creation.")
         }
         val creatorId = authenticationFacade.userId
-        val toEntity = modelDto.toEntity(creatorId)
-        toEntity.description = toEntity.description
-        val model = modelRepository.save(toEntity)
+        val modelEntity = modelDto.toEntity(creatorId)
+
+        storeRawModel(modelEntity)
+
+        val model = modelRepository.save(modelEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(model.id).toUri()
         return ResponseEntity.created(location).build()
+    }
+
+    private fun storeRawModel(toEntity: Model) {
+        val rawModel = toEntity.actualModel
+        try {
+            this.storage.putObject("models", toEntity.id.toString(), toEntity.actualModel!!)
+            toEntity.actualModel = null
+        } catch (e: Exception) {
+            logger.error { "Failed to store model with id ${toEntity.id}" }
+            toEntity.actualModel = rawModel
+        }
     }
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
@@ -126,12 +145,7 @@ class ModelService(
                 )
             )
 
-            this.predictionService.executePredictionAndSaveResults(model.toPredictionModelDto(), dataset)
-
-            val location: URI = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/datasets/{id}")
-                .buildAndExpand(dataset.id).toUri()
-            return ResponseEntity.created(location).build()
+            return triggerPredictionAndReturnSuccessStatus(model, dataset)
         }
 
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
@@ -153,15 +167,28 @@ class ModelService(
                 )
             )
 
-            this.predictionService.executePredictionAndSaveResults(model.toPredictionModelDto(), dataset)
-
-            val location: URI = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/datasets/{id}")
-                .buildAndExpand(dataset.id).toUri()
-            return ResponseEntity.created(location).build()
+            return triggerPredictionAndReturnSuccessStatus(model, dataset)
         }
 
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
+    }
+
+    private fun triggerPredictionAndReturnSuccessStatus(
+        model: Model,
+        dataset: Dataset
+    ): ResponseEntity<Unit> {
+        val storageActualModel = this.storage.getObject("models", model.id.toString())
+        val actualModel = storageActualModel.orElse(model.actualModel) ?: throw JaqpotRuntimeException("Actual model not found")
+
+        this.predictionService.executePredictionAndSaveResults(
+            model.toPredictionModelDto(actualModel),
+            dataset
+        )
+
+        val location: URI = ServletUriComponentsBuilder
+            .fromCurrentContextPath().path("/datasets/{id}")
+            .buildAndExpand(dataset.id).toUri()
+        return ResponseEntity.created(location).build()
     }
 
     @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)

@@ -74,8 +74,7 @@ class Model(
 
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)
-    @Column(nullable = false)
-    val actualModel: ByteArray,
+    var actualModel: ByteArray?,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
