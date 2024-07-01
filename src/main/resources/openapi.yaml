@@ -785,6 +785,7 @@ components:
             - FLOAT
             - CATEGORICAL
             - SMILES
+            - STRING
             - TEXT
           example: FLOAT
         featureDependency:
