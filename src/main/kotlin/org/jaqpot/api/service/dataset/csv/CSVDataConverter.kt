@@ -7,13 +7,12 @@ import org.springframework.stereotype.Component
 class CSVDataConverter {
     fun convertCsvContentToDataEntry(model: Model, csvData: List<List<String>>): List<Any> {
         return csvData.map {
-            it.mapIndexed { idx, value ->
-                {
-                    val inputObject = HashMap<String, String>()
-
-                    inputObject.put(model.independentFeatures[idx].key, value)
-                }
+            val inputObject = HashMap<String, String>()
+            it.forEachIndexed { idx, value ->
+                inputObject[model.independentFeatures[idx].key] = value
             }
+
+            inputObject
         }
     }
 }

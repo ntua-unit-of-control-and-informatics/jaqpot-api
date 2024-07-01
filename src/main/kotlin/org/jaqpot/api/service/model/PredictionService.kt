@@ -62,6 +62,12 @@ class PredictionService(
         modelDto: PredictionModelDto,
         request: HttpEntity<PredictionRequestDto>,
     ): List<Any> {
+
+        // uncomment to test request json
+//        val objectMapper = ObjectMapper()
+//        objectMapper.registerModule(JavaTimeModule())
+//        val json = objectMapper.writeValueAsString(request)
+
         val restTemplate = RestTemplate()
         val inferenceUrl = runtimeResolver.resolveRuntimeUrl(modelDto)
         val response =

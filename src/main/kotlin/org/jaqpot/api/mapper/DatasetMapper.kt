@@ -12,6 +12,7 @@ fun Dataset.toDto(): DatasetDto {
     return DatasetDto(
         type = this.type.toDto(),
         id = this.id,
+        entryType = this.entryType.toDto(),
         status = this.status.toDto(),
         failureReason = this.failureReason,
         input = this.input,
