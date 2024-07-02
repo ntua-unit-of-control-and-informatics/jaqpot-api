@@ -346,6 +346,70 @@ paths:
           description: Model not found
         '400':
           description: Invalid input
+  /v1/models/{modelId}/features/{featureId}:
+    patch:
+      summary: Update a feature for a specific model
+      description: Update the name, description, and feature type of an existing feature within a specific model
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - feature
+      operationId: partiallyUpdateModelFeature
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model containing the feature
+          schema:
+            type: integer
+            format: int64
+        - name: featureId
+          in: path
+          required: true
+          description: The ID of the feature to update
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - featureType
+              properties:
+                name:
+                  type: string
+                  description: A name for the feature that will appear on top of the form field
+                  maxLength: 255
+                  example: Updated Feature Name
+                description:
+                  type: string
+                  maxLength: 2000
+                  example: An updated description for this feature
+                featureType:
+                  $ref: '#/components/schemas/FeatureType'
+                possibleValues:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Feature updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+        '400':
+          description: Invalid input
+        '404':
+          description: Model or feature not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
   '/v1/datasets/{id}':
     get:
       summary: Get a Dataset
@@ -619,6 +683,8 @@ paths:
         "404":
           description: "Invitation not found"
 
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -779,15 +845,7 @@ components:
           type: string
           maxLength: 2000
         featureType:
-          type: string
-          enum:
-            - INTEGER
-            - FLOAT
-            - CATEGORICAL
-            - SMILES
-            - STRING
-            - TEXT
-          example: FLOAT
+          $ref: '#/components/schemas/FeatureType'
         featureDependency:
           type: string
           enum:
@@ -810,6 +868,16 @@ components:
           type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    FeatureType:
+      type: string
+      enum:
+        - INTEGER
+        - FLOAT
+        - CATEGORICAL
+        - SMILES
+        - STRING
+        - TEXT
+      example: FLOAT
     DatasetType:
       type: string
       enum:
