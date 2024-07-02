@@ -48,6 +48,6 @@ class Feature(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    var possibleValues: List<String>? = null,
+    var possibleValues: Set<String>? = null,
 
     ) : BaseEntity()
