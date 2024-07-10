@@ -70,7 +70,6 @@ class ModelService(
         }
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
-        toEntity.description = toEntity.description
         val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")

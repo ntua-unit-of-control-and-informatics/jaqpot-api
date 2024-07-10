@@ -5,6 +5,7 @@ import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
+import java.util.*
 
 fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null): ModelDto {
     return ModelDto(
@@ -47,7 +48,8 @@ fun ModelDto.toEntity(creatorId: String): Model {
         null,
         this.pretrained,
         this.tags,
-        this.actualModel,
+        // store as base64 representation
+        Base64.getEncoder().encode(this.actualModel),
     )
 
     m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
