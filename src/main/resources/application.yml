@@ -37,6 +37,17 @@ spring:
 #  cache:
 #    type: none
 
+management:
+  health:
+    readinessState:
+      enabled: true
+    livenessState:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 server:
   error:
     include-message: always
