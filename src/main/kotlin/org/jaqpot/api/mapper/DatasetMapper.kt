@@ -17,6 +17,7 @@ fun Dataset.toDto(): DatasetDto {
         failureReason = this.failureReason,
         input = this.input,
         result = this.result,
+        userId = this.userId,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )

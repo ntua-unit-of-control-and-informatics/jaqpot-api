@@ -5,11 +5,13 @@ import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.stereotype.Service
 
 @Service
 class DatasetService(private val datasetRepository: DatasetRepository) : DatasetApiDelegate {
-    // TODO only allow access to the user that created the dataset
+
+    @PostAuthorize("@getDatasetAuthorizationLogic.decide(#root)")
     override fun getDatasetById(id: Long): ResponseEntity<DatasetDto> {
         val dataset = datasetRepository.findById(id)
 

@@ -916,6 +916,8 @@ components:
             - SUCCESS
         failureReason:
           type: string
+        userId:
+          type: string
         created_at:
           type: DateTime
         updated_at:
