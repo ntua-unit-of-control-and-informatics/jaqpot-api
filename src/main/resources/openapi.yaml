@@ -962,9 +962,16 @@ components:
           type: string
         userId:
           type: string
-        created_at:
+        modelId:
+          type: integer
+          format: int64
+        executedAt:
           type: DateTime
-        updated_at:
+        executionFinishedAt:
+          type: DateTime
+        createdAt:
+          type: DateTime
+        updatedAt:
           type: DateTime
     DatasetCSV:
       type: object
@@ -994,9 +1001,16 @@ components:
             - SUCCESS
         failureReason:
           type: string
-        created_at:
+        modelId:
+          type: integer
+          format: int64
+        executedAt:
           type: DateTime
-        updated_at:
+        executionFinishedAt:
+          type: DateTime
+        createdAt:
+          type: DateTime
+        updatedAt:
           type: DateTime
 
 

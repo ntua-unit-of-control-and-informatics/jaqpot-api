@@ -36,8 +36,9 @@ class PredictionService(
                 predictionRequestDto
             )
 
+        updateDatasetToExecuting(dataset)
+
         try {
-            datasetRepository.updateStatusToExecuting(dataset.id!!)
             val results: List<Any> = makePredictionRequest(modelDto, request)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
@@ -46,10 +47,9 @@ class PredictionService(
         }
     }
 
-    private fun storeDatasetFailure(dataset: Dataset, err: Exception) {
-        dataset.status = DatasetStatus.FAILURE
-        dataset.failureReason = err.toString()
-
+    private fun updateDatasetToExecuting(dataset: Dataset) {
+        dataset.status = DatasetStatus.EXECUTING
+        dataset.executedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
     }
 
@@ -57,6 +57,13 @@ class PredictionService(
         dataset.status = DatasetStatus.SUCCESS
         dataset.result = results
         dataset.executionFinishedAt = OffsetDateTime.now()
+        datasetRepository.save(dataset)
+    }
+
+    private fun storeDatasetFailure(dataset: Dataset, err: Exception) {
+        dataset.status = DatasetStatus.FAILURE
+        dataset.failureReason = err.toString()
+
         datasetRepository.save(dataset)
     }
 

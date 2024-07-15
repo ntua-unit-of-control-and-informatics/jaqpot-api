@@ -44,7 +44,7 @@ class Dataset(
     @Column(columnDefinition = "TEXT")
     var failureReason: String?,
 
-    val executedAt: OffsetDateTime? = null,
+    var executedAt: OffsetDateTime? = null,
 
     var executionFinishedAt: OffsetDateTime? = null
 ) : BaseEntity()
