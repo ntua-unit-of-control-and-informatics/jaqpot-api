@@ -965,6 +965,8 @@ components:
         modelId:
           type: integer
           format: int64
+        modelName:
+          type: string
         executedAt:
           type: DateTime
         executionFinishedAt:
@@ -1004,6 +1006,8 @@ components:
         modelId:
           type: integer
           format: int64
+        modelName:
+          type: string
         executedAt:
           type: DateTime
         executionFinishedAt:
