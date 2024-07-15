@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.time.OffsetDateTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -36,7 +37,7 @@ class PredictionService(
             )
 
         try {
-            datasetRepository.updateStatus(dataset.id!!, DatasetStatus.EXECUTING)
+            datasetRepository.updateStatusToExecuting(dataset.id!!)
             val results: List<Any> = makePredictionRequest(modelDto, request)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
@@ -55,6 +56,7 @@ class PredictionService(
     private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
         dataset.status = DatasetStatus.SUCCESS
         dataset.result = results
+        dataset.executionFinishedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
     }
 
