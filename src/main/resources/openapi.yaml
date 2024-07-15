@@ -410,6 +410,50 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+  /v1/user/datasets:
+    get:
+      summary: Get Datasets by User ID
+      description: Retrieve all datasets associated with a specific user ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      operationId: getDatasets
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dataset'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '404':
+          description: User or datasets not found
   '/v1/datasets/{id}':
     get:
       summary: Get a Dataset
@@ -918,9 +962,16 @@ components:
           type: string
         userId:
           type: string
-        created_at:
+        modelId:
+          type: integer
+          format: int64
+        executedAt:
           type: DateTime
-        updated_at:
+        executionFinishedAt:
+          type: DateTime
+        createdAt:
+          type: DateTime
+        updatedAt:
           type: DateTime
     DatasetCSV:
       type: object
@@ -950,9 +1001,16 @@ components:
             - SUCCESS
         failureReason:
           type: string
-        created_at:
+        modelId:
+          type: integer
+          format: int64
+        executedAt:
           type: DateTime
-        updated_at:
+        executionFinishedAt:
+          type: DateTime
+        createdAt:
+          type: DateTime
+        updatedAt:
           type: DateTime
 
 
