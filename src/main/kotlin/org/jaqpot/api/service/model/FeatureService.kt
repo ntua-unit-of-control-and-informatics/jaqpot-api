@@ -32,6 +32,7 @@ class FeatureService(private val modelRepository: ModelRepository, private val f
         }
 
         partiallyUpdateModelFeatureRequestDto.name.let { feature.name = it }
+        partiallyUpdateModelFeatureRequestDto.units.let { feature.units = it }
         partiallyUpdateModelFeatureRequestDto.description?.let { feature.description = it }
         partiallyUpdateModelFeatureRequestDto.featureType.let { feature.featureType = it.toEntity() }
         if (partiallyUpdateModelFeatureRequestDto.featureType != FeatureTypeDto.CATEGORICAL) {

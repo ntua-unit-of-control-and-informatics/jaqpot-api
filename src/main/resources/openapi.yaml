@@ -407,6 +407,10 @@ paths:
                   description: A name for the feature that will appear on top of the form field
                   maxLength: 255
                   example: Updated Feature Name
+                units:
+                  type: string
+                  description: The units that this feature is using
+                  example: mg/L
                 description:
                   type: string
                   maxLength: 2000
