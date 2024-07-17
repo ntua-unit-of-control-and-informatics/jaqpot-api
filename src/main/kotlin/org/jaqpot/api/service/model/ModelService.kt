@@ -76,7 +76,7 @@ class ModelService(
         }
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
-        storeRawModel(modelEntity)
+        storeRawModel(toEntity)
         val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
@@ -177,7 +177,8 @@ class ModelService(
         dataset: Dataset
     ): ResponseEntity<Unit> {
         val storageActualModel = this.storage.getObject("models", model.id.toString())
-        val actualModel = storageActualModel.orElse(model.actualModel) ?: throw JaqpotRuntimeException("Actual model not found")
+        val actualModel =
+            storageActualModel.orElse(model.actualModel) ?: throw JaqpotRuntimeException("Actual model not found")
 
         this.predictionService.executePredictionAndSaveResults(
             model.toPredictionModelDto(actualModel),
