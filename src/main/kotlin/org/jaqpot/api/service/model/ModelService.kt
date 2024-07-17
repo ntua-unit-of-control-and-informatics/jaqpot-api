@@ -83,8 +83,9 @@ class ModelService(
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
+            val userCanDelete = authenticationFacade.isAdmin
             val user = userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId))
-            ResponseEntity.ok(it.toDto(user, userCanEdit))
+            ResponseEntity.ok(it.toDto(user, userCanEdit, userCanDelete))
         }
             .orElse(ResponseEntity.notFound().build())
     }

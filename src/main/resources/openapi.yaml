@@ -206,6 +206,28 @@ paths:
                 $ref: '#/components/schemas/Model'
         '404':
           description: Model not found
+    delete:
+      summary: Delete a Model
+      description: Delete a single model by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: deleteModelById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the model to delete
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '204':
+          description: Model deleted successfully
+        '404':
+          description: Model not found
   '/v1/models/legacy/{id}':
     get:
       summary: Get a legacy model
@@ -229,28 +251,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Model'
-        '404':
-          description: Model not found
-    delete:
-      summary: Delete a Model
-      description: Delete a single model by its ID
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - model
-      operationId: deleteModelById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the model to delete
-          schema:
-            type: integer
-            format: int64
-            example: 0
-      responses:
-        '204':
-          description: Model deleted successfully
         '404':
           description: Model not found
   /v1/models/{modelId}/predict:
