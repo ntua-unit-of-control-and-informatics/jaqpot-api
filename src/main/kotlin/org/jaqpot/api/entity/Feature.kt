@@ -27,6 +27,9 @@ class Feature(
     @Column(nullable = false)
     var name: String,
 
+    @Column
+    var units: String?,
+
     @Size(min = 3, max = 5000)
     @Column(columnDefinition = "TEXT")
     var description: String?,
