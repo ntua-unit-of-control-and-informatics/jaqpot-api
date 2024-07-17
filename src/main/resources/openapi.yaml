@@ -231,6 +231,28 @@ paths:
                 $ref: '#/components/schemas/Model'
         '404':
           description: Model not found
+    delete:
+      summary: Delete a Model
+      description: Delete a single model by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: deleteModelById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the model to delete
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '204':
+          description: Model deleted successfully
+        '404':
+          description: Model not found
   /v1/models/{modelId}/predict:
     post:
       summary: Predict with Model
@@ -816,6 +838,9 @@ components:
           $ref: '#/components/schemas/User'
         canEdit:
           description: If the current user can edit the model
+          type: boolean
+        canDelete:
+          description: If the current user can delete the model
           type: boolean
         tags:
           type: string
