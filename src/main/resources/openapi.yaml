@@ -206,6 +206,28 @@ paths:
                 $ref: '#/components/schemas/Model'
         '404':
           description: Model not found
+    delete:
+      summary: Delete a Model
+      description: Delete a single model by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: deleteModelById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the model to delete
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '204':
+          description: Model deleted successfully
+        '404':
+          description: Model not found
   '/v1/models/legacy/{id}':
     get:
       summary: Get a legacy model
@@ -394,7 +416,7 @@ paths:
                 possibleValues:
                   type: array
                   items:
-                    type: string
+                    $ref: '#/components/schemas/FeaturePossibleValue'
       responses:
         '200':
           description: Feature updated successfully
@@ -782,6 +804,7 @@ components:
             - R_SVM
             - R_TREE_CLASS
             - R_TREE_REGR
+            - QSAR_TOOLBOX
         jaqpotpyVersion:
           type: string
           example: 1.0.0
@@ -815,6 +838,9 @@ components:
           $ref: '#/components/schemas/User'
         canEdit:
           description: If the current user can edit the model
+          type: boolean
+        canDelete:
+          description: If the current user can delete the model
           type: boolean
         tags:
           type: string
@@ -902,7 +928,7 @@ components:
         possibleValues:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/FeaturePossibleValue'
         createdAt:
           type: DateTime
           format: date-time
@@ -912,6 +938,19 @@ components:
           type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+
+    FeaturePossibleValue:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          example: "value"
+        value:
+          type: string
+          example: "value"
     FeatureType:
       type: string
       enum:

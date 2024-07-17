@@ -17,6 +17,7 @@ fun ModelDto.Type.toEntity(): ModelType {
         ModelDto.Type.R_SVM -> ModelType.R_SVM
         ModelDto.Type.R_TREE_CLASS -> ModelType.R_TREE_CLASS
         ModelDto.Type.R_TREE_REGR -> ModelType.R_TREE_REGR
+        ModelDto.Type.QSAR_TOOLBOX -> ModelType.QSAR_TOOLBOX
     }
 }
 
@@ -34,5 +35,6 @@ fun ModelType.toDto(): ModelDto.Type {
         ModelType.R_SVM -> ModelDto.Type.R_SVM
         ModelType.R_TREE_CLASS -> ModelDto.Type.R_TREE_CLASS
         ModelType.R_TREE_REGR -> ModelDto.Type.R_TREE_REGR
+        ModelType.QSAR_TOOLBOX -> ModelDto.Type.QSAR_TOOLBOX
     }
 }

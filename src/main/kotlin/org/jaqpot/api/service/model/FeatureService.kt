@@ -37,7 +37,9 @@ class FeatureService(private val modelRepository: ModelRepository, private val f
         if (partiallyUpdateModelFeatureRequestDto.featureType != FeatureTypeDto.CATEGORICAL) {
             feature.possibleValues = null
         } else {
-            partiallyUpdateModelFeatureRequestDto.possibleValues?.let { feature.possibleValues = it.toSet() }
+            partiallyUpdateModelFeatureRequestDto.possibleValues?.let { possibleValues ->
+                feature.possibleValues = possibleValues.map { it.toEntity() }
+            }
         }
 
         val featureDto = featureRepository.save(feature).toDto()
