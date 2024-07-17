@@ -71,9 +71,15 @@ class FileEncodingProcessor {
         return addMetadata(dataToStore)
     }
 
-    fun readFile(data: ByteArray): ByteArray {
+    fun readFile(data: ByteArray, fromDatabase: Boolean = false): ByteArray {
         if (determineEncoding(data) == Encoding.BASE64) {
+            // no metadata on legacy base64 encoded files
             return Base64.getDecoder().decode(data)
+        }
+
+        if (fromDatabase) {
+            // no metadata on legacy database stored models
+            return data
         }
 
         val metadata = readMetadata(data)

@@ -7,7 +7,6 @@ import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetEntryType
 import org.jaqpot.api.entity.Model
-import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetModels200ResponseDto
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -76,7 +76,9 @@ class ModelService(
         }
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
-        storageService.storeRawModel(toEntity)
+        if (storageService.storeRawModel(toEntity)) {
+            toEntity.actualModel = null
+        }
         val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
@@ -165,12 +167,10 @@ class ModelService(
         model: Model,
         dataset: Dataset
     ): ResponseEntity<Unit> {
-        val storageActualModel = storageService.readRawModel(model)
-        val actualModel =
-            storageActualModel.orElse(model.actualModel) ?: throw JaqpotRuntimeException("Actual model not found")
+        val rawModel = storageService.readRawModel(model)
 
         this.predictionService.executePredictionAndSaveResults(
-            model.toPredictionModelDto(actualModel),
+            model.toPredictionModelDto(Base64.getEncoder().encode(rawModel)),
             dataset
         )
 

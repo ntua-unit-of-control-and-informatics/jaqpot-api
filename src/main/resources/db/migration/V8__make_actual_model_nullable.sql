@@ -1,2 +1,0 @@
-ALTER TABLE model
-    ALTER COLUMN actual_model DROP NOT NULL;
