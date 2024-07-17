@@ -22,7 +22,7 @@ import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
-import org.jaqpot.api.storage.Storage
+import org.jaqpot.api.storage.StorageService
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageRequest
@@ -47,7 +47,7 @@ class ModelService(
     private val organizationRepository: OrganizationRepository,
     private val csvParser: CSVParser,
     private val csvDataConverter: CSVDataConverter,
-    private val storage: Storage
+    private val storageService: StorageService
 ) : ModelApiDelegate {
 
 
@@ -76,23 +76,12 @@ class ModelService(
         }
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
-        storeRawModel(toEntity)
+        storageService.storeRawModel(toEntity)
         val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(model.id).toUri()
         return ResponseEntity.created(location).build()
-    }
-
-    private fun storeRawModel(toEntity: Model) {
-        val rawModel = toEntity.actualModel
-        try {
-            this.storage.putObject("models", toEntity.id.toString(), toEntity.actualModel!!)
-            toEntity.actualModel = null
-        } catch (e: Exception) {
-            logger.error { "Failed to store model with id ${toEntity.id}" }
-            toEntity.actualModel = rawModel
-        }
     }
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
@@ -176,7 +165,7 @@ class ModelService(
         model: Model,
         dataset: Dataset
     ): ResponseEntity<Unit> {
-        val storageActualModel = this.storage.getObject("models", model.id.toString())
+        val storageActualModel = storageService.readRawModel(model)
         val actualModel =
             storageActualModel.orElse(model.actualModel) ?: throw JaqpotRuntimeException("Actual model not found")
 
