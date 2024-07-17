@@ -22,7 +22,7 @@ class QSARToolbox(private val qsartoolboxConfig: QsartoolboxConfig) {
         val registerUnknown = true
         val ignoreStereo = false
 
-        val url = "${qsartoolboxConfig.url}/api/v6/search/smiles/${registerUnknown}/${ignoreStereo}"
+        val url = "${qsartoolboxConfig.url}/api/v6/search/smiles/${registerUnknown}/${ignoreStereo}?smiles={smiles}"
 
         val queryParams: MultiValueMap<String, String> = LinkedMultiValueMap()
         queryParams.add("smiles", smiles)
