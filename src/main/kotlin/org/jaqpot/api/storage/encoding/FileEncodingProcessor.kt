@@ -1,5 +1,6 @@
 package org.jaqpot.api.storage.encoding
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.apache.commons.codec.binary.Base64.isBase64
@@ -12,6 +13,7 @@ class FileEncodingProcessor {
 
     companion object {
         const val FILE_HEADER_SIZE = 6
+        private val logger = KotlinLogging.logger {}
     }
 
     private fun determineEncoding(bytes: ByteArray): Encoding {
@@ -71,8 +73,9 @@ class FileEncodingProcessor {
         return addMetadata(dataToStore)
     }
 
-    fun readFile(data: ByteArray, fromDatabase: Boolean = false): ByteArray {
+    fun readFile(data: ByteArray, fromDatabase: Boolean = false, modelId: Long?): ByteArray {
         if (determineEncoding(data) == Encoding.BASE64) {
+            logger.warn { "Deprecated base64 encoding detected on model $modelId" }
             // no metadata on legacy base64 encoded files
             return Base64.getDecoder().decode(data)
         }

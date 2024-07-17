@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class CSVDataConverter {
-    fun convertCsvContentToDataEntry(model: Model, csvData: List<List<String>>): List<Any> {
+    fun convertCsvContentToInput(model: Model, csvData: List<List<String>>): List<Any> {
         return csvData.map {
             val inputObject = HashMap<String, String>()
             it.forEachIndexed { idx, value ->

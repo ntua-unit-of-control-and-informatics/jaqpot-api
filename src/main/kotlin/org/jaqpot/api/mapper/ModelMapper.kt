@@ -5,6 +5,7 @@ import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
+import java.util.*
 
 fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanDelete: Boolean? = null): ModelDto {
     return ModelDto(
@@ -64,8 +65,19 @@ fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
-        rawModel = actualModel.decodeToString(),
+        rawModel = this.decodeRawModel(actualModel),
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )
 }
+
+fun Model.decodeRawModel(rawModel: ByteArray): String {
+    return if (isRModel()) {
+        // R models require special deserialization and base64 messes up the model
+        rawModel.decodeToString()
+    } else {
+        Base64.getEncoder().encodeToString(rawModel)
+    }
+}
+
+private fun Model.isRModel() = this.type.name.startsWith("R_")

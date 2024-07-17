@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
-import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -125,7 +124,7 @@ class ModelService(
             val userId = authenticationFacade.userId
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
-            val input = csvDataConverter.convertCsvContentToDataEntry(model, csvData)
+            val input = csvDataConverter.convertCsvContentToInput(model, csvData)
             val dataset = this.datasetRepository.save(
                 datasetCSVDto.toEntity(
                     model,
@@ -170,7 +169,7 @@ class ModelService(
         val rawModel = storageService.readRawModel(model)
 
         this.predictionService.executePredictionAndSaveResults(
-            model.toPredictionModelDto(Base64.getEncoder().encode(rawModel)),
+            model.toPredictionModelDto(rawModel),
             dataset
         )
 

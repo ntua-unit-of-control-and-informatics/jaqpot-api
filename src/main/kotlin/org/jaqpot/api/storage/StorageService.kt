@@ -36,12 +36,12 @@ class StorageService(private val storage: Storage, private val fileEncodingProce
         }
 
         if (rawModelFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawModelFromStorage.get())
+            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), modelId = model.id)
         } else if (model.actualModel != null) {
             logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to actual model from database" }
-            return fileEncodingProcessor.readFile(model.actualModel!!, fromDatabase = true)
+            return fileEncodingProcessor.readFile(model.actualModel!!, fromDatabase = true, model.id)
         }
-        
+
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
     }
 }
