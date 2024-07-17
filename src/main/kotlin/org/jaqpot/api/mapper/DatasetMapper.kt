@@ -17,6 +17,11 @@ fun Dataset.toDto(): DatasetDto {
         failureReason = this.failureReason,
         input = this.input,
         result = this.result,
+        userId = this.userId,
+        modelId = this.model.id,
+        modelName = this.model.name,
+        executedAt = this.executedAt,
+        executionFinishedAt = this.executionFinishedAt,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )

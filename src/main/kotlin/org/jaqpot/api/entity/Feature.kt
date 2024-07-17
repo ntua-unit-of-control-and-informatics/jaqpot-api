@@ -25,11 +25,14 @@ class Feature(
     val key: String,
 
     @Column(nullable = false)
-    val name: String,
+    var name: String,
+
+    @Column
+    var units: String?,
 
     @Size(min = 3, max = 5000)
     @Column(columnDefinition = "TEXT")
-    val description: String?,
+    var description: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -37,7 +40,7 @@ class Feature(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val featureType: FeatureType,
+    var featureType: FeatureType,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb")
@@ -48,6 +51,6 @@ class Feature(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    val possibleValues: List<String>? = null,
+    var possibleValues: List<FeaturePossibleValue>? = null,
 
     ) : BaseEntity()

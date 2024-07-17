@@ -7,26 +7,27 @@ import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 import java.util.*
 
-fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null): ModelDto {
+fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanDelete: Boolean? = null): ModelDto {
     return ModelDto(
-        this.name,
-        this.type.toDto(),
-        this.jaqpotpyVersion,
-        this.libraries.map { it.toDto() },
-        this.dependentFeatures.map { it.toDto() },
-        this.independentFeatures.map { it.toDto() },
-        this.visibility.toDto(),
-        byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
-        this.id,
-        this.meta,
-        this.description,
-        this.organizations.map { it.toDto() },
-        this.pretrained,
-        userDto,
-        userCanEdit,
-        this.tags,
-        this.createdAt,
-        this.updatedAt,
+        name = this.name,
+        type = this.type.toDto(),
+        jaqpotpyVersion = this.jaqpotpyVersion,
+        libraries = this.libraries.map { it.toDto() },
+        dependentFeatures = this.dependentFeatures.map { it.toDto() },
+        independentFeatures = this.independentFeatures.map { it.toDto() },
+        visibility = this.visibility.toDto(),
+        actualModel = byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
+        id = this.id,
+        meta = this.meta,
+        description = this.description,
+        organizations = this.organizations.map { it.toDto() },
+        pretrained = this.pretrained,
+        creator = userDto,
+        canEdit = userCanEdit,
+        canDelete = userCanDelete,
+        tags = this.tags,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
     )
 }
 
@@ -48,7 +49,8 @@ fun ModelDto.toEntity(creatorId: String): Model {
         null,
         this.pretrained,
         this.tags,
-        Base64.getDecoder().decode(this.actualModel),
+        // store as base64 representation
+        Base64.getEncoder().encode(this.actualModel),
     )
 
     m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })

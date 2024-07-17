@@ -75,11 +75,9 @@ class ModelService(
             throw IllegalStateException("ID should not be provided for resource creation.")
         }
         val creatorId = authenticationFacade.userId
-        val modelEntity = modelDto.toEntity(creatorId)
-
+        val toEntity = modelDto.toEntity(creatorId)
         storeRawModel(modelEntity)
-
-        val model = modelRepository.save(modelEntity)
+        val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(model.id).toUri()
@@ -103,8 +101,9 @@ class ModelService(
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
+            val userCanDelete = authenticationFacade.isAdmin
             val user = userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId))
-            ResponseEntity.ok(it.toDto(user, userCanEdit))
+            ResponseEntity.ok(it.toDto(user, userCanEdit, userCanDelete))
         }
             .orElse(ResponseEntity.notFound().build())
     }
@@ -217,8 +216,9 @@ class ModelService(
         val model: Model = modelRepository.save(existingModel)
 
         val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, model)
+        val userCanDelete = authenticationFacade.isAdmin
         val user = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
-        return ResponseEntity.ok(model.toDto(user, userCanEdit))
+        return ResponseEntity.ok(model.toDto(user, userCanEdit, userCanDelete))
     }
 
     @Cacheable(CacheKeys.SEARCH_MODELS)
@@ -227,6 +227,15 @@ class ModelService(
         val pageable = PageRequest.of(page, size)
         val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
+    }
+
+    @CacheEvict("searchModels", allEntries = true)
+    @PreAuthorize("hasAuthority('admin')")
+    override fun deleteModelById(id: Long): ResponseEntity<Unit> {
+        modelRepository.delete(modelRepository.findById(id).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
+        })
+        return ResponseEntity.noContent().build()
     }
 }
 

@@ -74,6 +74,7 @@ class Model(
 
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)
+    @Column
     var actualModel: ByteArray?,
 
     @JdbcTypeCode(SqlTypes.JSON)

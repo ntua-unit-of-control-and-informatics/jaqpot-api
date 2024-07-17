@@ -37,6 +37,17 @@ spring:
 #  cache:
 #    type: none
 
+management:
+  health:
+    readinessState:
+      enabled: true
+    livenessState:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 aws:
   s3:
     endpoint: http://localhost:4566
@@ -69,6 +80,8 @@ jaqpot:
     jaqpotpy-inference-legacy-24: http://localhost.jaqpot.org:8824/predict/sklearn/
     jaqpotpy-inference-legacy-latest: http://localhost.jaqpot.org:8888/predict/sklearn/
     jaqpotr: http://localhost:8004
+  qsartoolbox:
+    url:
 
 
 

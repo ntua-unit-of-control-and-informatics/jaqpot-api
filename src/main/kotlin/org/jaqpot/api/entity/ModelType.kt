@@ -15,4 +15,7 @@ enum class ModelType {
     R_SVM,
     R_TREE_CLASS,
     R_TREE_REGR,
+
+    // QSARTOOLBOX
+    QSAR_TOOLBOX,
 }

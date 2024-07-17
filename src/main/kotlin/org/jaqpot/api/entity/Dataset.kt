@@ -4,6 +4,7 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
+import java.time.OffsetDateTime
 
 @Entity
 class Dataset(
@@ -36,10 +37,14 @@ class Dataset(
     var input: List<Any>,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "result", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "result", columnDefinition = "jsonb", nullable = true)
     var result: List<Any>? = null,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
-    var failureReason: String?
+    var failureReason: String?,
+
+    var executedAt: OffsetDateTime? = null,
+
+    var executionFinishedAt: OffsetDateTime? = null
 ) : BaseEntity()
