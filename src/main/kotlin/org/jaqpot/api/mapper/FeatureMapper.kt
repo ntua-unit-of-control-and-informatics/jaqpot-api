@@ -16,6 +16,7 @@ fun Feature.toDto(): FeatureDto {
         featureDependency = this.featureDependency.toDto(),
         visible = this.visible,
         possibleValues = this.possibleValues?.map { it.toDto() },
+        units = this.units,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )
@@ -33,5 +34,6 @@ fun FeatureDto.toEntity(model: Model, featureDependency: FeatureDependency): Fea
         meta = this.meta,
         visible = this.visible,
         possibleValues = this.possibleValues?.map { it.toEntity() },
+        units = this.units
     )
 }

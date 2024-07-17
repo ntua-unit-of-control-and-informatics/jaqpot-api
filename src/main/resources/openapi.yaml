@@ -911,6 +911,11 @@ components:
           description: A name for the feature that will appear on top of the form field
           maxLength: 255
           example: A feature name
+        units:
+          type: string
+          description: A name for the feature that will appear on top of the form field
+          maxLength: 255
+          example: A feature unit
         description:
           type: string
           maxLength: 2000
