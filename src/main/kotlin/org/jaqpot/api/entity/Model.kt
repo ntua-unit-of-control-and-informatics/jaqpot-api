@@ -74,7 +74,7 @@ class Model(
 
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)
-    @Column(nullable = false)
+    @Column
     val actualModel: ByteArray,
 
     @JdbcTypeCode(SqlTypes.JSON)

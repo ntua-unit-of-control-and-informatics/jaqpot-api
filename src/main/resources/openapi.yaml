@@ -394,7 +394,7 @@ paths:
                 possibleValues:
                   type: array
                   items:
-                    type: string
+                    $ref: '#/components/schemas/FeaturePossibleValue'
       responses:
         '200':
           description: Feature updated successfully
@@ -782,6 +782,7 @@ components:
             - R_SVM
             - R_TREE_CLASS
             - R_TREE_REGR
+            - QSAR_TOOLBOX
         jaqpotpyVersion:
           type: string
           example: 1.0.0
@@ -902,7 +903,7 @@ components:
         possibleValues:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/FeaturePossibleValue'
         createdAt:
           type: DateTime
           format: date-time
@@ -912,6 +913,19 @@ components:
           type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+
+    FeaturePossibleValue:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          example: "value"
+        value:
+          type: string
+          example: "value"
     FeatureType:
       type: string
       enum:
