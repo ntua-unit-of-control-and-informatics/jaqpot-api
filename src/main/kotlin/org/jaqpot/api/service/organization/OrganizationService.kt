@@ -14,6 +14,7 @@ import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
@@ -66,6 +67,7 @@ class OrganizationService(
         return ResponseEntity.created(location).build()
     }
 
+    @PostAuthorize("@getOrganizationAuthorizationLogic.decide(#root)")
     override fun getOrganizationByName(name: String): ResponseEntity<OrganizationDto> {
         val organization = organizationRepository.findByName(name)
             .orElseThrow { NotFoundException("Organization with name $name not found.") }
