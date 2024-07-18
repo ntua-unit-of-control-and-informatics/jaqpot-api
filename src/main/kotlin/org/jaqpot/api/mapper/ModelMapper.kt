@@ -73,6 +73,7 @@ fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
 
 fun Model.decodeRawModel(rawModel: ByteArray): String {
     return if (isRModel()) {
+        // https://upci-ntua.atlassian.net/browse/JAQPOT-199
         // R models require special deserialization and base64 messes up the model
         rawModel.decodeToString()
     } else {
