@@ -49,8 +49,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         null,
         this.pretrained,
         this.tags,
-        // store as base64 representation
-        Base64.getEncoder().encode(this.actualModel),
+        this.actualModel,
     )
 
     m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
@@ -60,14 +59,26 @@ fun ModelDto.toEntity(creatorId: String): Model {
     return m
 }
 
-fun Model.toPredictionModelDto(): PredictionModelDto {
+fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
-        rawModel = this.actualModel.decodeToString(),
+        rawModel = this.decodeRawModel(actualModel),
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )
 }
+
+fun Model.decodeRawModel(rawModel: ByteArray): String {
+    return if (isRModel()) {
+        // https://upci-ntua.atlassian.net/browse/JAQPOT-199
+        // R models require special deserialization and base64 messes up the model
+        rawModel.decodeToString()
+    } else {
+        Base64.getEncoder().encodeToString(rawModel)
+    }
+}
+
+private fun Model.isRModel() = this.type.name.startsWith("R_")

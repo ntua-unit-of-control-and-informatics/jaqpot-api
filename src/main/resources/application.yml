@@ -48,6 +48,12 @@ management:
       probes:
         enabled: true
 
+aws:
+  region: eu-west-1
+  s3:
+    models-bucket:
+    datasets-bucket:
+
 server:
   error:
     include-message: always

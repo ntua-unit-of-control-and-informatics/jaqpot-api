@@ -23,7 +23,7 @@ class CSVParser {
                     it.toList()
                 }
         } catch (e: Exception) {
-            logger.error { "Error while parsing CSV $e" }
+            logger.error(e) { "Error while parsing CSV" }
             throw CSVParserException("Error while parsing CSV", e)
         }
     }
