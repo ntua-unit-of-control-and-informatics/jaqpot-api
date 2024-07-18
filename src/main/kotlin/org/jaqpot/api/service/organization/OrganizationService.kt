@@ -4,6 +4,7 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import org.jaqpot.api.OrganizationApiDelegate
 import org.jaqpot.api.cache.CacheKeys
+import org.jaqpot.api.entity.OrganizationVisibility
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.OrganizationDto
@@ -13,6 +14,7 @@ import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
@@ -23,10 +25,22 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
 ) : OrganizationApiDelegate {
 
-    @Cacheable(cacheNames = [CacheKeys.ALL_ORGANIZATIONS])
-    override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
-        return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
+    override fun getAllOrganizationsForUser(): ResponseEntity<List<OrganizationDto>> {
+        val userId = authenticationFacade.userId
+
+        if (authenticationFacade.isAdmin) {
+            return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
+        }
+
+        val publicOrganizations = getAllPublicOrganizations()
+        val userOrganizations = organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId)
+        val allOrganizationsForUser = publicOrganizations + userOrganizations
+
+        return ResponseEntity.ok(allOrganizationsForUser.distinctBy { org -> org.id }.map { it.toDto() })
     }
+
+    @Cacheable(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS])
+    fun getAllPublicOrganizations() = organizationRepository.findAllByVisibility(OrganizationVisibility.PUBLIC)
 
     override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
         val userId = authenticationFacade.userId
@@ -34,7 +48,7 @@ class OrganizationService(
             organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
     }
 
-    @CacheEvict(cacheNames = [CacheKeys.ALL_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
+    @CacheEvict(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
     @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {
@@ -53,6 +67,7 @@ class OrganizationService(
         return ResponseEntity.created(location).build()
     }
 
+    @PostAuthorize("@getOrganizationAuthorizationLogic.decide(#root)")
     override fun getOrganizationByName(name: String): ResponseEntity<OrganizationDto> {
         val organization = organizationRepository.findByName(name)
             .orElseThrow { NotFoundException("Organization with name $name not found.") }

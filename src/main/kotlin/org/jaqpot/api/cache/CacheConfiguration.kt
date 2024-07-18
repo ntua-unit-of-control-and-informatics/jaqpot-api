@@ -22,7 +22,7 @@ class CacheConfiguration {
         val manager = CaffeineCacheManager()
 
         manager.registerCustomCache(
-            CacheKeys.ALL_ORGANIZATIONS,
+            CacheKeys.ALL_PUBLIC_ORGANIZATIONS,
             Caffeine.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .build()

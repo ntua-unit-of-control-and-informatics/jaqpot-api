@@ -31,7 +31,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         value = """
             SELECT *, ts_rank_cd(textsearchable_index_col, to_tsquery(:query)) AS rank 
             FROM model, to_tsquery(:query) query
-            WHERE textsearchable_index_col @@ query
+            WHERE model.visibility = 'PUBLIC' AND textsearchable_index_col @@ query
             ORDER BY rank DESC
             """,
 //        countQuery = """
