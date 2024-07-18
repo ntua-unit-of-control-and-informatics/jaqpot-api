@@ -193,7 +193,7 @@ class ModelService(
     }
 
     @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
-    @PreAuthorize("@partialModelUpdateAuthorizationLogic.decide(#root, #id)")
+    @PreAuthorize("@partialModelUpdateAuthorizationLogic.decide(#root, #id, #partiallyUpdateModelRequestDto)")
     @Transactional
     override fun partiallyUpdateModel(
         id: Long,

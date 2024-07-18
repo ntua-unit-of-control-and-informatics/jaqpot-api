@@ -509,8 +509,8 @@ paths:
           description: Model not found
   /v1/organizations:
     get:
-      summary: Get all organizations
-      operationId: getAllOrganizations
+      summary: Get all organizations for a specific user
+      operationId: getAllOrganizationsForUser
       tags:
         - organization
       responses:

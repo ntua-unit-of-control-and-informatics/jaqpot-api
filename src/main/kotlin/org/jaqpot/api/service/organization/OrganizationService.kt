@@ -4,6 +4,7 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import org.jaqpot.api.OrganizationApiDelegate
 import org.jaqpot.api.cache.CacheKeys
+import org.jaqpot.api.entity.OrganizationVisibility
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.OrganizationDto
@@ -23,10 +24,22 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
 ) : OrganizationApiDelegate {
 
-    @Cacheable(cacheNames = [CacheKeys.ALL_ORGANIZATIONS])
-    override fun getAllOrganizations(): ResponseEntity<List<OrganizationDto>> {
-        return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
+    override fun getAllOrganizationsForUser(): ResponseEntity<List<OrganizationDto>> {
+        val userId = authenticationFacade.userId
+
+        if (authenticationFacade.isAdmin) {
+            return ResponseEntity.ok(organizationRepository.findAll().map { it.toDto() })
+        }
+
+        val publicOrganizations = getAllPublicOrganizations()
+        val userOrganizations = organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId)
+        val allOrganizationsForUser = publicOrganizations + userOrganizations
+
+        return ResponseEntity.ok(allOrganizationsForUser.distinctBy { org -> org.id }.map { it.toDto() })
     }
+
+    @Cacheable(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS])
+    fun getAllPublicOrganizations() = organizationRepository.findAllByVisibility(OrganizationVisibility.PUBLIC)
 
     override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
         val userId = authenticationFacade.userId
@@ -34,7 +47,7 @@ class OrganizationService(
             organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
     }
 
-    @CacheEvict(cacheNames = [CacheKeys.ALL_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
+    @CacheEvict(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
     @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {

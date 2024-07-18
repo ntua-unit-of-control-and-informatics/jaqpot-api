@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class FeatureService(private val modelRepository: ModelRepository, private val featureRepository: FeatureRepository) :
     FeatureApiDelegate {
-    @PreAuthorize("@partialModelUpdateAuthorizationLogic.decide(#root, #modelId)")
+    @PreAuthorize("@partialFeatureUpdateAuthorizationLogic.decide(#root, #modelId)")
     override fun partiallyUpdateModelFeature(
         modelId: Long,
         featureId: Long,
