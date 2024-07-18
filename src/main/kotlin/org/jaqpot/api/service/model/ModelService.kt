@@ -75,13 +75,13 @@ class ModelService(
         }
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
-        if (storageService.storeRawModel(toEntity)) {
-            toEntity.actualModel = null
+        val savedModel = modelRepository.save(toEntity)
+        if (storageService.storeRawModel(savedModel)) {
+            modelRepository.setActualModelToNull(savedModel.id)
         }
-        val model = modelRepository.save(toEntity)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
-            .buildAndExpand(model.id).toUri()
+            .buildAndExpand(savedModel.id).toUri()
         return ResponseEntity.created(location).build()
     }
 

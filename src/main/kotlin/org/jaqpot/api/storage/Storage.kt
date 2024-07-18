@@ -7,7 +7,12 @@ interface Storage {
         bucketName: String,
         keyName: String,
     ): Optional<ByteArray>
-    fun putObject(bucketName: String,
-                  keyName: String,
-                  obj: ByteArray)
+
+    fun putObject(
+        bucketName: String,
+        keyName: String,
+        obj: ByteArray,
+        metadata: Map<String, String> = mapOf(),
+    )
+
 }

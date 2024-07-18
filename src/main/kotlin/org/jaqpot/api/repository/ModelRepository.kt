@@ -1,12 +1,16 @@
 package org.jaqpot.api.repository
 
+import jakarta.transaction.Transactional
 import org.jaqpot.api.entity.Model
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
+import org.springframework.data.repository.query.Param
 import java.util.*
+
 
 interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudRepository<Model, Long> {
 
@@ -37,4 +41,9 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         nativeQuery = true
     )
     fun searchModelsBy(query: String, pageable: Pageable): Page<Model>
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Model m SET m.actualModel = NULL WHERE m.id = :id")
+    fun setActualModelToNull(@Param("id") id: Long?)
 }

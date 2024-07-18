@@ -49,13 +49,10 @@ management:
         enabled: true
 
 aws:
+  region: eu-west-1
   s3:
-    endpoint: http://localhost:4566
-    region: eu-central-1
-  credentials:
-    access-key: none
-    secret-key: none
-  region: eu-central-1
+    models-bucket:
+    datasets-bucket:
 
 server:
   error:

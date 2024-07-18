@@ -166,7 +166,7 @@ class OrganizationInvitationService(
                     model
                 )
             } catch (e: Exception) {
-                logger.error { "Failed to send email for invitation ${organizationInvitation.id}" }
+                logger.error(e) { "Failed to send email for invitation ${organizationInvitation.id}" }
             }
         }
 
