@@ -85,13 +85,14 @@ class ModelService(
 
     private fun storeActualModelToStorage(model: Model) {
         if (model.actualModel == null) {
+            // model is already stored in storage
             return
         }
         logger.info { "Storing actual model to storage for model with id ${model.id}" }
         if (storageService.storeRawModel(model)) {
+            logger.info { "Successfully moved actual model to storage for model ${model.id}" }
             modelRepository.setActualModelToNull(model.id)
         }
-        logger.info { "Successfully moved actual model to storage for model ${model.id}" }
     }
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
