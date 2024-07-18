@@ -76,13 +76,22 @@ class ModelService(
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
         val savedModel = modelRepository.save(toEntity)
-        if (storageService.storeRawModel(savedModel)) {
-            modelRepository.setActualModelToNull(savedModel.id)
-        }
+        storeActualModelToStorage(savedModel)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(savedModel.id).toUri()
         return ResponseEntity.created(location).build()
+    }
+
+    private fun storeActualModelToStorage(model: Model) {
+        if (model.actualModel == null) {
+            return
+        }
+        logger.info { "Storing actual model to storage for model with id ${model.id}" }
+        if (storageService.storeRawModel(model)) {
+            modelRepository.setActualModelToNull(model.id)
+        }
+        logger.info { "Successfully moved actual model to storage for model ${model.id}" }
     }
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
@@ -122,6 +131,7 @@ class ModelService(
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
             val userId = authenticationFacade.userId
+            storeActualModelToStorage(model)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
             val input = csvDataConverter.convertCsvContentToInput(model, csvData)
@@ -147,6 +157,8 @@ class ModelService(
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
+            storeActualModelToStorage(model)
+
             val userId = authenticationFacade.userId
             val dataset = this.datasetRepository.save(
                 datasetDto.toEntity(
