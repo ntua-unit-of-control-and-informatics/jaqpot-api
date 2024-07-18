@@ -4,18 +4,23 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import org.jaqpot.api.OrganizationApiDelegate
 import org.jaqpot.api.cache.CacheKeys
+import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.entity.OrganizationVisibility
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.OrganizationDto
+import org.jaqpot.api.model.PartialUpdateOrganizationRequestDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
@@ -76,9 +81,23 @@ class OrganizationService(
         return ResponseEntity.ok(organization.toDto(userCanEdit))
     }
 
-    // TODO implement
+    @PreAuthorize("@partialOrganizationUpdateAuthorizationLogic.decide(#root, #id)")
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
-    override fun updateOrganization(id: Long, organizationDto: OrganizationDto): ResponseEntity<OrganizationDto> {
-        return super.updateOrganization(id, organizationDto)
+    override fun partialUpdateOrganization(
+        id: Long,
+        partialUpdateOrganizationRequestDto: PartialUpdateOrganizationRequestDto
+    ): ResponseEntity<OrganizationDto> {
+        val existingOrganization = organizationRepository.findById(id).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with id $id not found")
+        }
+        partialUpdateOrganizationRequestDto.name.let { existingOrganization.name = it }
+        partialUpdateOrganizationRequestDto.contactEmail?.let { existingOrganization.contactEmail = it }
+        partialUpdateOrganizationRequestDto.visibility.let { existingOrganization.visibility = it.toEntity() }
+        partialUpdateOrganizationRequestDto.description?.let { existingOrganization.description = it }
+
+        val organization: Organization = organizationRepository.save(existingOrganization)
+
+        val userCanEdit = authenticationFacade.isAdmin || authenticationFacade.userId == organization.creatorId
+        return ResponseEntity.ok(organization.toDto(userCanEdit))
     }
 }

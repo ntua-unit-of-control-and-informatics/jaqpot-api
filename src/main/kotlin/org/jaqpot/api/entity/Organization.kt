@@ -14,14 +14,14 @@ class Organization(
     @Size(min = 3, max = 255)
     @Column(unique = true, nullable = false)
     @Pattern(regexp = "[\\w-_]+")
-    val name: String,
+    var name: String,
 
     @Column(nullable = false, updatable = false)
     val creatorId: String,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
-    val description: String? = null,
+    var description: String? = null,
 
     @ElementCollection
     @CollectionTable(
@@ -43,7 +43,7 @@ class Organization(
     val organizationInvitations: MutableList<OrganizationInvitation>,
 
     @Column(nullable = false)
-    val contactEmail: String,
+    var contactEmail: String,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
