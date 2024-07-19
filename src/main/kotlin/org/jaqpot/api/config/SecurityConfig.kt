@@ -31,7 +31,7 @@ class SecurityConfig(
                 authorize("/v1/models/legacy/{modelId:[a-zA-Z0-9]+}", permitAll)
                 authorize("/v1/models/{modelId:\\d+}", permitAll)
                 authorize("/v1/models/search", permitAll)
-                authorize("/v1/organizations/{organizationId:[\\d+]}", permitAll)
+                authorize("/v1/organizations/{organizationName:[\\w\\-_]+}", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2ResourceServer {
