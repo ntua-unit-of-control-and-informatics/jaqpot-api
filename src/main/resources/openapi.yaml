@@ -552,7 +552,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Organization'
-  /v1/organizations/{id}:
+  /v1/organizations/{id}/partial:
     patch:
       summary: Partially update an existing organization
       operationId: partialUpdateOrganization

@@ -15,6 +15,7 @@ import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
@@ -91,13 +92,17 @@ class OrganizationService(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with id $id not found")
         }
         partialUpdateOrganizationRequestDto.name.let { existingOrganization.name = it }
-        partialUpdateOrganizationRequestDto.contactEmail?.let { existingOrganization.contactEmail = it }
+        partialUpdateOrganizationRequestDto.contactEmail.let { existingOrganization.contactEmail = it }
         partialUpdateOrganizationRequestDto.visibility.let { existingOrganization.visibility = it.toEntity() }
         partialUpdateOrganizationRequestDto.description?.let { existingOrganization.description = it }
 
-        val organization: Organization = organizationRepository.save(existingOrganization)
+        val updatedOrganization: Organization = try {
+            organizationRepository.save(existingOrganization)
+        } catch (e: DataIntegrityViolationException) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "An organization with this name already exists", e)
+        }
 
-        val userCanEdit = authenticationFacade.isAdmin || authenticationFacade.userId == organization.creatorId
-        return ResponseEntity.ok(organization.toDto(userCanEdit))
+        val userCanEdit = authenticationFacade.isAdmin || authenticationFacade.userId == updatedOrganization.creatorId
+        return ResponseEntity.ok(updatedOrganization.toDto(userCanEdit))
     }
 }
