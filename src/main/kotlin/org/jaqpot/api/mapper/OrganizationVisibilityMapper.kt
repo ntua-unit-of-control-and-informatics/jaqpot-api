@@ -1,18 +1,18 @@
 package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.OrganizationVisibility
-import org.jaqpot.api.model.OrganizationDto
+import org.jaqpot.api.model.OrganizationVisibilityDto
 
-fun OrganizationDto.Visibility.toEntity(): OrganizationVisibility {
+fun OrganizationVisibilityDto.toEntity(): OrganizationVisibility {
     return when (this) {
-        OrganizationDto.Visibility.PUBLIC -> OrganizationVisibility.PUBLIC
-        org.jaqpot.api.model.OrganizationDto.Visibility.PRIVATE -> OrganizationVisibility.PRIVATE
+        OrganizationVisibilityDto.PUBLIC -> OrganizationVisibility.PUBLIC
+        OrganizationVisibilityDto.PRIVATE -> OrganizationVisibility.PRIVATE
     }
 }
 
-fun OrganizationVisibility.toDto(): OrganizationDto.Visibility {
+fun OrganizationVisibility.toDto(): OrganizationVisibilityDto {
     return when (this) {
-        OrganizationVisibility.PUBLIC -> OrganizationDto.Visibility.PUBLIC
-        OrganizationVisibility.PRIVATE -> OrganizationDto.Visibility.PRIVATE
+        OrganizationVisibility.PUBLIC -> OrganizationVisibilityDto.PUBLIC
+        OrganizationVisibility.PRIVATE -> OrganizationVisibilityDto.PRIVATE
     }
 }

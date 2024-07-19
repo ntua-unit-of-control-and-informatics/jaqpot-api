@@ -552,10 +552,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Organization'
-  /v1/organizations/{id}:
-    put:
-      summary: Update an existing organization
-      operationId: updateOrganization
+  /v1/organizations/{id}/partial:
+    patch:
+      summary: Partially update an existing organization
+      operationId: partialUpdateOrganization
       tags:
         - organization
       parameters:
@@ -570,7 +570,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Organization'
+              type: object
+              required:
+                - name
+                - contactEmail
+                - visibility
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                contactEmail:
+                  type: string
+                  format: email
+                visibility:
+                  $ref: '#/components/schemas/OrganizationVisibility'
+              additionalProperties: false
       responses:
         '200':
           description: Organization updated successfully
@@ -1084,6 +1099,8 @@ components:
           example: "my-awesome-org"
         creatorId:
           type: string
+        visibility:
+          $ref: '#/components/schemas/OrganizationVisibility'
         description:
           type: string
           minLength: 3
@@ -1103,11 +1120,6 @@ components:
         contactPhone:
           type: string
           example: "+1234567890"
-        visibility:
-          type: string
-          enum:
-            - PUBLIC
-            - PRIVATE
         website:
           type: string
           example: "http://www.my-awesome-org.com"
@@ -1121,6 +1133,11 @@ components:
           type: DateTime
         updated_at:
           type: DateTime
+    OrganizationVisibility:
+      type: string
+      enum:
+        - PUBLIC
+        - PRIVATE
     OrganizationInvitation:
       type: "object"
       required:

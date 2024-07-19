@@ -5,37 +5,37 @@ import org.jaqpot.api.model.OrganizationDto
 
 fun Organization.toDto(userCanEdit: Boolean = false): OrganizationDto {
     return OrganizationDto(
-        this.name,
-        this.contactEmail,
-        this.visibility.toDto(),
-        this.id,
-        this.creatorId,
-        this.description,
-        this.userIds.toList(),
-        emptyList(),
-        this.contactPhone,
-        this.website,
-        this.address,
-        userCanEdit,
-        this.createdAt,
-        this.updatedAt
+        name = this.name,
+        visibility = this.visibility.toDto(),
+        contactEmail = this.contactEmail,
+        id = this.id,
+        creatorId = this.creatorId,
+        description = this.description,
+        userIds = this.userIds.toList(),
+        models = emptyList(),
+        contactPhone = this.contactPhone,
+        website = this.website,
+        address = this.address,
+        canEdit = userCanEdit,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
     )
 }
 
 fun OrganizationDto.toEntity(adminUserId: String): Organization {
     return Organization(
-        this.id,
-        this.name,
-        adminUserId,
-        this.description,
-        this.userIds?.toMutableSet() ?: mutableSetOf(),
-        mutableSetOf(),
-        mutableListOf(),
-        this.contactEmail,
-        this.visibility.toEntity(),
-        this.contactPhone,
-        this.website,
-        this.address
+        id = this.id,
+        name = this.name,
+        creatorId = adminUserId,
+        description = this.description,
+        userIds = this.userIds?.toMutableSet() ?: mutableSetOf(),
+        models = mutableSetOf(),
+        organizationInvitations = mutableListOf(),
+        contactEmail = this.contactEmail,
+        visibility = this.visibility.toEntity(),
+        contactPhone = this.contactPhone,
+        website = this.website,
+        address = this.address
     )
 }
 
