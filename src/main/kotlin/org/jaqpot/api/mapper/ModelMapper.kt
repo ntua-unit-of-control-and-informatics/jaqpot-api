@@ -26,6 +26,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanD
         canEdit = userCanEdit,
         canDelete = userCanDelete,
         tags = this.tags,
+        associatedOrganization = this.associatedOrganization?.toDto(),
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )

@@ -928,6 +928,8 @@ components:
         canDelete:
           description: If the current user can delete the model
           type: boolean
+        associatedOrganization:
+          $ref: '#/components/schemas/Organization'
         tags:
           type: string
         createdAt:
