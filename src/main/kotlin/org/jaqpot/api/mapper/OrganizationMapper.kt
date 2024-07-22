@@ -12,7 +12,6 @@ fun Organization.toDto(userCanEdit: Boolean = false): OrganizationDto {
         creatorId = this.creatorId,
         description = this.description,
         userIds = this.userIds.toList(),
-        models = emptyList(),
         contactPhone = this.contactPhone,
         website = this.website,
         address = this.address,

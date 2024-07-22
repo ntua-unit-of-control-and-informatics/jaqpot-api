@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository
 import java.util.*
 
 interface OrganizationRepository : CrudRepository<Organization, Long> {
+    @Cacheable(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS])
     fun findAllByVisibility(visibility: OrganizationVisibility): List<Organization>
     fun findByName(name: String): Optional<Organization>
 

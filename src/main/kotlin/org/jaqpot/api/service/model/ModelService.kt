@@ -205,6 +205,10 @@ class ModelService(
         partiallyUpdateModelRequestDto.name.let { existingModel.name = it }
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
+        partiallyUpdateModelRequestDto.associatedOrganizationId?.let {
+            // throws if user has no access or 404 if organization does not exist
+            existingModel.associatedOrganization = organizationRepository.findById(it).get()
+        }
         if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
             partiallyUpdateModelRequestDto.organizationIds?.let {
                 val organizations = organizationRepository.findAllById(it)
@@ -221,6 +225,21 @@ class ModelService(
         val userCanDelete = authenticationFacade.isAdmin
         val user = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
         return ResponseEntity.ok(model.toDto(user, userCanEdit, userCanDelete))
+    }
+
+    @PreAuthorize("@getAllAssociatedModelsAuthorizationLogic.decide(#root, #orgName)")
+    override fun getAllAssociatedModels(
+        orgName: String,
+        page: Int,
+        size: Int
+    ): ResponseEntity<GetModels200ResponseDto> {
+        val organization = organizationRepository.findByName(orgName).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with name $orgName not found")
+        }
+
+        val pageable = PageRequest.of(page, size)
+        val modelsPage = modelRepository.findAllByAssociatedOrganizationId(organization.id!!, pageable)
+        return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
     }
 
     @Cacheable(CacheKeys.SEARCH_MODELS)

@@ -357,6 +357,9 @@ paths:
                   items:
                     type: integer
                     format: int64
+                associatedOrganizationId:
+                  type: integer
+                  format: int64
       responses:
         '200':
           description: Model fields updated successfully
@@ -696,6 +699,70 @@ paths:
           description: "Unauthorized, only admins can create invitations"
         "429":
           description: "Too many requests, rate limit exceeded"
+  /v1/organizations/{orgName}/associated-models:
+    get:
+      tags:
+        - model
+      summary: "Get all models associated with an organization"
+      description: "This endpoint allows users to retrieve all models associated with a specific organization."
+      operationId: getAllAssociatedModels
+      parameters:
+        - name: "orgName"
+          in: "path"
+          description: "Name of the organization"
+          required: true
+          schema:
+            type: "string"
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: "Models retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        "400":
+          description: "Bad request, invalid input"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: "Unauthorized, only authenticated users can access this endpoint"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: "Organization not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /v1/organizations/{name}/invitations/{uuid}:
     get:
       tags:
@@ -861,6 +928,8 @@ components:
         canDelete:
           description: If the current user can delete the model
           type: boolean
+        associatedOrganization:
+          $ref: '#/components/schemas/Organization'
         tags:
           type: string
         createdAt:
@@ -1110,10 +1179,6 @@ components:
           type: array
           items:
             type: string
-        models:
-          type: array
-          items:
-            $ref: '#/components/schemas/Model'
         contactEmail:
           type: string
           example: "contact@my-awesome-org.com"

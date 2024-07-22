@@ -16,6 +16,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
 
     fun findAllByCreatorId(creatorId: String, pageable: Pageable): Page<Model>
     fun findOneByLegacyId(legacyId: String): Optional<Model>
+    fun findAllByAssociatedOrganizationId(organizationId: Long, pageable: Pageable): Page<Model>
 
     @Query(
         """
@@ -41,6 +42,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         nativeQuery = true
     )
     fun searchModelsBy(query: String, pageable: Pageable): Page<Model>
+
 
     @Modifying
     @Transactional
