@@ -14,7 +14,6 @@ import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -45,7 +44,6 @@ class OrganizationService(
         return ResponseEntity.ok(allOrganizationsForUser.distinctBy { org -> org.id }.map { it.toDto() })
     }
 
-    @Cacheable(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS])
     fun getAllPublicOrganizations() = organizationRepository.findAllByVisibility(OrganizationVisibility.PUBLIC)
 
     override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
@@ -71,6 +69,15 @@ class OrganizationService(
             .fromCurrentRequest().path("/{name}")
             .buildAndExpand(organization.name).toUri()
         return ResponseEntity.created(location).build()
+    }
+
+    @PostAuthorize("@getOrganizationAuthorizationLogic.decide(#root)")
+    fun getOrganizationById(id: Long): ResponseEntity<OrganizationDto> {
+        val organization = organizationRepository.findById(id)
+            .orElseThrow { NotFoundException("Organization with id $id not found.") }
+
+        val userCanEdit = authenticationFacade.userId == organization.creatorId
+        return ResponseEntity.ok(organization.toDto(userCanEdit))
     }
 
     @PostAuthorize("@getOrganizationAuthorizationLogic.decide(#root)")

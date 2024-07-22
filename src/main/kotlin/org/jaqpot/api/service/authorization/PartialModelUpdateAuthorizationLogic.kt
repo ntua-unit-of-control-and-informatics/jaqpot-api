@@ -34,12 +34,21 @@ class PartialModelUpdateAuthorizationLogic(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
+        val organizationsThatUserCanSee = organizationService.getAllOrganizationsForUser().body
+        val organizationsThatUserCanSeeIds = organizationsThatUserCanSee!!.map { it.id }
+
         if (!partiallyUpdateModelRequestDto.organizationIds.isNullOrEmpty()) {
-            val organizationIds = partiallyUpdateModelRequestDto.organizationIds!!
-            val organizationsThatUserCanSee = organizationService.getAllOrganizationsForUser().body
-            val organizationsThatUserCanSeeIds = organizationsThatUserCanSee.map { it.id }
+            val organizationIds = partiallyUpdateModelRequestDto.organizationIds
+
             if (!organizationsThatUserCanSeeIds.containsAll(organizationIds)) {
                 logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and organizationIds $organizationIds that they do not have access to" }
+                return false
+            }
+        }
+
+        if (partiallyUpdateModelRequestDto.associatedOrganizationId != null) {
+            if (!organizationsThatUserCanSeeIds.contains(partiallyUpdateModelRequestDto.associatedOrganizationId)) {
+                logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and associatedOrganizationId ${partiallyUpdateModelRequestDto.associatedOrganizationId} that they do not have access to" }
                 return false
             }
         }

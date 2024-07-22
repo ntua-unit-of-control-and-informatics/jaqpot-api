@@ -357,6 +357,9 @@ paths:
                   items:
                     type: integer
                     format: int64
+                associatedOrganizationId:
+                  type: integer
+                  format: int64
       responses:
         '200':
           description: Model fields updated successfully
@@ -728,9 +731,20 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: '#/components/schemas/Model'
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
         "400":
           description: "Bad request, invalid input"
           content:

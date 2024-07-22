@@ -83,5 +83,5 @@ class Model(
 
     @ManyToOne
     @JoinColumn(name = "associated_organization_id")
-    var associatedWith: Organization? = null
+    var associatedOrganization: Organization? = null
 ) : BaseEntity()
