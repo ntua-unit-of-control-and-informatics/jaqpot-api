@@ -80,4 +80,8 @@ class Model(
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
+
+    @ManyToOne
+    @JoinColumn(name = "associated_organization_id")
+    var associatedWith: Organization? = null
 ) : BaseEntity()
