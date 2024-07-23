@@ -66,6 +66,10 @@ dependencies {
     // logger
     implementation("org.slf4j:slf4j-api:2.0.13")
     implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
+    // json logs for loki and promtail
+    implementation("ch.qos.logback.contrib:logback-json-classic:0.1.5")
+    implementation("ch.qos.logback.contrib:logback-jackson:0.1.5")
+    implementation("org.codehaus.janino:janino:3.1.12")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
