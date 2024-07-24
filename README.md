@@ -1,8 +1,8 @@
-[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api-v2/actions/workflows/build.yml) [![Publish Docker image](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml)
+[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/build.yml) [![Publish Docker image](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml)
 
-# Jaqpot API v2
+# Jaqpot API
 
-Welcome to the GitHub repository of Jaqpot API v2! This repository contains the codebase for a modern, RESTful API designed for molecular modeling, built using Spring Boot and Kotlin. Our API supports comprehensive model management and prediction services, facilitating seamless integration into machine learning workflows.
+Welcome to the GitHub repository of Jaqpot API! This repository contains the codebase for a modern, RESTful API designed for molecular modeling, built using Spring Boot and Kotlin. Our API supports comprehensive model management and prediction services, facilitating seamless integration into machine learning workflows.
 
 ## Features
 - **Model Management:** Efficient handling of model lifecycle from creation to deployment.
@@ -10,10 +10,10 @@ Welcome to the GitHub repository of Jaqpot API v2! This repository contains the 
 - **Kotlin and Spring Boot:** Utilizes the power and simplicity of Kotlin combined with the robustness of Spring Boot for a performant and scalable backend.
 
 ## Getting Started
-To get started with Jaqpot API v2, clone this repository and navigate to the project directory:
+To get started with Jaqpot API, clone this repository and navigate to the project directory:
 ```bash
-git clone https://github.com/your-org/jaqpot-api-v2.git
-cd jaqpot-api-v2
+git clone https://github.com/your-org/jaqpot-api.git
+cd jaqpot-api
 ```
 
 ### Prerequisites
