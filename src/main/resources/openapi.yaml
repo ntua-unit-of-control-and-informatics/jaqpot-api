@@ -71,7 +71,7 @@ paths:
             type: array
             items:
               type: string
-            example: [ "field1,asc", "field2,desc" ]
+            example: [ "field1|asc", "field2|desc" ]
       responses:
         '200':
           description: Paginated list of models
@@ -128,7 +128,7 @@ paths:
             type: array
             items:
               type: string
-            example: [ "field1,asc", "field2,desc" ]
+            example: [ "field1|asc", "field2|desc" ]
       responses:
         '200':
           description: Paginated list of models
@@ -180,7 +180,7 @@ paths:
             type: array
             items:
               type: string
-            example: [ "field1,asc", "field2,desc" ]
+            example: [ "field1|asc", "field2|desc" ]
       responses:
         '200':
           description: Paginated list of shared models
@@ -492,7 +492,7 @@ paths:
             type: array
             items:
               type: string
-            example: [ "field1,asc", "field2,desc" ]
+            example: [ "field1|asc", "field2|desc" ]
       responses:
         '200':
           description: Successful Response
@@ -764,7 +764,7 @@ paths:
             type: array
             items:
               type: string
-            example: [ "field1,asc", "field2,desc" ]
+            example: [ "field1|asc", "field2|desc" ]
       responses:
         "200":
           description: "Models retrieved successfully"

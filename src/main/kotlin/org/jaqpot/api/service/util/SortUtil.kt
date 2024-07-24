@@ -5,6 +5,8 @@ import org.springframework.data.domain.Sort.Order
 
 class SortUtil {
     companion object {
+        private const val SORT_DELIMITER = "|" // Delimiter for sorting parameters
+
         fun parseSortParameters(sortParams: List<String>?): List<Order> {
             if (sortParams.isNullOrEmpty()) {
                 return listOf()
@@ -12,7 +14,7 @@ class SortUtil {
 
             return sortParams
                 .map { sortParam: String ->
-                    val parts = sortParam.split(",".toRegex()).dropLastWhile { it.isEmpty() }
+                    val parts = sortParam.split(SORT_DELIMITER).dropLastWhile { it.isEmpty() }
                         .toTypedArray()
                     if (parts.size == 2) {
                         return@map Order(Sort.Direction.fromString(parts[1]), parts[0])
