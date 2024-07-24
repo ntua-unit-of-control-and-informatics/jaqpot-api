@@ -21,10 +21,12 @@ import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
+import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
 import org.jaqpot.api.storage.StorageService
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
@@ -50,18 +52,18 @@ class ModelService(
 ) : ModelApiDelegate {
 
 
-    override fun getModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
+    override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
-        val pageable = PageRequest.of(page, size)
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val modelsPage = modelRepository.findAllByCreatorId(creatorId, pageable)
         val creator = userService.getUserById(creatorId).orElse(UserDto(creatorId))
 
         return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
     }
 
-    override fun getSharedModels(page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
+    override fun getSharedModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
-        val pageable = PageRequest.of(page, size)
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val sharedModelsPage = modelRepository.findAllSharedWithUser(creatorId, pageable)
 
         return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
@@ -231,21 +233,27 @@ class ModelService(
     override fun getAllAssociatedModels(
         orgName: String,
         page: Int,
-        size: Int
+        size: Int,
+        sort: List<String>?
     ): ResponseEntity<GetModels200ResponseDto> {
         val organization = organizationRepository.findByName(orgName).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with name $orgName not found")
         }
 
-        val pageable = PageRequest.of(page, size)
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val modelsPage = modelRepository.findAllByAssociatedOrganizationId(organization.id!!, pageable)
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
     }
 
     @Cacheable(CacheKeys.SEARCH_MODELS)
-    override fun searchModels(query: String, page: Int, size: Int): ResponseEntity<GetModels200ResponseDto> {
+    override fun searchModels(
+        query: String,
+        page: Int,
+        size: Int,
+        sort: List<String>?
+    ): ResponseEntity<GetModels200ResponseDto> {
         val transformedQuery = FullTextUtil.transformSearchQuery(query)
-        val pageable = PageRequest.of(page, size)
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
     }
