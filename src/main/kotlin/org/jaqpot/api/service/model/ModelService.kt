@@ -249,11 +249,10 @@ class ModelService(
     override fun searchModels(
         query: String,
         page: Int,
-        size: Int,
-        sort: List<String>?
+        size: Int
     ): ResponseEntity<GetModels200ResponseDto> {
         val transformedQuery = FullTextUtil.transformSearchQuery(query)
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
+        val pageable = PageRequest.of(page, size)
         val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
     }
