@@ -723,6 +723,55 @@ paths:
           description: "Unauthorized, only admins can create invitations"
         "429":
           description: "Too many requests, rate limit exceeded"
+  /v1/organizations/{orgId}/invitations/{id}/resend:
+    post:
+      tags:
+        - organization-invitation
+      summary: "Resend an invitation email"
+      description: "This endpoint allows an organization admin to resend an invitation email if it has not expired. Only organization admins can access this endpoint."
+      operationId: resendInvitation
+      parameters:
+        - name: "orgId"
+          in: "path"
+          description: "ID of the organization"
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: "id"
+          in: "path"
+          description: "ID of the invitation"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Invitation resent successfully"
+        "400":
+          description: "Bad request, invalid input"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: "Unauthorized, only organization admins can access this endpoint"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: "Organization or invitation not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "410":
+          description: "Gone, the invitation has expired"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /v1/organizations/{orgName}/associated-models:
     get:
       tags:

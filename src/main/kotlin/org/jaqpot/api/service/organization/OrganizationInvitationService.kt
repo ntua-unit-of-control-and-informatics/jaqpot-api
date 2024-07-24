@@ -14,6 +14,7 @@ import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.CreateInvitationsRequestDto
 import org.jaqpot.api.model.OrganizationInvitationDto
+import org.jaqpot.api.model.UserDto
 import org.jaqpot.api.repository.OrganizationInvitationRepository
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
@@ -136,7 +137,7 @@ class OrganizationInvitationService(
             val organizationInvitation = organizationInvitationRepository.save(
                 OrganizationInvitation(
                     null,
-                    user.map { it -> it.id }.orElse(null),
+                    user.map { it.id }.orElse(null),
                     email,
                     organization,
                     OrganizationInvitationStatus.PENDING,
@@ -148,27 +149,64 @@ class OrganizationInvitationService(
         }?.toMap() ?: emptyMap()
 
         userOrganizationInvitationDictionary.forEach { (organizationInvitation, user) ->
-            val invitationActionUrl = generateInvitationActionUrl(
-                organization,
-                organizationInvitation,
-                jaqpotConfig
-            )
-            val model = EmailModelHelper.generateOrganizationInvitationEmailModel(
-                invitationActionUrl,
-                orgName,
-                user.map { it -> it.name.orEmpty() }.orElse("")
-            )
             try {
-                emailService.sendHTMLEmail(
-                    organizationInvitation.userEmail,
-                    ORGANIZATION_INVITATION_EMAIL_SUBJECT,
-                    FreemarkerTemplate.DEFAULT,
-                    model
-                )
+                sendInvitationEmail(organization, organizationInvitation, orgName, user)
             } catch (e: Exception) {
                 logger.error(e) { "Failed to send email for invitation ${organizationInvitation.id}" }
             }
         }
+
+        return ResponseEntity.ok(Unit)
+    }
+
+    private fun sendInvitationEmail(
+        organization: Organization,
+        organizationInvitation: OrganizationInvitation,
+        orgName: String,
+        user: Optional<UserDto>
+    ) {
+        val invitationActionUrl = generateInvitationActionUrl(
+            organization,
+            organizationInvitation,
+            jaqpotConfig
+        )
+        val model = EmailModelHelper.generateOrganizationInvitationEmailModel(
+            invitationActionUrl,
+            orgName,
+            user.map { it.name.orEmpty() }.orElse("")
+        )
+        emailService.sendHTMLEmail(
+            organizationInvitation.userEmail,
+            ORGANIZATION_INVITATION_EMAIL_SUBJECT,
+            FreemarkerTemplate.DEFAULT,
+            model
+        )
+
+    }
+
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60 * 10)
+    @PreAuthorize("@resendInvitationAuthorizationLogic.decide(#root, #orgId)")
+    override fun resendInvitation(orgId: Long, id: String): ResponseEntity<Unit> {
+        val organization = organizationRepository.findById(orgId)
+            .orElseThrow { NotFoundException("Organization with id $orgId not found") }
+
+        val invitation = organizationInvitationRepository.findByIdAndOrganization(UUID.fromString(id), organization)
+            .orElseThrow { NotFoundException("Invitation with id $id not found") }
+
+        if (invitation.status == OrganizationInvitationStatus.ACCEPTED || invitation.status == OrganizationInvitationStatus.REJECTED) {
+            throw BadRequestException("This invitation has already status ${invitation.status}")
+        }
+
+        if (invitation.expirationDate.isBefore(OffsetDateTime.now())) {
+            throw BadRequestException("This invitation has expired. Please ask the organization admin to generate a new invitation")
+        }
+
+        sendInvitationEmail(
+            organization,
+            invitation,
+            organization.name,
+            userService.getUserByEmail(invitation.userEmail)
+        )
 
         return ResponseEntity.ok(Unit)
     }
