@@ -63,7 +63,7 @@ class RuntimeResolver(
             return Optional.empty()
         }
 
-        return Optional.of(R_RUNTIMES[modelDto.type]!!)
+        return Optional.of("${runtimeProvider.jaqpotRUrl}/${R_RUNTIMES[modelDto.type]!!}")
     }
 
     private fun legacyResolveRuntime(modelDto: PredictionModelDto): Optional<String> {
