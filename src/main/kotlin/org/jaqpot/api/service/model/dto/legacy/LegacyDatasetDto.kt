@@ -10,5 +10,5 @@ class LegacyDatasetDto(
 )
 
 class LegacyDataEntryDto(
-    val values: List<Any>
+    val values: List<Map<Int, Any>>
 )

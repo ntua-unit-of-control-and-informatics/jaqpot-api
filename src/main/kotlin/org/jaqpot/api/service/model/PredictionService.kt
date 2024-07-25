@@ -80,7 +80,7 @@ class PredictionService(
             }
         )
 
-        val values: List<Any> = datasetDto.input.map { inputRow ->
+        val values: List<Map<Int, Any>> = datasetDto.input.map { inputRow ->
             (0 until modelDto.independentFeatures.size).associateWith { index ->
                 (inputRow as Map<String, Any>).getValue(modelDto.independentFeatures[index].key)
             }
