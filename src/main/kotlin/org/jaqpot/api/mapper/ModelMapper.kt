@@ -78,9 +78,17 @@ fun Model.decodeRawModel(rawModel: ByteArray): String {
         // https://upci-ntua.atlassian.net/browse/JAQPOT-199
         // R models require special deserialization and base64 messes up the model
         rawModel.decodeToString()
-    } else {
+    }
+//    else if (isLegacyModel()) {
+//        String(rawModel)
+//    }
+    else {
         Base64.getEncoder().encodeToString(rawModel)
     }
+}
+
+private fun Model.isLegacyModel(): Boolean {
+    return this.legacyPredictionService != null
 }
 
 private fun Model.isRModel() = this.type.name.startsWith("R_")

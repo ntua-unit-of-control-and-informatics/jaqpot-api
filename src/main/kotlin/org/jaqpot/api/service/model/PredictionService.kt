@@ -1,5 +1,7 @@
 package org.jaqpot.api.service.model
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.Dataset
@@ -64,14 +66,33 @@ class PredictionService(
         modelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): LegacyPredictionRequestDto {
-        val additionalInfo = mutableMapOf<String, Any>()
-        additionalInfo["predictedFeatures"] = modelDto.dependentFeatures.map {
-            it.key to it.name
-        }.toMap()
+        val additionalInfo = mutableMapOf<String, Any>(
+            "predictedFeatures" to modelDto.dependentFeatures.associate {
+                it.key to it.name
+            },
+            "independentFeatures" to modelDto.independentFeatures.associate {
+                it.key to it.name
+            }
+        )
+        additionalInfo["fromUser"] = mutableMapOf<String, Any>(
+            "inputSeries" to modelDto.independentFeatures.map {
+                it.key
+            }
+        )
+
+        val values: List<Any> = datasetDto.input.map { inputRow ->
+            (0 until modelDto.independentFeatures.size).associateWith { index ->
+                (inputRow as Map<String, Any>).getValue(modelDto.independentFeatures[index].key)
+            }
+        }
+
         val legacyPredictionRequestDto = LegacyPredictionRequestDto(
-            modelDto.rawModel,
-            LegacyDatasetDto(LegacyDataEntryDto(datasetDto.input)),
-            additionalInfo
+            rawModel = arrayOf(modelDto.rawModel),
+            dataset = LegacyDatasetDto(
+                LegacyDataEntryDto(values = values),
+                features = modelDto.independentFeatures
+            ),
+            additionalInfo = additionalInfo
         )
         return legacyPredictionRequestDto
     }
@@ -108,9 +129,9 @@ class PredictionService(
         }
 
         // uncomment to test request json
-//        val objectMapper = ObjectMapper()
-//        objectMapper.registerModule(JavaTimeModule())
-//        val json = objectMapper.writeValueAsString(request)
+        val objectMapper = ObjectMapper()
+        objectMapper.registerModule(JavaTimeModule())
+        val json = objectMapper.writeValueAsString(request)
 
         val restTemplate = RestTemplate()
         val inferenceUrl = runtimeResolver.resolveRuntimeUrl(modelDto)
