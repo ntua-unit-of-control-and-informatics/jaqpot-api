@@ -27,6 +27,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanD
         canDelete = userCanDelete,
         tags = this.tags,
         associatedOrganization = this.associatedOrganization?.toDto(),
+        legacyPredictionService = this.legacyPredictionService,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )

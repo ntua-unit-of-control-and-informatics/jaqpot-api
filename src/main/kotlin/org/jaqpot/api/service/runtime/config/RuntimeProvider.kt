@@ -7,16 +7,16 @@ import org.springframework.context.annotation.Configuration
 class RuntimeProvider(
     @Value("\${jaqpot.runtime.jaqpotpy-inference-v6}")
     val jaqpotpyInferenceV6Url: String,
-    @Value("\${jaqpot.runtime.jaqpotpy-inference-legacy-legacy}")
-    val jaqpotpyInferenceLegacyLegacy: String,
-    @Value("\${jaqpot.runtime.jaqpotpy-inference-legacy-22}")
-    val jaqpotpyInferenceLegacy22: String,
-    @Value("\${jaqpot.runtime.jaqpotpy-inference-legacy-23}")
-    val jaqpotpyInferenceLegacy23: String,
-    @Value("\${jaqpot.runtime.jaqpotpy-inference-legacy-24}")
-    val jaqpotpyInferenceLegacy24: String,
-    @Value("\${jaqpot.runtime.jaqpotpy-inference-legacy-latest}")
-    val jaqpotpyInferenceLegacyLatest: String,
+    @Value("\${jaqpot.runtime.legacy.jaqpot-inference}")
+    val legacyJaqpotInference: String,
+    @Value("\${jaqpot.runtime.legacy.python-generic-latest}")
+    val legacyPythonGenericLatest: String,
+    @Value("\${jaqpot.runtime.legacy.python-generic-22}")
+    val legacyPythonGeneric22: String,
+    @Value("\${jaqpot.runtime.legacy.python-generic-23}")
+    val legacyPythonGeneric23: String,
+    @Value("\${jaqpot.runtime.legacy.python-generic-24}")
+    val legacyPythonGeneric24: String,
 
     @Value("\${jaqpot.runtime.jaqpotr}")
     val jaqpotRUrl: String

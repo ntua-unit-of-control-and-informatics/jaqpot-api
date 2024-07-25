@@ -1013,6 +1013,8 @@ components:
           $ref: '#/components/schemas/Organization'
         tags:
           type: string
+        legacyPredictionService:
+          type: string
         createdAt:
           type: DateTime
           format: date-time
