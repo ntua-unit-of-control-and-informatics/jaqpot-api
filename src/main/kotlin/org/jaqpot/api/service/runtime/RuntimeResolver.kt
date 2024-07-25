@@ -81,7 +81,15 @@ class RuntimeResolver(
         val path = legacyPredictionUrl.path
         logger.info { "path: $path" }
 
-        if (legacyPredictionService.contains("jaqpot-inference.jaqpot")) {
+        if (legacyPredictionService.contains("jaqpot-r")) {
+            return if (legacyPredictionService.contains("predict.pbpk")) {
+                "${runtimeProvider.jaqpotRUrl}/${R_RUNTIMES[ModelDto.Type.R_PBPK]}"
+            } else if (legacyPredictionService.contains("predict.caret")) {
+                "${runtimeProvider.jaqpotRUrl}/${R_RUNTIMES[ModelDto.Type.R_CARET]}"
+            } else {
+                throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
+            }
+        } else if (legacyPredictionService.contains("jaqpot-inference.jaqpot")) {
             logger.info { "Using legacyJaqpotInference runtime" }
             return runtimeProvider.legacyJaqpotInference + path
         } else if (legacyPredictionService.contains("jaqpot-python")) {
