@@ -17,6 +17,8 @@ import org.jaqpot.api.service.model.dto.legacy.LegacyDatasetDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyPredictionRequestDto
 import org.jaqpot.api.service.runtime.RuntimeResolver
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
@@ -36,10 +38,14 @@ class PredictionService(
         val datasetDto = dataset.toDto()
 
 
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.accept = listOf(MediaType.APPLICATION_JSON)
         val request = if (!modelDto.legacyPredictionService.isNullOrEmpty()) {
             val legacyPredictionRequestDto = generateLegacyPredictionRequest(modelDto, datasetDto)
             HttpEntity(
-                legacyPredictionRequestDto
+                legacyPredictionRequestDto,
+                headers
             )
         } else {
             val predictionRequestDto = PredictionRequestDto(
@@ -47,7 +53,8 @@ class PredictionService(
                 datasetDto,
             )
             HttpEntity(
-                predictionRequestDto
+                predictionRequestDto,
+                headers
             )
         }
 
@@ -80,17 +87,22 @@ class PredictionService(
             }
         )
 
-        val values: List<Map<Int, Any>> = datasetDto.input.map { inputRow ->
-            (0 until modelDto.independentFeatures.size).associateWith { index ->
-                (inputRow as Map<String, Any>).getValue(modelDto.independentFeatures[index].key)
+        val values: Map<Int, Any> =
+            (0 until modelDto.independentFeatures.size).associate { index ->
+                index to (datasetDto.input[0] as Map<String, Any>).getValue(modelDto.independentFeatures[index].key)
             }
-        }
+
 
         val legacyPredictionRequestDto = LegacyPredictionRequestDto(
             rawModel = arrayOf(modelDto.rawModel),
             dataset = LegacyDatasetDto(
                 LegacyDataEntryDto(values = values),
-                features = modelDto.independentFeatures
+                features = modelDto.independentFeatures.mapIndexed { index, it ->
+                    mapOf(
+                        "name" to it.name,
+                        "key" to index
+                    )
+                }
             ),
             additionalInfo = additionalInfo
         )
@@ -135,8 +147,8 @@ class PredictionService(
 
         val restTemplate = RestTemplate()
         val inferenceUrl = runtimeResolver.resolveRuntimeUrl(modelDto)
-        val response =
-            restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
+
+        val response = restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 
         val results: List<Any> = response.body?.predictions ?: emptyList()
         return results

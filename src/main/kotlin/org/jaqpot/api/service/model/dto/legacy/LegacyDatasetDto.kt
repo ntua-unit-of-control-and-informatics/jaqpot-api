@@ -1,14 +1,13 @@
 package org.jaqpot.api.service.model.dto.legacy
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import org.jaqpot.api.model.FeatureDto
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class LegacyDatasetDto(
     val dataEntry: LegacyDataEntryDto,
-    val features: List<FeatureDto>
+    val features: List<Map<String, Any>>
 )
 
 class LegacyDataEntryDto(
-    val values: List<Map<Int, Any>>
+    val values: Map<Int, Any>
 )
