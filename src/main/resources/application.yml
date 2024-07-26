@@ -70,15 +70,16 @@ jaqpot:
   frontend:
     url: http://localhost.jaqpot.org:3000
   runtime:
-    jaqpotpy-inference-v6: http://localhost.jaqpot.org:8002/predict/
+    jaqpotpy-inference-v6: http://localhost.jaqpot.org:8002
     jaqpotr: http://localhost:8004
 
     legacy:
       jaqpot-inference: http://localhost.jaqpot.org:8880
-      python-generic-latest: http://localhost.jaqpot.org:8820
-      python-generic-22: http://localhost.jaqpot.org:8822
-      python-generic-23: http://localhost.jaqpot.org:8823
-      python-generic-24: http://localhost.jaqpot.org:8824
+      python-generic-0.20: http://localhost.jaqpot.org:8820
+      python-generic-0.22: http://localhost.jaqpot.org:8822
+      python-generic-0.23: http://localhost.jaqpot.org:8823
+      python-generic-0.24: http://localhost.jaqpot.org:8824
+      python-generic-1: http://localhost.jaqpot.org:8825
   qsartoolbox:
     url:
 

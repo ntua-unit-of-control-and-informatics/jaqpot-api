@@ -91,4 +91,9 @@ private fun Model.isLegacyModel(): Boolean {
     return this.legacyPredictionService != null
 }
 
-private fun Model.isRModel() = this.type.name.startsWith("R_")
+fun Model.isRModel() = this.type.name.startsWith("R_")
+
+
+fun ModelDto.isRModel() = this.type.name.startsWith("R_")
+
+fun ModelDto.isLegacyModel() = this.legacyPredictionService != null
