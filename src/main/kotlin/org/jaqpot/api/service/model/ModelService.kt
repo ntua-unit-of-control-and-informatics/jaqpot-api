@@ -104,9 +104,9 @@ class ModelService(
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
-            val userCanDelete = authenticationFacade.isAdmin
+            val isAdmin = authenticationFacade.isAdmin
             val user = userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId))
-            ResponseEntity.ok(it.toDto(user, userCanEdit, userCanDelete))
+            ResponseEntity.ok(it.toDto(user, userCanEdit, isAdmin))
         }
             .orElse(ResponseEntity.notFound().build())
     }
@@ -225,9 +225,9 @@ class ModelService(
         val model: Model = modelRepository.save(existingModel)
 
         val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, model)
-        val userCanDelete = authenticationFacade.isAdmin
+        val isAdmin = authenticationFacade.isAdmin
         val user = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
-        return ResponseEntity.ok(model.toDto(user, userCanEdit, userCanDelete))
+        return ResponseEntity.ok(model.toDto(user, userCanEdit, isAdmin))
     }
 
     @PreAuthorize("@getAllAssociatedModelsAuthorizationLogic.decide(#root, #orgName)")

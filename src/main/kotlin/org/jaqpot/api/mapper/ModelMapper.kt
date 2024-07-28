@@ -7,7 +7,7 @@ import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 import java.util.*
 
-fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanDelete: Boolean? = null): ModelDto {
+fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin: Boolean? = null): ModelDto {
     return ModelDto(
         name = this.name,
         type = this.type.toDto(),
@@ -24,7 +24,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanD
         pretrained = this.pretrained,
         creator = userDto,
         canEdit = userCanEdit,
-        canDelete = userCanDelete,
+        isAdmin = isAdmin,
         tags = this.tags,
         associatedOrganization = this.associatedOrganization?.toDto(),
         legacyPredictionService = this.legacyPredictionService,
