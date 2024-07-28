@@ -75,10 +75,10 @@ jaqpot:
 
     legacy:
       jaqpot-inference: http://localhost.jaqpot.org:8880
-      generic-python-0.20: http://localhost.jaqpot.org:8820
-      generic-python-0.22: http://localhost.jaqpot.org:8822
-      generic-python-0.23: http://localhost.jaqpot.org:8823
-      generic-python-0.24: http://localhost.jaqpot.org:8824
+      generic-python-020: http://localhost.jaqpot.org:8820
+      generic-python-022: http://localhost.jaqpot.org:8822
+      generic-python-023: http://localhost.jaqpot.org:8823
+      generic-python-024: http://localhost.jaqpot.org:8824
       generic-python-1: http://localhost.jaqpot.org:8825
   qsartoolbox:
     url:
