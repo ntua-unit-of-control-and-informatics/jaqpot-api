@@ -9,16 +9,16 @@ class RuntimeConfiguration(
     val jaqpotpyInferenceV6Url: String,
     @Value("\${jaqpot.runtime.legacy.jaqpot-inference}")
     val legacyJaqpotInference: String,
-    @Value("\${jaqpot.runtime.legacy.python-generic-0.20}")
-    val legacyPythonGeneric20: String,
-    @Value("\${jaqpot.runtime.legacy.python-generic-0.22}")
-    val legacyPythonGeneric22: String,
-    @Value("\${jaqpot.runtime.legacy.python-generic-0.23}")
-    val legacyPythonGeneric23: String,
-    @Value("\${jaqpot.runtime.legacy.python-generic-0.24}")
-    val legacyPythonGeneric24: String,
-    @Value("\${jaqpot.runtime.legacy.python-generic-1}")
-    val legacyPythonGeneric1: String,
+    @Value("\${jaqpot.runtime.legacy.generic-python-0.20}")
+    val legacyGenericPython20: String,
+    @Value("\${jaqpot.runtime.legacy.generic-python-0.22}")
+    val legacyGenericPython22: String,
+    @Value("\${jaqpot.runtime.legacy.generic-python-0.23}")
+    val legacyGenericPython23: String,
+    @Value("\${jaqpot.runtime.legacy.generic-python-0.24}")
+    val legacyGenericPython24: String,
+    @Value("\${jaqpot.runtime.legacy.generic-python-1}")
+    val legacyGenericPython1: String,
 
     @Value("\${jaqpot.runtime.jaqpotr}")
     val jaqpotRUrl: String

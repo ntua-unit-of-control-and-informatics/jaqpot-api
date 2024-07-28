@@ -18,6 +18,6 @@ class LegacyPythonGeneric1Runtime(private val runtimeConfiguration: RuntimeConfi
     }
 
     override fun getRuntimeUrl(): String {
-        return runtimeConfiguration.legacyPythonGeneric1
+        return runtimeConfiguration.legacyGenericPython1
     }
 }

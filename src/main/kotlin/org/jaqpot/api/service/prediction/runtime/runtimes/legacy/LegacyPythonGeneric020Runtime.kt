@@ -15,7 +15,7 @@ class LegacyPythonGeneric020Runtime(private val runtimeConfiguration: RuntimeCon
     }
 
     override fun getRuntimeUrl(): String {
-        return runtimeConfiguration.legacyPythonGeneric20
+        return runtimeConfiguration.legacyGenericPython20
     }
 
     override fun createRequestBody(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): HttpEntity<Any> {
