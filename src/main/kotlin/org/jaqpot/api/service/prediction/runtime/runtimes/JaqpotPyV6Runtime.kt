@@ -23,4 +23,8 @@ class JaqpotPyV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) 
         return runtimeConfiguration.jaqpotpyInferenceV6Url
     }
 
+    override fun getRuntimePath(predictionModelDto: PredictionModelDto): String {
+        return "/predict/"
+    }
+
 }

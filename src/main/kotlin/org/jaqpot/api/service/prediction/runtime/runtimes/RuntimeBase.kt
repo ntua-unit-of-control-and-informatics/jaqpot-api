@@ -18,9 +18,7 @@ abstract class RuntimeBase {
         private val logger = KotlinLogging.logger {}
     }
 
-    open fun getRuntimePath(predictionModelDto: PredictionModelDto): String {
-        return "/predict"
-    }
+    abstract fun getRuntimePath(predictionModelDto: PredictionModelDto): String
 
     abstract fun createRequestBody(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): HttpEntity<Any>
 
