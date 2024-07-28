@@ -42,7 +42,7 @@ abstract class RuntimeBase {
 
             return Optional.of(response.body!!)
         } catch (e: Exception) {
-            logger.error(e) { "Prediction failed" }
+            logger.warn(e) { "Prediction failed for ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
             return Optional.empty()
         }
     }

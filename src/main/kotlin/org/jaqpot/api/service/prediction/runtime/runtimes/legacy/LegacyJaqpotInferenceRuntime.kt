@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class LegacyJaqpotInferenceRuntime(private val runtimeConfiguration: RuntimeConfiguration) : RuntimeBase() {
 
     override fun getRuntimePath(predictionModelDto: PredictionModelDto): String {
-        return "/predict"
+        return "/predict/"
     }
 
     override fun getRuntimeUrl(): String {
