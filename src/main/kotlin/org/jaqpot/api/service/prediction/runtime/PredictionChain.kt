@@ -1,0 +1,85 @@
+package org.jaqpot.api.service.prediction.runtime
+
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.dto.prediction.PredictionModelDto
+import org.jaqpot.api.error.JaqpotRuntimeException
+import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.service.model.dto.PredictionResponseDto
+import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotPyV6Runtime
+import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotRV6Runtime
+import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.legacy.*
+import org.springframework.stereotype.Component
+
+
+@Component
+class PredictionChain(
+    private val jaqpotPyV6Runtime: JaqpotPyV6Runtime,
+    private val jaqpotRV6Runtime: JaqpotRV6Runtime,
+    private val legacyPythonGeneric1Runtime: LegacyPythonGeneric1Runtime,
+    private val legacyPythonGeneric020Runtime: LegacyPythonGeneric020Runtime,
+    private val legacyPythonGeneric022Runtime: LegacyPythonGeneric022Runtime,
+    private val legacyPythonGeneric023Runtime: LegacyPythonGeneric023Runtime,
+    private val legacyPythonGeneric024Runtime: LegacyPythonGeneric024Runtime,
+    private val legacyJaqpotInferenceRuntime: LegacyJaqpotInferenceRuntime,
+) {
+    companion object {
+        private val logger = KotlinLogging.logger {}
+    }
+
+    fun getPredictionResults(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): PredictionResponseDto {
+        logger.info {}
+        if (predictionModelDto.isRModel()) {
+            return jaqpotRV6Runtime.sendPredictionRequest(predictionModelDto, datasetDto).get()
+        }
+
+        if (!predictionModelDto.isLegacyModel()) {
+            return jaqpotPyV6Runtime.sendPredictionRequest(predictionModelDto, datasetDto).get()
+        }
+
+        val matchedLegacyRuntime =
+            resolveRuntimeWithPredictionService(predictionModelDto.legacyPredictionService!!)
+
+        return matchedLegacyRuntime.sendPredictionRequest(predictionModelDto, datasetDto)
+            .or { legacyPythonGeneric020Runtime.sendPredictionRequest(predictionModelDto, datasetDto) }
+            .or { legacyPythonGeneric022Runtime.sendPredictionRequest(predictionModelDto, datasetDto) }
+            .or { legacyPythonGeneric023Runtime.sendPredictionRequest(predictionModelDto, datasetDto) }
+            .or { legacyPythonGeneric024Runtime.sendPredictionRequest(predictionModelDto, datasetDto) }
+            .or { legacyPythonGeneric1Runtime.sendPredictionRequest(predictionModelDto, datasetDto) }
+            .or { legacyJaqpotInferenceRuntime.sendPredictionRequest(predictionModelDto, datasetDto) }
+            .orElseThrow { JaqpotRuntimeException("Failed to succeed on all the legacy runtimes for model ${predictionModelDto.id}") }
+    }
+
+    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String): RuntimeBase {
+        if (legacyPredictionService.contains("jaqpot-inference.jaqpot")) {
+            return legacyJaqpotInferenceRuntime
+        } else if (legacyPredictionService.contains("jaqpot-python")) {
+            return if (legacyPredictionService.contains("jaqpot-python-generic-service.jaqpot")) {
+                logger.info { "Using legacyPythonGeneric20 runtime" }
+                legacyPythonGeneric020Runtime
+            } else if (legacyPredictionService.contains("python-generic-service-22")) {
+                logger.info { "Using legacyPythonGeneric22 runtime" }
+                legacyPythonGeneric022Runtime
+            } else if (legacyPredictionService.contains("python-generic-service-23")) {
+                logger.info { "Using legacyPythonGeneric23 runtime" }
+                legacyPythonGeneric023Runtime
+            } else if (legacyPredictionService.contains("python-generic-service-24")) {
+                legacyPythonGeneric024Runtime
+            } else if (legacyPredictionService.contains("python-generic-service-1")) {
+                legacyPythonGeneric1Runtime
+            } else {
+                throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
+            }
+        } else {
+            throw JaqpotRuntimeException("unknown runtime with predictionService $legacyPredictionService")
+        }
+    }
+}
+
+private fun PredictionModelDto.isLegacyModel(): Boolean {
+    return this.legacyPredictionService != null
+}
+
+private fun PredictionModelDto.isRModel(): Boolean {
+    return this.type.name.startsWith("R_")
+}

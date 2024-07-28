@@ -11,4 +11,6 @@ class PredictionModelDto(
     val rawModel: String,
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
     val legacyPredictionService: String?
+
+
 )

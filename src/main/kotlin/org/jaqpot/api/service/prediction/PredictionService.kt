@@ -1,47 +1,48 @@
-package org.jaqpot.api.service.model
+package org.jaqpot.api.service.prediction
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
+import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.repository.DatasetRepository
-import org.jaqpot.api.service.model.dto.PredictionRequestDto
+import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
-import org.jaqpot.api.service.runtime.RuntimeResolver
-import org.springframework.http.HttpEntity
+import org.jaqpot.api.service.prediction.runtime.PredictionChain
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
 import java.time.OffsetDateTime
 
-private val logger = KotlinLogging.logger {}
 
 @Service
 class PredictionService(
     private val datasetRepository: DatasetRepository,
-    private val runtimeResolver: RuntimeResolver,
+    private val predictionChain: PredictionChain,
     private val qsarToolboxPredictionService: QSARToolboxPredictionService
 ) {
 
+    companion object {
+        private val logger = KotlinLogging.logger {}
+    }
+
     @Async
-    fun executePredictionAndSaveResults(modelDto: PredictionModelDto, dataset: Dataset) {
+    fun executePredictionAndSaveResults(predictionModelDto: PredictionModelDto, dataset: Dataset) {
         val datasetDto = dataset.toDto()
 
-        val predictionRequestDto = PredictionRequestDto(
-            modelDto,
-            datasetDto,
-        )
-        val request: HttpEntity<PredictionRequestDto> =
-            HttpEntity(
-                predictionRequestDto
-            )
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.accept = listOf(MediaType.APPLICATION_JSON)
+
 
         updateDatasetToExecuting(dataset)
 
         try {
-            val results: List<Any> = makePredictionRequest(modelDto, request)
+            val results: List<Any> = makePredictionRequest(predictionModelDto, datasetDto)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
             logger.error(e) { "Prediction for dataset with id ${dataset.id} failed" }
@@ -70,24 +71,27 @@ class PredictionService(
     }
 
     private fun makePredictionRequest(
-        modelDto: PredictionModelDto,
-        request: HttpEntity<PredictionRequestDto>,
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto
     ): List<Any> {
-        if (modelDto.type == ModelDto.Type.QSAR_TOOLBOX) {
-            return qsarToolboxPredictionService.makePredictionRequest(modelDto, request)
+        if (predictionModelDto.type == ModelDto.Type.QSAR_TOOLBOX) {
+            return qsarToolboxPredictionService.makePredictionRequest(
+                predictionModelDto,
+                datasetDto
+            )
         }
 
         // uncomment to test request json
 //        val objectMapper = ObjectMapper()
 //        objectMapper.registerModule(JavaTimeModule())
 //        val json = objectMapper.writeValueAsString(request)
+//        logger.info { json }
 
-        val restTemplate = RestTemplate()
-        val inferenceUrl = runtimeResolver.resolveRuntimeUrl(modelDto)
-        val response =
-            restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 
-        val results: List<Any> = response.body?.predictions ?: emptyList()
+        val response: PredictionResponseDto =
+            predictionChain.getPredictionResults(predictionModelDto, datasetDto)
+
+        val results: List<Any> = response.predictions ?: emptyList()
         return results
     }
 }

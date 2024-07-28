@@ -20,6 +20,7 @@ import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
+import org.jaqpot.api.service.prediction.PredictionService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
 import org.jaqpot.api.storage.StorageService
@@ -103,9 +104,9 @@ class ModelService(
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
-            val userCanDelete = authenticationFacade.isAdmin
+            val isAdmin = authenticationFacade.isAdmin
             val user = userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId))
-            ResponseEntity.ok(it.toDto(user, userCanEdit, userCanDelete))
+            ResponseEntity.ok(it.toDto(user, userCanEdit, isAdmin))
         }
             .orElse(ResponseEntity.notFound().build())
     }
@@ -224,9 +225,9 @@ class ModelService(
         val model: Model = modelRepository.save(existingModel)
 
         val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, model)
-        val userCanDelete = authenticationFacade.isAdmin
+        val isAdmin = authenticationFacade.isAdmin
         val user = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
-        return ResponseEntity.ok(model.toDto(user, userCanEdit, userCanDelete))
+        return ResponseEntity.ok(model.toDto(user, userCanEdit, isAdmin))
     }
 
     @PreAuthorize("@getAllAssociatedModelsAuthorizationLogic.decide(#root, #orgName)")

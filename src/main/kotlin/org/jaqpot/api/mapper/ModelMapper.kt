@@ -7,7 +7,7 @@ import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 import java.util.*
 
-fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanDelete: Boolean? = null): ModelDto {
+fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin: Boolean? = null): ModelDto {
     return ModelDto(
         name = this.name,
         type = this.type.toDto(),
@@ -24,9 +24,10 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, userCanD
         pretrained = this.pretrained,
         creator = userDto,
         canEdit = userCanEdit,
-        canDelete = userCanDelete,
+        isAdmin = isAdmin,
         tags = this.tags,
         associatedOrganization = this.associatedOrganization?.toDto(),
+        legacyPredictionService = this.legacyPredictionService,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )
@@ -77,9 +78,22 @@ fun Model.decodeRawModel(rawModel: ByteArray): String {
         // https://upci-ntua.atlassian.net/browse/JAQPOT-199
         // R models require special deserialization and base64 messes up the model
         rawModel.decodeToString()
-    } else {
+    }
+//    else if (isLegacyModel()) {
+//        String(rawModel)
+//    }
+    else {
         Base64.getEncoder().encodeToString(rawModel)
     }
 }
 
-private fun Model.isRModel() = this.type.name.startsWith("R_")
+private fun Model.isLegacyModel(): Boolean {
+    return this.legacyPredictionService != null
+}
+
+fun Model.isRModel() = this.type.name.startsWith("R_")
+
+
+fun ModelDto.isRModel() = this.type.name.startsWith("R_")
+
+fun ModelDto.isLegacyModel() = this.legacyPredictionService != null

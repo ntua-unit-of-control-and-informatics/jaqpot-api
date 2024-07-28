@@ -1006,12 +1006,13 @@ components:
         canEdit:
           description: If the current user can edit the model
           type: boolean
-        canDelete:
-          description: If the current user can delete the model
+        isAdmin:
           type: boolean
         associatedOrganization:
           $ref: '#/components/schemas/Organization'
         tags:
+          type: string
+        legacyPredictionService:
           type: string
         createdAt:
           type: DateTime
