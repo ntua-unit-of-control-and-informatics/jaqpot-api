@@ -21,6 +21,20 @@ servers:
   - url: 'https://api.jaqpot.org'
     description: Jaqpot API
 paths:
+  /v1/auth/validate:
+    get:
+      summary: Validate JWT
+      description: Validate a JWT token
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - auth
+      operationId: validateJWT
+      responses:
+        '200':
+          description: JWT is valid
+        '401':
+          description: Unauthorized
   /v1/models:
     post:
       summary: Create a new model
