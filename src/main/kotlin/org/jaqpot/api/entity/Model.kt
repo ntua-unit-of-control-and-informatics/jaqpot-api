@@ -57,7 +57,7 @@ class Model(
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("association_type = 'AFFILIATION'")
-    var affiliatedOrganizations: MutableList<ModelOrganizationAssociation>,
+    val affiliatedOrganizations: MutableList<ModelOrganizationAssociation>,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

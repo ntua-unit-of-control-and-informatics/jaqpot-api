@@ -1,5 +1,7 @@
 package org.jaqpot.api.entity
 
-enum class ModelOrganizationAssociationType {
+import java.io.Serializable
+
+enum class ModelOrganizationAssociationType : Serializable {
     AFFILIATION, SHARE
 }

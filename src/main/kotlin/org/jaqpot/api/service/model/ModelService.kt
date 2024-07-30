@@ -203,6 +203,14 @@ class ModelService(
         val existingModel = modelRepository.findById(id).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
         }
+        val neededOrganizationsIds: List<Long> =
+            (partiallyUpdateModelRequestDto.affiliatedOrganizationIds
+                ?: listOf()) + (partiallyUpdateModelRequestDto.sharedWithOrganizationIds ?: listOf())
+
+        val neededOrganizationsDictionary =
+            organizationRepository.findAllById(neededOrganizationsIds)
+                .associateBy { it.id!! }
+
         partiallyUpdateModelRequestDto.name.let { existingModel.name = it }
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
@@ -210,26 +218,26 @@ class ModelService(
             // only allow admins to update affiliated organizations
             partiallyUpdateModelRequestDto.affiliatedOrganizationIds?.let {
                 // throws if user has no access or 404 if organization does not exist
-                val organizations = organizationRepository.findAllById(it)
+
                 existingModel.affiliatedOrganizations.clear()
                 existingModel.affiliatedOrganizations.addAll(
-                    organizations.map { organization ->
+                    it.map { organizationId ->
+                        val organization = neededOrganizationsDictionary[organizationId]!!
                         ModelOrganizationAssociation(
                             existingModel,
                             organization,
                             ModelOrganizationAssociationType.AFFILIATION
                         )
-                    }.toMutableList()
+                    }
                 )
             }
         }
 
-
         if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
             partiallyUpdateModelRequestDto.sharedWithOrganizationIds?.let {
-                val organizations = organizationRepository.findAllById(it)
                 existingModel.sharedWithOrganizations.clear()
-                existingModel.sharedWithOrganizations.addAll(organizations.map { organization ->
+                existingModel.sharedWithOrganizations.addAll(it.map { organizationId ->
+                    val organization = neededOrganizationsDictionary[organizationId]!!
                     ModelOrganizationAssociation(
                         existingModel,
                         organization,
