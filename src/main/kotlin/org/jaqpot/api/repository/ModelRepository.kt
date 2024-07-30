@@ -16,13 +16,21 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
 
     fun findAllByCreatorId(creatorId: String, pageable: Pageable): Page<Model>
     fun findOneByLegacyId(legacyId: String): Optional<Model>
-    fun findAllByAssociatedOrganizationId(organizationId: Long, pageable: Pageable): Page<Model>
 
     @Query(
         """
         SELECT m FROM Model m
-        JOIN m.organizations o 
-        JOIN o.userIds u 
+        JOIN m.affiliatedOrganizations o 
+        WHERE o.organization.id = :organizationId
+        """
+    )
+    fun findAllByAffiliatedOrganizations(organizationId: Long, pageable: Pageable): Page<Model>
+
+    @Query(
+        """
+        SELECT m FROM Model m
+        JOIN m.sharedWithOrganizations o 
+        JOIN o.organization.userIds u 
         WHERE u = :userId
         """
     )

@@ -42,5 +42,5 @@ class PredictModelAuthorizationLogic(
     }
 
     private fun getUserIdsFromSharedOrganizations(modelDto: ModelDto) =
-        modelDto.organizations?.flatMap { it -> it.userIds ?: emptyList() } ?: emptyList()
+        modelDto.sharedWithOrganizations?.flatMap { it -> it.userIds ?: emptyList() } ?: emptyList()
 }

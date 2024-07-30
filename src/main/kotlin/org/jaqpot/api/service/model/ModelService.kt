@@ -4,9 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.cache.CacheKeys
-import org.jaqpot.api.entity.Dataset
-import org.jaqpot.api.entity.DatasetEntryType
-import org.jaqpot.api.entity.Model
+import org.jaqpot.api.entity.*
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetModels200ResponseDto
@@ -208,18 +206,39 @@ class ModelService(
         partiallyUpdateModelRequestDto.name.let { existingModel.name = it }
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
-        partiallyUpdateModelRequestDto.associatedOrganizationId?.let {
-            // throws if user has no access or 404 if organization does not exist
-            existingModel.associatedOrganization = organizationRepository.findById(it).get()
-        }
-        if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
-            partiallyUpdateModelRequestDto.organizationIds?.let {
+        if (authenticationFacade.isAdmin) {
+            // only allow admins to update affiliated organizations
+            partiallyUpdateModelRequestDto.affiliatedOrganizationIds?.let {
+                // throws if user has no access or 404 if organization does not exist
                 val organizations = organizationRepository.findAllById(it)
-                existingModel.organizations.clear()
-                existingModel.organizations.addAll(organizations)
+                existingModel.affiliatedOrganizations.clear()
+                existingModel.affiliatedOrganizations.addAll(
+                    organizations.map { organization ->
+                        ModelOrganizationAssociation(
+                            existingModel,
+                            organization,
+                            ModelOrganizationAssociationType.AFFILIATION
+                        )
+                    }.toMutableList()
+                )
+            }
+        }
+
+
+        if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
+            partiallyUpdateModelRequestDto.sharedWithOrganizationIds?.let {
+                val organizations = organizationRepository.findAllById(it)
+                existingModel.sharedWithOrganizations.clear()
+                existingModel.sharedWithOrganizations.addAll(organizations.map { organization ->
+                    ModelOrganizationAssociation(
+                        existingModel,
+                        organization,
+                        ModelOrganizationAssociationType.SHARE
+                    )
+                })
             }
         } else {
-            existingModel.organizations.clear()
+            existingModel.sharedWithOrganizations.clear()
         }
 
         val model: Model = modelRepository.save(existingModel)
@@ -230,8 +249,8 @@ class ModelService(
         return ResponseEntity.ok(model.toDto(user, userCanEdit, isAdmin))
     }
 
-    @PreAuthorize("@getAllAssociatedModelsAuthorizationLogic.decide(#root, #orgName)")
-    override fun getAllAssociatedModels(
+    @PreAuthorize("@getAllAffiliatedModelsAuthorizationLogic.decide(#root, #orgName)")
+    override fun getAllAffiliatedModels(
         orgName: String,
         page: Int,
         size: Int,
@@ -242,7 +261,7 @@ class ModelService(
         }
 
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val modelsPage = modelRepository.findAllByAssociatedOrganizationId(organization.id!!, pageable)
+        val modelsPage = modelRepository.findAllByAffiliatedOrganizations(organization.id!!, pageable)
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
     }
 

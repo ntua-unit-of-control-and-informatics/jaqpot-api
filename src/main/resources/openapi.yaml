@@ -382,14 +382,16 @@ paths:
                   maxLength: 15000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
-                organizationIds:
+                sharedWithOrganizationIds:
                   type: array
                   items:
                     type: integer
                     format: int64
-                associatedOrganizationId:
-                  type: integer
-                  format: int64
+                affiliatedOrganizationIds:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
       responses:
         '200':
           description: Model fields updated successfully
@@ -786,13 +788,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /v1/organizations/{orgName}/associated-models:
+  /v1/organizations/{orgName}/affiliated-models:
     get:
       tags:
         - model
-      summary: "Get all models associated with an organization"
-      description: "This endpoint allows users to retrieve all models associated with a specific organization."
-      operationId: getAllAssociatedModels
+      summary: "Get all models affiliated with an organization"
+      description: "This endpoint allows users to retrieve all models affiliated with a specific organization."
+      operationId: getAllAffiliatedModels
       parameters:
         - name: "orgName"
           in: "path"
@@ -1001,7 +1003,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Feature'
-        organizations:
+        sharedWithOrganizations:
           type: array
           items:
             $ref: '#/components/schemas/Organization'
@@ -1022,8 +1024,10 @@ components:
           type: boolean
         isAdmin:
           type: boolean
-        associatedOrganization:
-          $ref: '#/components/schemas/Organization'
+        affiliatedOrganizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
         tags:
           type: string
         legacyPredictionService:
