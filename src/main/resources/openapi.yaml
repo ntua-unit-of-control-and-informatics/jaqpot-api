@@ -385,7 +385,7 @@ paths:
                 description:
                   type: string
                   minLength: 3
-                  maxLength: 15000
+                  maxLength: 50000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
                 sharedWithOrganizationIds:
@@ -1059,7 +1059,7 @@ components:
         description:
           type: string
           minLength: 3
-          maxLength: 15000
+          maxLength: 50000
           example: A description of your model
         creator:
           $ref: '#/components/schemas/User'

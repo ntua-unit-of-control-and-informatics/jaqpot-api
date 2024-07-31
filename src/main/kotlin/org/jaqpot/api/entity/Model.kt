@@ -27,7 +27,7 @@ class Model(
     @Column(nullable = false)
     var name: String,
 
-    @Size(min = 3, max = 15000)
+    @Size(min = 3, max = 50000)
     @Column(columnDefinition = "TEXT")
     var description: String?,
 

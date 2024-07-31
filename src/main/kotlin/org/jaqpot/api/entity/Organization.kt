@@ -19,7 +19,7 @@ class Organization(
     @Column(nullable = false, updatable = false)
     val creatorId: String,
 
-    @Size(min = 3, max = 15000)
+    @Size(min = 3, max = 50000)
     @Column(columnDefinition = "TEXT")
     var description: String? = null,
 
