@@ -60,10 +60,20 @@ class ModelService(
         return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
     }
 
-    override fun getSharedModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
+    override fun getSharedModels(
+        page: Int,
+        size: Int,
+        sort: List<String>?,
+        organizationId: Long?
+    ): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val sharedModelsPage = modelRepository.findAllSharedWithUser(creatorId, pageable)
+        
+        val sharedModelsPage = if (organizationId == null) {
+            modelRepository.findAllSharedWithUser(creatorId, pageable)
+        } else {
+            modelRepository.findAllSharedWithUserByOrganizationId(creatorId, pageable, organizationId)
+        }
 
         return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
     }

@@ -37,6 +37,16 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
     fun findAllSharedWithUser(userId: String, pageable: Pageable): Page<Model>
 
     @Query(
+        """
+        SELECT m FROM Model m
+        JOIN m.sharedWithOrganizations o 
+        JOIN o.organization.userIds u 
+        WHERE u = :userId AND o.organization.id = :organizationId
+        """
+    )
+    fun findAllSharedWithUserByOrganizationId(userId: String, pageable: Pageable, organizationId: Long): Page<Model>
+
+    @Query(
         value = """
             SELECT *, ts_rank_cd(textsearchable_index_col, to_tsquery(:query)) AS rank 
             FROM model, to_tsquery(:query) query

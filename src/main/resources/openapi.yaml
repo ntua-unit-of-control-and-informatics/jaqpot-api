@@ -187,6 +187,12 @@ paths:
             items:
               type: string
             example: [ "field1|asc", "field2|desc" ]
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Paginated list of shared models
