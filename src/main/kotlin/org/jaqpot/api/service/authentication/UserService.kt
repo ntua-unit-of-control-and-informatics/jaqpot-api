@@ -5,6 +5,5 @@ import java.util.*
 
 interface UserService {
     fun getUserById(id: String): Optional<UserDto>
-    fun getUserByUsername(username: String): Optional<UserDto>
     fun getUserByEmail(email: String): Optional<UserDto>
 }

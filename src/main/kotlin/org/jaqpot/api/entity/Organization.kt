@@ -31,13 +31,13 @@ class Organization(
     @Column(name = "user_id", nullable = false)
     val userIds: MutableSet<String> = mutableSetOf(),
 
-    @ManyToMany
-    @JoinTable(
-        name = "organization_models",
-        joinColumns = [JoinColumn(name = "organization_id")],
-        inverseJoinColumns = [JoinColumn(name = "model_id")]
-    )
-    val models: MutableSet<Model> = mutableSetOf(),
+//    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
+//    @SQLRestriction("association_type = 'AFFILIATION'")
+//    val affiliatedModels: MutableSet<ModelOrganizationAssociation> = mutableSetOf(),
+//
+//    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
+//    @SQLRestriction("association_type = 'SHARE'")
+//    val sharedModels: MutableSet<ModelOrganizationAssociation> = mutableSetOf(),
 
     @OneToMany(mappedBy = "organization", orphanRemoval = true)
     val organizationInvitations: MutableList<OrganizationInvitation>,

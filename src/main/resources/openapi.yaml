@@ -97,7 +97,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Model'
+                      $ref: '#/components/schemas/ModelSummary'
                   totalElements:
                     type: integer
                   totalPages:
@@ -146,7 +146,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Model'
+                      $ref: '#/components/schemas/ModelSummary'
                   totalElements:
                     type: integer
                   totalPages:
@@ -187,6 +187,12 @@ paths:
             items:
               type: string
             example: [ "field1|asc", "field2|desc" ]
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Paginated list of shared models
@@ -198,7 +204,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Model'
+                      $ref: '#/components/schemas/ModelSummary'
                   totalElements:
                     type: integer
                   totalPages:
@@ -382,14 +388,16 @@ paths:
                   maxLength: 15000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
-                organizationIds:
+                sharedWithOrganizationIds:
                   type: array
                   items:
                     type: integer
                     format: int64
-                associatedOrganizationId:
-                  type: integer
-                  format: int64
+                affiliatedOrganizationIds:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
       responses:
         '200':
           description: Model fields updated successfully
@@ -786,13 +794,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /v1/organizations/{orgName}/associated-models:
+  /v1/organizations/{orgName}/affiliated-models:
     get:
       tags:
         - model
-      summary: "Get all models associated with an organization"
-      description: "This endpoint allows users to retrieve all models associated with a specific organization."
-      operationId: getAllAssociatedModels
+      summary: "Get all models affiliated with an organization"
+      description: "This endpoint allows users to retrieve all models affiliated with a specific organization."
+      operationId: getAllAffiliatedModels
       parameters:
         - name: "orgName"
           in: "path"
@@ -831,7 +839,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Model'
+                      $ref: '#/components/schemas/ModelSummary'
                   totalElements:
                     type: integer
                   totalPages:
@@ -971,21 +979,7 @@ components:
           maxLength: 15000
           example: A description of your model
         type:
-          type: string
-          enum:
-            - SKLEARN
-            - TORCH
-            - R_BNLEARN_DISCRETE
-            - R_CARET
-            - R_GBM
-            - R_NAIVE_BAYES
-            - R_PBPK
-            - R_RF
-            - R_RPART
-            - R_SVM
-            - R_TREE_CLASS
-            - R_TREE_REGR
-            - QSAR_TOOLBOX
+          $ref: '#/components/schemas/ModelType'
         jaqpotpyVersion:
           type: string
           example: 1.0.0
@@ -1001,7 +995,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Feature'
-        organizations:
+        sharedWithOrganizations:
           type: array
           items:
             $ref: '#/components/schemas/Organization'
@@ -1022,8 +1016,10 @@ components:
           type: boolean
         isAdmin:
           type: boolean
-        associatedOrganization:
-          $ref: '#/components/schemas/Organization'
+        affiliatedOrganizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
         tags:
           type: string
         legacyPredictionService:
@@ -1037,6 +1033,84 @@ components:
           type: DateTime
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    ModelSummary:
+      type: object
+      required:
+        - id
+        - name
+        - visibility
+        - type
+        - sharedWithOrganizations
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 0
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          example: My Model
+        visibility:
+          $ref: '#/components/schemas/ModelVisibility'
+        description:
+          type: string
+          minLength: 3
+          maxLength: 15000
+          example: A description of your model
+        creator:
+          $ref: '#/components/schemas/User'
+        type:
+          $ref: '#/components/schemas/ModelType'
+        dependentFeaturesLength:
+          type: integer
+        independentFeaturesLength:
+          type: integer
+        sharedWithOrganizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationSummary'
+        createdAt:
+          type: DateTime
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: DateTime
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
+
+    OrganizationSummary:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 0
+        name:
+          type: string
+          example: My Organization
+
+    ModelType:
+      type: string
+      enum:
+        - SKLEARN
+        - TORCH
+        - R_BNLEARN_DISCRETE
+        - R_CARET
+        - R_GBM
+        - R_NAIVE_BAYES
+        - R_PBPK
+        - R_RF
+        - R_RPART
+        - R_SVM
+        - R_TREE_CLASS
+        - R_TREE_REGR
+        - QSAR_TOOLBOX
     ModelVisibility:
       type: string
       enum:

@@ -6,7 +6,7 @@ import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.model.DatasetDto
-import org.jaqpot.api.model.ModelDto
+import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
@@ -74,7 +74,7 @@ class PredictionService(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): List<Any> {
-        if (predictionModelDto.type == ModelDto.Type.QSAR_TOOLBOX) {
+        if (predictionModelDto.type == ModelTypeDto.QSAR_TOOLBOX) {
             return qsarToolboxPredictionService.makePredictionRequest(
                 predictionModelDto,
                 datasetDto

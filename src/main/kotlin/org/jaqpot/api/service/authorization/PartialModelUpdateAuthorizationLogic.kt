@@ -37,18 +37,20 @@ class PartialModelUpdateAuthorizationLogic(
         val organizationsThatUserCanSee = organizationService.getAllOrganizationsForUser().body
         val organizationsThatUserCanSeeIds = organizationsThatUserCanSee!!.map { it.id }
 
-        if (!partiallyUpdateModelRequestDto.organizationIds.isNullOrEmpty()) {
-            val organizationIds = partiallyUpdateModelRequestDto.organizationIds
+        if (!partiallyUpdateModelRequestDto.sharedWithOrganizationIds.isNullOrEmpty()) {
+            val sharedWithOrganizationIds = partiallyUpdateModelRequestDto.sharedWithOrganizationIds
 
-            if (!organizationsThatUserCanSeeIds.containsAll(organizationIds)) {
-                logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and organizationIds $organizationIds that they do not have access to" }
+            if (!organizationsThatUserCanSeeIds.containsAll(sharedWithOrganizationIds)) {
+                logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and sharedWithOrganizationIds $sharedWithOrganizationIds that they do not have access to" }
                 return false
             }
         }
 
-        if (partiallyUpdateModelRequestDto.associatedOrganizationId != null) {
-            if (!organizationsThatUserCanSeeIds.contains(partiallyUpdateModelRequestDto.associatedOrganizationId)) {
-                logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and associatedOrganizationId ${partiallyUpdateModelRequestDto.associatedOrganizationId} that they do not have access to" }
+        if (!partiallyUpdateModelRequestDto.affiliatedOrganizationIds.isNullOrEmpty()) {
+            val affiliatedOrganizationIds = partiallyUpdateModelRequestDto.affiliatedOrganizationIds
+
+            if (!organizationsThatUserCanSeeIds.containsAll(affiliatedOrganizationIds)) {
+                logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and affiliatedOrganizationIds $affiliatedOrganizationIds that they do not have access to" }
                 return false
             }
         }
