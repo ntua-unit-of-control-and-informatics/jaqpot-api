@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page
 
 fun Page<Model>.toGetModels200ResponseDto(creatorDto: UserDto?): GetModels200ResponseDto {
     return GetModels200ResponseDto(
-        this.content.map { it.toDto(creatorDto) },
+        this.content.map { it.toModelSummaryDto(creatorDto) },
         this.totalElements.toInt(),
         this.totalPages,
         this.pageable.pageSize,
