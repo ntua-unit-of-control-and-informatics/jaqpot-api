@@ -68,7 +68,7 @@ class ModelService(
     ): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        
+
         val sharedModelsPage = if (organizationId == null) {
             modelRepository.findAllSharedWithUser(creatorId, pageable)
         } else {
@@ -213,6 +213,11 @@ class ModelService(
         val existingModel = modelRepository.findById(id).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
         }
+
+        val user = userService.getUserById(authenticationFacade.userId).orElse(UserDto(authenticationFacade.userId))
+
+        logger.info { "Updating model with id $id by user ${user.id} and name ${user.name}" }
+
         val neededOrganizationsIds: List<Long> =
             (partiallyUpdateModelRequestDto.affiliatedOrganizationIds
                 ?: listOf()) + (partiallyUpdateModelRequestDto.sharedWithOrganizationIds ?: listOf())
@@ -263,8 +268,8 @@ class ModelService(
 
         val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, model)
         val isAdmin = authenticationFacade.isAdmin
-        val user = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
-        return ResponseEntity.ok(model.toDto(user, userCanEdit, isAdmin))
+        val modelCreator = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
+        return ResponseEntity.ok(model.toDto(modelCreator, userCanEdit, isAdmin))
     }
 
     @PreAuthorize("@getAllAffiliatedModelsAuthorizationLogic.decide(#root, #orgName)")
