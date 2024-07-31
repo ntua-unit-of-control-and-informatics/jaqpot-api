@@ -66,13 +66,13 @@ class ModelService(
         sort: List<String>?,
         organizationId: Long?
     ): ResponseEntity<GetModels200ResponseDto> {
-        val creatorId = authenticationFacade.userId
+        val userId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
 
         val sharedModelsPage = if (organizationId == null) {
-            modelRepository.findAllSharedWithUser(creatorId, pageable)
+            modelRepository.findAllSharedWithUser(userId, pageable)
         } else {
-            modelRepository.findAllSharedWithUserByOrganizationId(creatorId, pageable, organizationId)
+            modelRepository.findAllSharedWithUserByOrganizationId(userId, pageable, organizationId)
         }
 
         return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
