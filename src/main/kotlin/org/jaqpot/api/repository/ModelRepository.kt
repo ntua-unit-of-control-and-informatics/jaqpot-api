@@ -30,7 +30,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         """
         SELECT m FROM Model m
         JOIN m.sharedWithOrganizations o 
-        JOIN o.organization.userIds u 
+        LEFT JOIN o.organization.userIds u 
         WHERE (u = :userId OR o.organization.creatorId = :userId)
         """
     )
