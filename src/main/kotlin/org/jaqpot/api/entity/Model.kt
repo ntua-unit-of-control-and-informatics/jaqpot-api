@@ -78,6 +78,10 @@ class Model(
     var actualModel: ByteArray?,
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "extra_config", columnDefinition = "jsonb")
+    val extraConfig: Map<String, Any>? = emptyMap(),
+
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 

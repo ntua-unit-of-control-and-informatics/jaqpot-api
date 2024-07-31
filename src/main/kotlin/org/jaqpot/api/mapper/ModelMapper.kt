@@ -52,6 +52,11 @@ fun ModelDto.toEntity(creatorId: String): Model {
         legacyPredictionService = null,
         pretrained = this.pretrained,
         tags = this.tags,
+        extraConfig = this.extraConfig?.let {
+            mapOf(
+                "torchConfig" to this.extraConfig?.torchConfig as Any,
+            )
+        },
         actualModel = this.actualModel,
     )
 
@@ -69,6 +74,7 @@ fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
         rawModel = this.decodeRawModel(actualModel),
+        extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )

@@ -8,5 +8,6 @@ import org.jaqpot.api.model.DatasetDto
 class PredictionRequestDto(
     val model: PredictionModelDto,
     val dataset: DatasetDto,
+    val extraConfig: Map<String, Any>? = mapOf(),
     val doa: Any? = null
 )

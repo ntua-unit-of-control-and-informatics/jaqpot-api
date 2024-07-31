@@ -9,6 +9,7 @@ class PredictionModelDto(
     val independentFeatures: List<FeatureDto>,
     val type: ModelTypeDto,
     val rawModel: String,
+    val extraConfig: Map<String, Any>? = emptyMap(),
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
     val legacyPredictionService: String?
 )

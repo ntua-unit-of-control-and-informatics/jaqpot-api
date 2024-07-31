@@ -1024,6 +1024,8 @@ components:
           type: string
         legacyPredictionService:
           type: string
+        extraConfig:
+          $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
           type: DateTime
           format: date-time
@@ -1111,6 +1113,14 @@ components:
         - R_TREE_CLASS
         - R_TREE_REGR
         - QSAR_TOOLBOX
+    ModelExtraConfig:
+      type: object
+      description: A JSON object containing extra configuration for the model
+      properties:
+        torchConfig:
+          type: object
+          additionalProperties:
+            type: object
     ModelVisibility:
       type: string
       enum:
