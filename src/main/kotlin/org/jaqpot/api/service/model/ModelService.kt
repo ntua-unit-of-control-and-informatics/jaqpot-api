@@ -228,6 +228,7 @@ class ModelService(
 
         partiallyUpdateModelRequestDto.name.let { existingModel.name = it }
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
+        partiallyUpdateModelRequestDto.tags.let { existingModel.tags = it }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
         if (authenticationFacade.isAdmin) {
             // only allow admins to update affiliated organizations
