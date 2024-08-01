@@ -388,6 +388,9 @@ paths:
                   maxLength: 50000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
+                tags:
+                  type: string
+                  maxLength: 1000
                 sharedWithOrganizationIds:
                   type: array
                   items:
@@ -1022,6 +1025,7 @@ components:
             $ref: '#/components/schemas/Organization'
         tags:
           type: string
+          maxLength: 1000
         legacyPredictionService:
           type: string
         extraConfig:
