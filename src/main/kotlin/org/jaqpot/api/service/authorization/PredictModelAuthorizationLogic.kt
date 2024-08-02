@@ -32,14 +32,21 @@ class PredictModelAuthorizationLogic(
                 return true
             }
 
+            val creatorIdsFromSharedOrganizations =
+                getCreatorIdsFromSharedOrganizations(modelDto)
             val userIdsFromSharedOrganizations =
                 getUserIdsFromSharedOrganizations(modelDto)
 
-            return userIdsFromSharedOrganizations.contains(authenticationFacade.userId)
+            val allAllowedUserIds = creatorIdsFromSharedOrganizations + userIdsFromSharedOrganizations
+
+            return allAllowedUserIds.contains(authenticationFacade.userId)
         }
 
         throw IllegalStateException("Unexpected model visibility ${modelDto.visibility}")
     }
+
+    private fun getCreatorIdsFromSharedOrganizations(modelDto: ModelDto): List<String> =
+        modelDto.sharedWithOrganizations!!.map { it.creatorId!! } ?: emptyList()
 
     private fun getUserIdsFromSharedOrganizations(modelDto: ModelDto) =
         modelDto.sharedWithOrganizations?.flatMap { it -> it.userIds ?: emptyList() } ?: emptyList()
