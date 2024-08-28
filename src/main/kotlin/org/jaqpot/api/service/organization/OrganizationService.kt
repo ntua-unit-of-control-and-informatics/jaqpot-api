@@ -49,7 +49,8 @@ class OrganizationService(
     override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
         val userId = authenticationFacade.userId
         return ResponseEntity.ok(
-            organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId).map { it.toDto() })
+            organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId)
+                .map { it.toDto(isCreator = it.creatorId == userId) })
     }
 
     @CacheEvict(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
