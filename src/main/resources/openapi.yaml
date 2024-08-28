@@ -1297,6 +1297,9 @@ components:
         canEdit:
           description: If the current user can edit the organization
           type: boolean
+        isCreator:
+          description: If the current user is the creator of the organization
+          type: boolean
         created_at:
           type: DateTime
         updated_at:
