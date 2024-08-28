@@ -20,15 +20,6 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
     @Query(
         """
         SELECT m FROM Model m
-        JOIN m.affiliatedOrganizations o 
-        WHERE o.organization.id = :organizationId AND m.visibility = 'PUBLIC'
-        """
-    )
-    fun findAllByAffiliatedOrganizations(organizationId: Long, pageable: Pageable): Page<Model>
-
-    @Query(
-        """
-        SELECT m FROM Model m
         JOIN m.sharedWithOrganizations o 
         LEFT JOIN o.organization.userIds u 
         WHERE (u = :userId OR o.organization.creatorId = :userId)

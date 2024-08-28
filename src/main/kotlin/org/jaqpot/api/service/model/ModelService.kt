@@ -218,9 +218,7 @@ class ModelService(
 
         logger.info { "Updating model with id $id by user ${user.id} and name ${user.name}" }
 
-        val neededOrganizationsIds: List<Long> =
-            (partiallyUpdateModelRequestDto.affiliatedOrganizationIds
-                ?: listOf()) + (partiallyUpdateModelRequestDto.sharedWithOrganizationIds ?: listOf())
+        val neededOrganizationsIds: List<Long> = partiallyUpdateModelRequestDto.sharedWithOrganizationIds ?: listOf()
 
         val neededOrganizationsDictionary =
             organizationRepository.findAllById(neededOrganizationsIds)
@@ -230,24 +228,7 @@ class ModelService(
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
         partiallyUpdateModelRequestDto.tags.let { existingModel.tags = it }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
-        if (authenticationFacade.isAdmin) {
-            // only allow admins to update affiliated organizations
-            partiallyUpdateModelRequestDto.affiliatedOrganizationIds?.let {
-                // throws if user has no access or 404 if organization does not exist
 
-                existingModel.affiliatedOrganizations.clear()
-                existingModel.affiliatedOrganizations.addAll(
-                    it.map { organizationId ->
-                        val organization = neededOrganizationsDictionary[organizationId]!!
-                        ModelOrganizationAssociation(
-                            existingModel,
-                            organization,
-                            ModelOrganizationAssociationType.AFFILIATION
-                        )
-                    }
-                )
-            }
-        }
 
         if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
             partiallyUpdateModelRequestDto.sharedWithOrganizationIds?.let {
@@ -255,6 +236,7 @@ class ModelService(
                 existingModel.sharedWithOrganizations.addAll(it.map { organizationId ->
                     val organization = neededOrganizationsDictionary[organizationId]!!
                     ModelOrganizationAssociation(
+                        null,
                         existingModel,
                         organization,
                         ModelOrganizationAssociationType.SHARE
@@ -271,22 +253,6 @@ class ModelService(
         val isAdmin = authenticationFacade.isAdmin
         val modelCreator = userService.getUserById(model.creatorId).orElse(UserDto(model.creatorId))
         return ResponseEntity.ok(model.toDto(modelCreator, userCanEdit, isAdmin))
-    }
-
-    @PreAuthorize("@getAllAffiliatedModelsAuthorizationLogic.decide(#root, #orgName)")
-    override fun getAllAffiliatedModels(
-        orgName: String,
-        page: Int,
-        size: Int,
-        sort: List<String>?
-    ): ResponseEntity<GetModels200ResponseDto> {
-        val organization = organizationRepository.findByName(orgName).orElseThrow {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with name $orgName not found")
-        }
-
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val modelsPage = modelRepository.findAllByAffiliatedOrganizations(organization.id!!, pageable)
-        return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
     }
 
     @Cacheable(CacheKeys.SEARCH_MODELS)

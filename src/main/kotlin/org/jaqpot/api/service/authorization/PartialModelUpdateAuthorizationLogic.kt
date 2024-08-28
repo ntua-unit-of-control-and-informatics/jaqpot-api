@@ -46,15 +46,6 @@ class PartialModelUpdateAuthorizationLogic(
             }
         }
 
-        if (!partiallyUpdateModelRequestDto.affiliatedOrganizationIds.isNullOrEmpty()) {
-            val affiliatedOrganizationIds = partiallyUpdateModelRequestDto.affiliatedOrganizationIds
-
-            if (!organizationsThatUserCanSeeIds.containsAll(affiliatedOrganizationIds)) {
-                logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and affiliatedOrganizationIds $affiliatedOrganizationIds that they do not have access to" }
-                return false
-            }
-        }
-
         return authenticationFacade.userId == model.creatorId
     }
 
