@@ -396,11 +396,6 @@ paths:
                   items:
                     type: integer
                     format: int64
-                affiliatedOrganizationIds:
-                  type: array
-                  items:
-                    type: integer
-                    format: int64
       responses:
         '200':
           description: Model fields updated successfully
@@ -797,78 +792,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /v1/organizations/{orgName}/affiliated-models:
-    get:
-      tags:
-        - model
-      summary: "Get all models affiliated with an organization"
-      description: "This endpoint allows users to retrieve all models affiliated with a specific organization."
-      operationId: getAllAffiliatedModels
-      parameters:
-        - name: "orgName"
-          in: "path"
-          description: "Name of the organization"
-          required: true
-          schema:
-            type: "string"
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-            example: [ "field1|asc", "field2|desc" ]
-      responses:
-        "200":
-          description: "Models retrieved successfully"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ModelSummary'
-                  totalElements:
-                    type: integer
-                  totalPages:
-                    type: integer
-                  pageSize:
-                    type: integer
-                  pageNumber:
-                    type: integer
-        "400":
-          description: "Bad request, invalid input"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        "401":
-          description: "Unauthorized, only authenticated users can access this endpoint"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        "404":
-          description: "Organization not found"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /v1/organizations/{name}/invitations/{uuid}:
     get:
       tags:
@@ -1019,10 +942,6 @@ components:
           type: boolean
         isAdmin:
           type: boolean
-        affiliatedOrganizations:
-          type: array
-          items:
-            $ref: '#/components/schemas/Organization'
         tags:
           type: string
           maxLength: 1000

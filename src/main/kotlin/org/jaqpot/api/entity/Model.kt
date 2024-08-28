@@ -55,10 +55,6 @@ class Model(
     @SQLRestriction("association_type = 'SHARE'")
     val sharedWithOrganizations: MutableList<ModelOrganizationAssociation>,
 
-    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @SQLRestriction("association_type = 'AFFILIATION'")
-    val affiliatedOrganizations: MutableList<ModelOrganizationAssociation>,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var visibility: ModelVisibility,
@@ -86,51 +82,4 @@ class Model(
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 
     ) : BaseEntity()
-//{
-//    // manage bidirectional relationships
-//    fun addOrganizationAssociation(organization: Organization, associationType: ModelOrganizationAssociationType) {
-//        val association = ModelOrganizationAssociation(
-//            model = this,
-//            organization = organization,
-//            associationType = associationType
-//        )
-//        if (associationType == ModelOrganizationAssociationType.AFFILIATION) {
-//            affiliatedOrganizations.add(association)
-//            organization.affiliatedModels.add(association)
-//        } else {
-//            sharedWithOrganizations.add(association)
-//            organization.sharedModels.add(association)
-//        }
-//    }
-//
-//    fun removeOrganizationAssociation(organization: Organization) {
-//        if (affiliatedOrganizations.any { it.organization == organization }) {
-//            val association = affiliatedOrganizations.find { it.organization == organization }
-//            if (association != null) {
-//                affiliatedOrganizations.remove(association)
-//                organization.affiliatedModels.remove(association)
-//            }
-//        } else {
-//            val association = sharedWithOrganizations.find { it.organization == organization }
-//            if (association != null) {
-//                sharedWithOrganizations.remove(association)
-//                organization.sharedModels.remove(association)
-//            }
-//        }
-//    }
-//
-//    fun clearAffiliatedOrganizationAssociations() {
-//        affiliatedOrganizations.forEach { association ->
-//            association.organization.affiliatedModels.remove(association)
-//        }
-//        affiliatedOrganizations.clear()
-//    }
-//
-//    fun clearSharedOrganizationAssociations() {
-//        sharedWithOrganizations.forEach { association ->
-//            association.organization.sharedModels.remove(association)
-//        }
-//        sharedWithOrganizations.clear()
-//    }
-//
-//}
+

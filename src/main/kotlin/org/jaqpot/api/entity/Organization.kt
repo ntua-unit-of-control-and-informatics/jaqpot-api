@@ -31,14 +31,6 @@ class Organization(
     @Column(name = "user_id", nullable = false)
     val userIds: MutableSet<String> = mutableSetOf(),
 
-//    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
-//    @SQLRestriction("association_type = 'AFFILIATION'")
-//    val affiliatedModels: MutableSet<ModelOrganizationAssociation> = mutableSetOf(),
-//
-//    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
-//    @SQLRestriction("association_type = 'SHARE'")
-//    val sharedModels: MutableSet<ModelOrganizationAssociation> = mutableSetOf(),
-
     @OneToMany(mappedBy = "organization", orphanRemoval = true)
     val organizationInvitations: MutableList<OrganizationInvitation>,
 
