@@ -1044,6 +1044,42 @@ components:
           type: object
           additionalProperties:
             type: object
+        preprocessors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Preprocessor'
+        featurizers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Featurizer'
+    Preprocessor:
+      type: object
+      description: A preprocessor for the model
+      required:
+        - name
+        - config
+      properties:
+        name:
+          type: string
+          example: StandardScaler
+        config:
+          type: object
+          additionalProperties:
+            type: object
+    Featurizer:
+      type: object
+      description: A featurizer for the model
+      required:
+        - name
+        - config
+      properties:
+        name:
+          type: string
+          example: RDKitFeaturizer
+        config:
+          type: object
+          additionalProperties:
+            type: object
     ModelVisibility:
       type: string
       enum:

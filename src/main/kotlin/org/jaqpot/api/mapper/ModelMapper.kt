@@ -52,7 +52,10 @@ fun ModelDto.toEntity(creatorId: String): Model {
         tags = this.tags,
         extraConfig = this.extraConfig?.let {
             mapOf(
-                "torchConfig" to this.extraConfig?.torchConfig as Any,
+                // TODO force specific type for torch config
+                "torchConfig" to (this.extraConfig?.torchConfig ?: {}),
+                "preprocessors" to (this.extraConfig?.preprocessors ?: arrayOf<Any>()),
+                "featurizers" to (this.extraConfig?.featurizers ?: arrayOf<Any>()),
             )
         },
         actualModel = this.actualModel,
