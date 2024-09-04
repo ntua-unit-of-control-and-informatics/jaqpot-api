@@ -24,6 +24,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 class OrganizationInvitationServiceTest {
@@ -49,6 +50,17 @@ class OrganizationInvitationServiceTest {
     @InjectMockKs
     private lateinit var organizationInvitationService: OrganizationInvitationService
 
+    val date = OffsetDateTime.of(
+        2012,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        ZoneOffset.UTC
+    )
+
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
@@ -61,6 +73,13 @@ class OrganizationInvitationServiceTest {
             authenticationFacade
         )
 
+        mockkStatic(OffsetDateTime::class)
+
+
+
+        every {
+            OffsetDateTime.now()
+        } returns date
     }
 
     @Test
@@ -355,5 +374,72 @@ class OrganizationInvitationServiceTest {
         verify(exactly = 0) {
             organizationRepository.save(any())
         }
+    }
+
+    @Test
+    fun resendInvitation_throws404IfOrgNotFound() {
+        every { organizationRepository.findById(any()) } returns Optional.empty()
+
+        assertThrows<NotFoundException> {
+            organizationInvitationService.resendInvitation(1L, UUID.randomUUID().toString())
+        }
+    }
+
+    @Test
+    fun resendInvitation_throws404IfInvitationNotFound() {
+        val organization = mockk<Organization>()
+
+        every { organizationRepository.findById(any()) } returns Optional.of(organization)
+        every { organizationInvitationRepository.findByIdAndOrganization(any(), organization) } returns Optional.empty()
+
+        assertThrows<NotFoundException> {
+            organizationInvitationService.resendInvitation(1L, UUID.randomUUID().toString())
+        }
+    }
+
+    @Test
+    fun resendInvitation_throwsIfStatusIsAlreadyFinal() {
+        val organization = mockk<Organization>()
+        val invitation = mockk<OrganizationInvitation>()
+
+        every { invitation.status } returns OrganizationInvitationStatus.ACCEPTED
+
+        every { organizationRepository.findById(any()) } returns Optional.of(organization)
+        every { organizationInvitationRepository.findByIdAndOrganization(any(), organization) } returns Optional.of(
+            invitation
+        )
+
+        val ex = assertThrows<BadRequestException> {
+            organizationInvitationService.resendInvitation(1L, UUID.randomUUID().toString())
+        }
+
+        assertEquals("This invitation has already status ${invitation.status}", ex.message)
+    }
+
+    @Test
+    fun resendInvitation_updatesExpirationDateAndSendsEmail() {
+        val organization = mockk<Organization>()
+        every { organization.name } returns "orgName"
+        val invitation = mockk<OrganizationInvitation>(relaxed = true)
+        val user = mockk<UserDto>()
+        every { user.name } returns "userName"
+
+        every { emailService.sendHTMLEmail(any(), any(), any(), any()) } just Runs
+
+        every { jaqpotConfig.frontendUrl } returns "http://localhost:8080"
+
+        every { organizationRepository.findById(any()) } returns Optional.of(organization)
+        every { organizationInvitationRepository.findByIdAndOrganization(any(), organization) } returns Optional.of(
+            invitation
+        )
+        every { organizationInvitationRepository.save(any()) } returns invitation
+        every { userService.getUserByEmail(any()) } returns Optional.of(user)
+        every { invitation.userEmail } returns "email@example.com"
+
+        organizationInvitationService.resendInvitation(1L, UUID.randomUUID().toString())
+
+        verify { invitation.expirationDate = date.plusWeeks(1) }
+        verify { organizationInvitationRepository.save(invitation) }
+        verify { emailService.sendHTMLEmail(any(), any(), any(), any()) }
     }
 }

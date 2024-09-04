@@ -25,6 +25,6 @@ class OrganizationInvitation(
     var status: OrganizationInvitationStatus = OrganizationInvitationStatus.PENDING,
 
     @Column(updatable = false, nullable = false)
-    val expirationDate: OffsetDateTime
+    var expirationDate: OffsetDateTime
 
 ) : BaseEntity()
