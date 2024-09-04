@@ -82,9 +82,12 @@ class OrganizationService(
             .orElseThrow { NotFoundException("Organization with id $id not found.") }
 
         val userCanEdit = authenticationFacade.userId == organization.creatorId
+        val creator = userService.getUserById(organization.creatorId)
+            .orElseThrow { NotFoundException("Organization creator for organization $id not found.") }
         val organizationMembers = getOrganizationUserDtos(organization)
         return ResponseEntity.ok(
             organization.toDto(
+                creator = creator,
                 userCanEdit = userCanEdit,
                 organizationMembers = organizationMembers
             )
@@ -107,8 +110,11 @@ class OrganizationService(
 
         val organizationMembers = getOrganizationUserDtos(organization)
         val userCanEdit = authenticationFacade.userId == organization.creatorId
+        val creator = userService.getUserById(organization.creatorId)
+            .orElseThrow { NotFoundException("Organization creator for organization $name not found.") }
         return ResponseEntity.ok(
             organization.toDto(
+                creator = creator,
                 userCanEdit = userCanEdit,
                 organizationMembers = organizationMembers
             )
@@ -137,8 +143,11 @@ class OrganizationService(
 
         val organizationMembers = getOrganizationUserDtos(updatedOrganization)
         val userCanEdit = authenticationFacade.isAdmin || authenticationFacade.userId == updatedOrganization.creatorId
+        val creator = userService.getUserById(updatedOrganization.creatorId)
+            .orElseThrow { NotFoundException("Organization creator for organization $id not found.") }
         return ResponseEntity.ok(
             updatedOrganization.toDto(
+                creator = creator,
                 userCanEdit = userCanEdit,
                 organizationMembers = organizationMembers
             )

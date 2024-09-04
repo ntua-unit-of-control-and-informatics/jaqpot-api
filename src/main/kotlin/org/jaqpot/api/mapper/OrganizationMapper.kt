@@ -3,8 +3,10 @@ package org.jaqpot.api.mapper
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.model.OrganizationDto
 import org.jaqpot.api.model.OrganizationUserDto
+import org.jaqpot.api.model.UserDto
 
 fun Organization.toDto(
+    creator: UserDto? = null,
     userCanEdit: Boolean = false,
     isCreator: Boolean = false,
     organizationMembers: List<OrganizationUserDto>
@@ -14,7 +16,7 @@ fun Organization.toDto(
         visibility = this.visibility.toDto(),
         contactEmail = this.contactEmail,
         id = this.id,
-        creatorId = this.creatorId,
+        creator = creator,
         description = this.description,
         organizationMembers = organizationMembers,
         contactPhone = this.contactPhone,

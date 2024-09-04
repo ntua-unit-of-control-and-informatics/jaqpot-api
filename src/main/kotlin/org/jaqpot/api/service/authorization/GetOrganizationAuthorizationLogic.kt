@@ -25,7 +25,7 @@ class GetOrganizationAuthorizationLogic(private val authenticationFacade: Authen
         if (organizationDto.visibility == OrganizationVisibilityDto.PUBLIC) {
             return true
         } else if (organizationDto.visibility === OrganizationVisibilityDto.PRIVATE) {
-            return organizationDto.creatorId == authenticationFacade.userId || (userBelongsToOrganization(
+            return organizationDto.creator!!.id == authenticationFacade.userId || (userBelongsToOrganization(
                 organizationDto.organizationMembers?.map { it.userId }
             ))
         }

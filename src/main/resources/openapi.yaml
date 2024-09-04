@@ -1305,8 +1305,8 @@ components:
           minLength: 3
           maxLength: 200
           example: "my-awesome-org"
-        creatorId:
-          type: string
+        creator:
+          $ref: '#/components/schemas/User'
         visibility:
           $ref: '#/components/schemas/OrganizationVisibility'
         description:
