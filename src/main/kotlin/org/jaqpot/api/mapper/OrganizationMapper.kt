@@ -28,7 +28,7 @@ fun Organization.toDto(
 }
 
 fun OrganizationDto.toEntity(adminUserId: String): Organization {
-    val o = Organization(
+    return Organization(
         id = this.id,
         name = this.name,
         creatorId = adminUserId,
@@ -41,15 +41,5 @@ fun OrganizationDto.toEntity(adminUserId: String): Organization {
         website = this.website,
         address = this.address
     )
-
-    this.organizationMembers?.let { organizationMemberDtos ->
-        o.organizationMembers.addAll(organizationMemberDtos.map {
-            it.toUserOrganizationAssociationEntity(
-                o
-            )
-        })
-    }
-
-    return o
 }
 
