@@ -15,7 +15,6 @@ import org.jaqpot.api.model.PartialUpdateOrganizationRequestDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
-import org.jaqpot.api.service.model.ModelService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.dao.DataIntegrityViolationException
@@ -33,7 +32,6 @@ class OrganizationService(
     private val authenticationFacade: AuthenticationFacade,
     private val organizationRepository: OrganizationRepository,
     private val userService: UserService,
-    modelService: ModelService
 ) : OrganizationApiDelegate {
 
     override fun getAllOrganizationsForUser(): ResponseEntity<List<OrganizationDto>> {
