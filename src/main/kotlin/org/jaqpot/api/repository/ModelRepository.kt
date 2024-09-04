@@ -21,7 +21,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         """
         SELECT m FROM Model m
         JOIN m.sharedWithOrganizations o 
-        LEFT JOIN o.organization.userIds u 
+        LEFT JOIN o.organization.organizationMembers u 
         WHERE (u = :userId OR o.organization.creatorId = :userId)
         """
     )
@@ -31,7 +31,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         """
         SELECT m FROM Model m
         JOIN m.sharedWithOrganizations o 
-        LEFT JOIN o.organization.userIds u 
+        LEFT JOIN o.organization.organizationMembers u
         WHERE (u = :userId OR o.organization.creatorId = :userId) AND o.organization.id = :organizationId
         """
     )

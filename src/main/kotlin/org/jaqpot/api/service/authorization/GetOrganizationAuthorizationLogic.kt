@@ -26,8 +26,7 @@ class GetOrganizationAuthorizationLogic(private val authenticationFacade: Authen
             return true
         } else if (organizationDto.visibility === OrganizationVisibilityDto.PRIVATE) {
             return organizationDto.creatorId == authenticationFacade.userId || (userBelongsToOrganization(
-                organizationDto,
-                organizationDto.userIds
+                organizationDto.organizationMembers?.map { it.userId }
             ))
         }
 
@@ -35,10 +34,9 @@ class GetOrganizationAuthorizationLogic(private val authenticationFacade: Authen
     }
 
     private fun userBelongsToOrganization(
-        organizationDto: OrganizationDto,
         userIds: List<String>?
     ): Boolean {
-        if (organizationDto.userIds.isNullOrEmpty()) {
+        if (userIds.isNullOrEmpty()) {
             return false;
         }
 

@@ -2,8 +2,13 @@ package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.model.OrganizationDto
+import org.jaqpot.api.model.OrganizationUserDto
 
-fun Organization.toDto(userCanEdit: Boolean = false, isCreator: Boolean = false): OrganizationDto {
+fun Organization.toDto(
+    userCanEdit: Boolean = false,
+    isCreator: Boolean = false,
+    organizationMembers: List<OrganizationUserDto>
+): OrganizationDto {
     return OrganizationDto(
         name = this.name,
         visibility = this.visibility.toDto(),
@@ -11,7 +16,7 @@ fun Organization.toDto(userCanEdit: Boolean = false, isCreator: Boolean = false)
         id = this.id,
         creatorId = this.creatorId,
         description = this.description,
-        userIds = this.userIds.toList(),
+        organizationMembers = organizationMembers,
         contactPhone = this.contactPhone,
         website = this.website,
         address = this.address,
@@ -23,12 +28,12 @@ fun Organization.toDto(userCanEdit: Boolean = false, isCreator: Boolean = false)
 }
 
 fun OrganizationDto.toEntity(adminUserId: String): Organization {
-    return Organization(
+    val o = Organization(
         id = this.id,
         name = this.name,
         creatorId = adminUserId,
         description = this.description,
-        userIds = this.userIds?.toMutableSet() ?: mutableSetOf(),
+        organizationMembers = mutableListOf(),
         organizationInvitations = mutableListOf(),
         contactEmail = this.contactEmail,
         visibility = this.visibility.toEntity(),
@@ -36,5 +41,15 @@ fun OrganizationDto.toEntity(adminUserId: String): Organization {
         website = this.website,
         address = this.address
     )
+
+    this.organizationMembers?.let { organizationMemberDtos ->
+        o.organizationMembers.addAll(organizationMemberDtos.map {
+            it.toUserOrganizationAssociationEntity(
+                o
+            )
+        })
+    }
+
+    return o
 }
 

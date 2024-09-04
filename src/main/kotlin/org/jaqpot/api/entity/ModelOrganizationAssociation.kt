@@ -23,7 +23,8 @@ class ModelOrganizationAssociation(
     val organization: Organization,
 
     @Enumerated(EnumType.STRING)
-    val associationType: ModelOrganizationAssociationType? = null
+    @Column(nullable = false)
+    val associationType: ModelOrganizationAssociationType
 
 ) : BaseEntity()
 

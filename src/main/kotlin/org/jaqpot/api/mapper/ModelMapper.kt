@@ -20,7 +20,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         id = this.id,
         meta = this.meta,
         description = this.description,
-        sharedWithOrganizations = this.sharedWithOrganizations.map { it.organization.toDto() },
+        sharedWithOrganizations = this.sharedWithOrganizations.map { it.organization.toDto(organizationMembers = emptyList()) },
         pretrained = this.pretrained,
         creator = userDto,
         canEdit = userCanEdit,
@@ -61,9 +61,9 @@ fun ModelDto.toEntity(creatorId: String): Model {
         actualModel = this.actualModel,
     )
 
-    m.libraries.addAll(this.libraries.map { it -> it.toEntity(m) })
-    m.dependentFeatures.addAll(this.dependentFeatures.map { it -> it.toEntity(m, FeatureDependency.DEPENDENT) })
-    m.independentFeatures.addAll(this.independentFeatures.map { it -> it.toEntity(m, FeatureDependency.INDEPENDENT) })
+    m.libraries.addAll(this.libraries.map { it.toEntity(m) })
+    m.dependentFeatures.addAll(this.dependentFeatures.map { it.toEntity(m, FeatureDependency.DEPENDENT) })
+    m.independentFeatures.addAll(this.independentFeatures.map { it.toEntity(m, FeatureDependency.INDEPENDENT) })
 
     return m
 }

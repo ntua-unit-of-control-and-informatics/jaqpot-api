@@ -48,5 +48,8 @@ class GetModelAuthorizationLogic(private val authenticationFacade: Authenticatio
         modelDto.sharedWithOrganizations!!.map { it.creatorId!! } ?: emptyList()
 
     private fun getUserIdsFromSharedOrganizations(modelDto: ModelDto): List<String> =
-        modelDto.sharedWithOrganizations!!.flatMap { it.userIds ?: emptyList() } ?: emptyList()
+        modelDto.sharedWithOrganizations!!.flatMap { organizationDto ->
+            organizationDto.organizationMembers?.map { it.userId } ?: emptyList()
+        }
+            ?: emptyList()
 }
