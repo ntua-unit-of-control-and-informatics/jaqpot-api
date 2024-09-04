@@ -9,7 +9,7 @@ class SortUtil {
 
         fun parseSortParameters(sortParams: List<String>?): List<Order> {
             if (sortParams.isNullOrEmpty()) {
-                return listOf()
+                return emptyList()
             }
 
             return sortParams

@@ -1305,8 +1305,8 @@ components:
           minLength: 3
           maxLength: 200
           example: "my-awesome-org"
-        creatorId:
-          type: string
+        creator:
+          $ref: '#/components/schemas/User'
         visibility:
           $ref: '#/components/schemas/OrganizationVisibility'
         description:
@@ -1314,10 +1314,10 @@ components:
           minLength: 3
           maxLength: 2000
           example: "An awesome organization for managing models."
-        userIds:
+        organizationMembers:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/OrganizationUser'
         contactEmail:
           type: string
           example: "contact@my-awesome-org.com"
@@ -1340,6 +1340,33 @@ components:
           type: DateTime
         updated_at:
           type: DateTime
+
+    OrganizationUser:
+      type: object
+      required:
+        - userId
+        - email
+        - username
+        - associationType
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        associationType:
+          $ref: '#/components/schemas/OrganizationUserAssociationType'
+
+    OrganizationUserAssociationType:
+      type: string
+      enum:
+        - ADMIN
+        - MEMBER
     OrganizationVisibility:
       type: string
       enum:
@@ -1385,10 +1412,12 @@ components:
           type: string
           x-stoplight:
             id: 0gri1l9rmiv13
-        name:
+        username:
           type: string
           x-stoplight:
             id: x0pm25vavfibz
+        email:
+          type: string
         emailVerified:
           type: boolean
     ErrorResponse:

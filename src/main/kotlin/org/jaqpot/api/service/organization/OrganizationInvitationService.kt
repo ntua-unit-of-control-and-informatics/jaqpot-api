@@ -7,9 +7,7 @@ import org.jaqpot.api.NotFoundException
 import org.jaqpot.api.OrganizationInvitationApiDelegate
 import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.config.JaqpotConfig
-import org.jaqpot.api.entity.Organization
-import org.jaqpot.api.entity.OrganizationInvitation
-import org.jaqpot.api.entity.OrganizationInvitationStatus
+import org.jaqpot.api.entity.*
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.CreateInvitationsRequestDto
@@ -114,7 +112,14 @@ class OrganizationInvitationService(
         val updatedInvitation = organizationInvitationRepository.save(invitation)
 
         if (updatedInvitation.status == OrganizationInvitationStatus.ACCEPTED) {
-            organization.userIds.add(authenticationFacade.userId)
+            organization.organizationMembers.add(
+                OrganizationUserAssociation(
+                    null,
+                    authenticationFacade.userId,
+                    organization,
+                    OrganizationUserAssociationType.MEMBER
+                )
+            )
 
             organizationRepository.save(organization)
         }
@@ -173,7 +178,7 @@ class OrganizationInvitationService(
         val model = EmailModelHelper.generateOrganizationInvitationEmailModel(
             invitationActionUrl,
             orgName,
-            user.map { it.name.orEmpty() }.orElse("")
+            user.map { it.username.orEmpty() }.orElse("")
         )
         emailService.sendHTMLEmail(
             organizationInvitation.userEmail,

@@ -216,7 +216,7 @@ class ModelService(
 
         val user = userService.getUserById(authenticationFacade.userId).orElse(UserDto(authenticationFacade.userId))
 
-        logger.info { "Updating model with id $id by user ${user.id} and name ${user.name}" }
+        logger.info { "Updating model with id $id by user ${user.id} and name ${user.username}" }
 
         val neededOrganizationsIds: List<Long> = partiallyUpdateModelRequestDto.sharedWithOrganizationIds ?: listOf()
 

@@ -15,15 +15,16 @@ class ModelOrganizationAssociation(
     val id: Long? = 0,
 
     @ManyToOne
-    @JoinColumn(name = "model_id")
+    @JoinColumn(name = "model_id", nullable = false)
     val model: Model,
 
     @ManyToOne
-    @JoinColumn(name = "organization_id")
+    @JoinColumn(name = "organization_id", nullable = false)
     val organization: Organization,
 
     @Enumerated(EnumType.STRING)
-    val associationType: ModelOrganizationAssociationType? = null
+    @Column(nullable = false)
+    val associationType: ModelOrganizationAssociationType
 
 ) : BaseEntity()
 

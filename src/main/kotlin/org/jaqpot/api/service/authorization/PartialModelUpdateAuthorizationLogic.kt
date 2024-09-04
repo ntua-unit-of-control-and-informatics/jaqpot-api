@@ -38,7 +38,7 @@ class PartialModelUpdateAuthorizationLogic(
         val organizationsThatUserCanSeeIds = organizationsThatUserCanSee!!.map { it.id }
 
         if (!partiallyUpdateModelRequestDto.sharedWithOrganizationIds.isNullOrEmpty()) {
-            val sharedWithOrganizationIds = partiallyUpdateModelRequestDto.sharedWithOrganizationIds
+            val sharedWithOrganizationIds: List<Long> = partiallyUpdateModelRequestDto.sharedWithOrganizationIds!!
 
             if (!organizationsThatUserCanSeeIds.containsAll(sharedWithOrganizationIds)) {
                 logger.error { "User ${authenticationFacade.userId} attempted to update model with id $modelId and sharedWithOrganizationIds $sharedWithOrganizationIds that they do not have access to" }

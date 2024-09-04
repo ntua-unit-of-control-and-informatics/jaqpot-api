@@ -287,7 +287,7 @@ class OrganizationInvitationServiceTest {
         mockkStatic(OrganizationInvitation::toDto)
         every { any<OrganizationInvitation>().toDto() } returns organizationInvitationDto
 
-        every { organization.userIds } returns mutableSetOf()
+        every { organization.organizationMembers } returns mutableListOf()
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
         every { organizationRepository.save(any()) } returns organization
@@ -341,7 +341,7 @@ class OrganizationInvitationServiceTest {
         mockkStatic(OrganizationInvitation::toDto)
         every { any<OrganizationInvitation>().toDto() } returns organizationInvitationDto
 
-        every { organization.userIds } returns mutableSetOf()
+        every { organization.organizationMembers } returns mutableListOf()
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
         every { organizationRepository.save(any()) } returns organization
@@ -422,7 +422,7 @@ class OrganizationInvitationServiceTest {
         every { organization.name } returns "orgName"
         val invitation = mockk<OrganizationInvitation>(relaxed = true)
         val user = mockk<UserDto>()
-        every { user.name } returns "userName"
+        every { user.username } returns "userName"
 
         every { emailService.sendHTMLEmail(any(), any(), any(), any()) } just Runs
 

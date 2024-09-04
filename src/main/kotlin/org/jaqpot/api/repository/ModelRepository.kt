@@ -21,8 +21,8 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         """
         SELECT m FROM Model m
         JOIN m.sharedWithOrganizations o 
-        LEFT JOIN o.organization.userIds u 
-        WHERE (u = :userId OR o.organization.creatorId = :userId)
+        LEFT JOIN o.organization.organizationMembers u 
+        WHERE (u.userId = :userId OR o.organization.creatorId = :userId)
         """
     )
     fun findAllSharedWithUser(userId: String, pageable: Pageable): Page<Model>
@@ -31,8 +31,8 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
         """
         SELECT m FROM Model m
         JOIN m.sharedWithOrganizations o 
-        LEFT JOIN o.organization.userIds u 
-        WHERE (u = :userId OR o.organization.creatorId = :userId) AND o.organization.id = :organizationId
+        LEFT JOIN o.organization.organizationMembers u
+        WHERE (u.userId = :userId OR o.organization.creatorId = :userId) AND o.organization.id = :organizationId
         """
     )
     fun findAllSharedWithUserByOrganizationId(userId: String, pageable: Pageable, organizationId: Long): Page<Model>

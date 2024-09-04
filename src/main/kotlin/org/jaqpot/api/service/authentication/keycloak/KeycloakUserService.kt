@@ -25,7 +25,14 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
     fun getUserById(id: String): Optional<UserDto> {
         try {
             val user = keycloakAdminClient.realm(keycloakConfig.realm).users().get(id).toRepresentation()
-            return Optional.of(UserDto(user.id, "${user.firstName} ${user.lastName}", user.isEmailVerified))
+            return Optional.of(
+                UserDto(
+                    user.id,
+                    user.username,
+                    user.email,
+                    user.isEmailVerified
+                )
+            )
         } catch (e: Exception) {
             logger.error(e) { "Could not retrieve user by id: $id" }
             return Optional.empty()
@@ -35,7 +42,7 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
     fun getUserByUsername(username: String): Optional<UserDto> {
         try {
             val user = keycloakAdminClient.realm(keycloakConfig.realm).users().searchByUsername(username, true).first()
-            return Optional.of(UserDto(user.id, "${user.firstName} ${user.lastName}", user.isEmailVerified))
+            return Optional.of(UserDto(user.id, user.username, user.email, user.isEmailVerified))
         } catch (e: Exception) {
             logger.error(e) { "Could not retrieve user by username: $username" }
             return Optional.empty()
@@ -50,7 +57,14 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
                 return Optional.empty()
             } else if (users.size == 1) {
                 val user = users.first()
-                return Optional.of(UserDto(user.id, "${user.firstName} ${user.lastName}", user.isEmailVerified))
+                return Optional.of(
+                    UserDto(
+                        user.id,
+                        user.username,
+                        user.email,
+                        user.isEmailVerified
+                    )
+                )
             } else {
                 logger.error { "Found more than 1 users with the same email" }
                 return Optional.empty()
