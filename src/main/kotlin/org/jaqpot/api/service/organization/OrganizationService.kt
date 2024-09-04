@@ -15,6 +15,7 @@ import org.jaqpot.api.model.PartialUpdateOrganizationRequestDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.jaqpot.api.service.model.ModelService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.dao.DataIntegrityViolationException
@@ -31,7 +32,8 @@ import java.net.URI
 class OrganizationService(
     private val authenticationFacade: AuthenticationFacade,
     private val organizationRepository: OrganizationRepository,
-    private val userService: UserService
+    private val userService: UserService,
+    modelService: ModelService
 ) : OrganizationApiDelegate {
 
     override fun getAllOrganizationsForUser(): ResponseEntity<List<OrganizationDto>> {
@@ -42,15 +44,13 @@ class OrganizationService(
                 organizationRepository.findAll().map { it.toDto(organizationMembers = emptyList()) })
         }
 
-        val publicOrganizations = getAllPublicOrganizations()
+        val publicOrganizations = organizationRepository.findAllByVisibility(OrganizationVisibility.PUBLIC)
         val userOrganizations = organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId)
         val allOrganizationsForUser = publicOrganizations + userOrganizations
 
         return ResponseEntity.ok(allOrganizationsForUser.distinctBy { org -> org.id }
             .map { it.toDto(organizationMembers = emptyList()) })
     }
-
-    fun getAllPublicOrganizations() = organizationRepository.findAllByVisibility(OrganizationVisibility.PUBLIC)
 
     override fun getAllOrganizationsByUser(): ResponseEntity<List<OrganizationDto>> {
         val userId = authenticationFacade.userId
@@ -146,4 +146,5 @@ class OrganizationService(
             )
         )
     }
+
 }

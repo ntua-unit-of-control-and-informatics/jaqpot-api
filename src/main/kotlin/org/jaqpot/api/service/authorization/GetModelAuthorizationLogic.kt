@@ -1,15 +1,20 @@
 package org.jaqpot.api.service.authorization
 
+import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.ModelVisibilityDto
+import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations
 import org.springframework.stereotype.Component
 
 @Component("getModelAuthorizationLogic")
-class GetModelAuthorizationLogic(private val authenticationFacade: AuthenticationFacade) {
+class GetModelAuthorizationLogic(
+    private val authenticationFacade: AuthenticationFacade,
+    private val organizationRepository: OrganizationRepository
+) {
     fun decide(operations: MethodSecurityExpressionOperations): Boolean {
         val responseEntity = operations.returnObject as ResponseEntity<*>
         if (!responseEntity.statusCode.is2xxSuccessful) {
@@ -31,12 +36,10 @@ class GetModelAuthorizationLogic(private val authenticationFacade: Authenticatio
                 return true
             }
 
-            val creatorIdsFromSharedOrganizations =
-                getCreatorIdsFromSharedOrganizations(modelDto)
-            val userIdsFromSharedOrganizations =
-                getUserIdsFromSharedOrganizations(modelDto)
+            val modelOrganizations =
+                organizationRepository.findAllById(modelDto.sharedWithOrganizations?.map { it.id }).toList()
 
-            val allAllowedUserIds = creatorIdsFromSharedOrganizations + userIdsFromSharedOrganizations
+            val allAllowedUserIds = allAllowedUserIdsForModel(modelOrganizations)
 
             return allAllowedUserIds.contains(authenticationFacade.userId)
         }
@@ -44,12 +47,14 @@ class GetModelAuthorizationLogic(private val authenticationFacade: Authenticatio
         throw JaqpotRuntimeException("Unexpected model visibility ${modelDto.visibility}")
     }
 
-    private fun getCreatorIdsFromSharedOrganizations(modelDto: ModelDto): List<String> =
-        modelDto.sharedWithOrganizations!!.map { it.creatorId!! } ?: emptyList()
+    private fun allAllowedUserIdsForModel(modelOrganizations: List<Organization>): List<String> {
+        val creatorIdsFromModelOrganizations =
+            modelOrganizations.map { it.creatorId }
+        val userIdsFromModelOrganizations =
+            modelOrganizations.flatMap { organization -> organization.organizationMembers.map { it.userId } }
 
-    private fun getUserIdsFromSharedOrganizations(modelDto: ModelDto): List<String> =
-        modelDto.sharedWithOrganizations!!.flatMap { organizationDto ->
-            organizationDto.organizationMembers?.map { it.userId } ?: emptyList()
-        }
-            ?: emptyList()
+        val allAllowedUserIds = creatorIdsFromModelOrganizations + userIdsFromModelOrganizations
+        return allAllowedUserIds
+    }
+
 }
