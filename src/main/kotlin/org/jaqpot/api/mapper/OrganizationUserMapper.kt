@@ -2,7 +2,7 @@ package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Organization
 import org.jaqpot.api.entity.OrganizationUserAssociation
-import org.jaqpot.api.entity.UserOrganizationAssociationType
+import org.jaqpot.api.entity.OrganizationUserAssociationType
 import org.jaqpot.api.model.OrganizationUserDto
 
 fun OrganizationUserDto.toUserOrganizationAssociationEntity(org: Organization): OrganizationUserAssociation {
@@ -10,7 +10,7 @@ fun OrganizationUserDto.toUserOrganizationAssociationEntity(org: Organization): 
         id = null,
         userId = this.userId,
         organization = org,
-        UserOrganizationAssociationType.MEMBER
+        OrganizationUserAssociationType.MEMBER
     )
 }
 

@@ -23,7 +23,7 @@ class OrganizationUserAssociation(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val associationType: UserOrganizationAssociationType
+    val associationType: OrganizationUserAssociationType
 
 ) : BaseEntity()
 

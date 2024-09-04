@@ -117,7 +117,7 @@ class OrganizationInvitationService(
                     null,
                     authenticationFacade.userId,
                     organization,
-                    UserOrganizationAssociationType.MEMBER
+                    OrganizationUserAssociationType.MEMBER
                 )
             )
 
