@@ -30,6 +30,7 @@ class KeycloakUserServiceTest {
         every { userRepresentation.id } returns "id"
         every { userRepresentation.firstName } returns "firstName"
         every { userRepresentation.lastName } returns "lastName"
+        every { userRepresentation.email } returns "email@email.com"
         every { userRepresentation.isEmailVerified } returns true
         keycloakClient = mockk()
         keycloakUserService = KeycloakUserService(keycloakConfig)
