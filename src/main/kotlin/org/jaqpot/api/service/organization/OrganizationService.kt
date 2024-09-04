@@ -1,7 +1,7 @@
 package org.jaqpot.api.service.organization
 
 import jakarta.ws.rs.BadRequestException
-import jakarta.ws.rs.NotFoundException
+import org.jaqpot.api.NotFoundException
 import org.jaqpot.api.OrganizationApiDelegate
 import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.Organization
