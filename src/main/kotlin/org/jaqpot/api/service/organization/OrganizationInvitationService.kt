@@ -197,9 +197,10 @@ class OrganizationInvitationService(
             throw BadRequestException("This invitation has already status ${invitation.status}")
         }
 
-        if (invitation.expirationDate.isBefore(OffsetDateTime.now())) {
-            throw BadRequestException("This invitation has expired. Please ask the organization admin to generate a new invitation")
-        }
+        // refresh expiration date for the invitation to 1 week from now
+        invitation.expirationDate = OffsetDateTime.now().plusWeeks(1)
+
+        organizationInvitationRepository.save(invitation)
 
         sendInvitationEmail(
             organization,
