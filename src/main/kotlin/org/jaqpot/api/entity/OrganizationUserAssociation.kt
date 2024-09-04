@@ -18,7 +18,7 @@ class OrganizationUserAssociation(
     val userId: String,
 
     @ManyToOne
-    @JoinColumn(name = "organization_id")
+    @JoinColumn(name = "organization_id", nullable = false)
     val organization: Organization,
 
     @Enumerated(EnumType.STRING)
