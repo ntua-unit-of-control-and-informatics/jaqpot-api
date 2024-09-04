@@ -287,7 +287,7 @@ class OrganizationInvitationServiceTest {
         mockkStatic(OrganizationInvitation::toDto)
         every { any<OrganizationInvitation>().toDto() } returns organizationInvitationDto
 
-        every { organization.userIds } returns mutableSetOf()
+        every { organization.organizationMembers } returns mutableListOf()
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
         every { organizationRepository.save(any()) } returns organization
@@ -341,7 +341,7 @@ class OrganizationInvitationServiceTest {
         mockkStatic(OrganizationInvitation::toDto)
         every { any<OrganizationInvitation>().toDto() } returns organizationInvitationDto
 
-        every { organization.userIds } returns mutableSetOf()
+        every { organization.organizationMembers } returns mutableListOf()
 
         every { organizationRepository.findByName(any()) } returns Optional.of(organization)
         every { organizationRepository.save(any()) } returns organization
