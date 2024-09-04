@@ -28,8 +28,7 @@ class KeycloakUserServiceTest {
     @BeforeEach
     fun setup() {
         every { userRepresentation.id } returns "id"
-        every { userRepresentation.firstName } returns "firstName"
-        every { userRepresentation.lastName } returns "lastName"
+        every { userRepresentation.username } returns "username"
         every { userRepresentation.email } returns "email@email.com"
         every { userRepresentation.isEmailVerified } returns true
         keycloakClient = mockk()
@@ -42,7 +41,7 @@ class KeycloakUserServiceTest {
         every { keycloakClient.realm("realm").users().get("id").toRepresentation() } returns userRepresentation
         val user = keycloakUserService.getUserById("id")
 
-        assertEquals(user.get().name, "firstName lastName")
+        assertEquals(user.get().username, "username")
     }
 
     @Test
@@ -52,7 +51,7 @@ class KeycloakUserServiceTest {
         } returns listOf(userRepresentation)
         val user = keycloakUserService.getUserByUsername("username")
 
-        assertEquals(user.get().name, "firstName lastName")
+        assertEquals(user.get().username, "username")
     }
 
     @Test
@@ -62,6 +61,6 @@ class KeycloakUserServiceTest {
         } returns listOf(userRepresentation)
         val user = keycloakUserService.getUserByEmail("email")
 
-        assertEquals(user.get().name, "firstName lastName")
+        assertEquals(user.get().username, "username")
     }
 }

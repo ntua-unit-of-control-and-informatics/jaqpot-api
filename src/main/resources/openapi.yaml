@@ -1346,12 +1346,15 @@ components:
       required:
         - userId
         - email
+        - username
         - associationType
       properties:
         id:
           type: integer
           format: int64
         userId:
+          type: string
+        username:
           type: string
         email:
           type: string
@@ -1409,7 +1412,7 @@ components:
           type: string
           x-stoplight:
             id: 0gri1l9rmiv13
-        name:
+        username:
           type: string
           x-stoplight:
             id: x0pm25vavfibz

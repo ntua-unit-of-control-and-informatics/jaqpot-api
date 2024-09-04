@@ -28,7 +28,7 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
             return Optional.of(
                 UserDto(
                     user.id,
-                    "${user.firstName} ${user.lastName}",
+                    user.username,
                     user.email,
                     user.isEmailVerified
                 )
@@ -42,7 +42,7 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
     fun getUserByUsername(username: String): Optional<UserDto> {
         try {
             val user = keycloakAdminClient.realm(keycloakConfig.realm).users().searchByUsername(username, true).first()
-            return Optional.of(UserDto(user.id, "${user.firstName} ${user.lastName}", user.email, user.isEmailVerified))
+            return Optional.of(UserDto(user.id, user.username, user.email, user.isEmailVerified))
         } catch (e: Exception) {
             logger.error(e) { "Could not retrieve user by username: $username" }
             return Optional.empty()
@@ -60,7 +60,7 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
                 return Optional.of(
                     UserDto(
                         user.id,
-                        "${user.firstName} ${user.lastName}",
+                        user.username,
                         user.email,
                         user.isEmailVerified
                     )

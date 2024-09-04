@@ -97,7 +97,7 @@ class OrganizationService(
         val organizationMembers = organization.organizationMembers.map {
             val userDto = userService.getUserById(it.userId).orElseThrow()
 
-            it.toOrganizationUserDto(userDto.email!!)
+            it.toOrganizationUserDto(userDto.username!!, userDto.email!!)
         }
         return organizationMembers
     }
