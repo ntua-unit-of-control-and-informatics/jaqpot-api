@@ -189,7 +189,7 @@ class OrganizationInvitationService(
 
     }
 
-    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60 * 10)
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60 * 10)
     @PreAuthorize("@resendInvitationAuthorizationLogic.decide(#root, #orgId)")
     override fun resendInvitation(orgId: Long, id: String): ResponseEntity<Unit> {
         val organization = organizationRepository.findById(orgId)
