@@ -39,7 +39,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
             SELECT 1 FROM m.sharedWithOrganizations o
             JOIN o.organization org
             LEFT JOIN org.organizationMembers u
-            WHERE u.userId = :userId OR org.creatorId = :userId AND o.organization.id = :organizationId
+            WHERE (u.userId = :userId OR org.creatorId = :userId) AND o.organization.id = :organizationId
          )
         """
     )
