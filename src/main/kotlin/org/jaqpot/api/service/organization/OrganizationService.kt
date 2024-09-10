@@ -54,7 +54,7 @@ class OrganizationService(
         val userId = authenticationFacade.userId
         return ResponseEntity.ok(
             organizationRepository.findByCreatorIdOrUserIdsContaining(userId, userId)
-                .map { it.toDto(isCreator = it.creatorId == userId, organizationMembers = emptyList()) })
+                .map { it.toDto(userCanEdit = it.creatorId == userId, organizationMembers = emptyList()) })
     }
 
     @CacheEvict(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
@@ -85,10 +85,12 @@ class OrganizationService(
         val creator = userService.getUserById(organization.creatorId)
             .orElseThrow { NotFoundException("Organization creator for organization $id not found.") }
         val organizationMembers = getOrganizationUserDtos(organization)
+        val userIsMember = organization.organizationMembers.any { it.userId == authenticationFacade.userId }
         return ResponseEntity.ok(
             organization.toDto(
                 creator = creator,
                 userCanEdit = userCanEdit,
+                userIsMember = userIsMember,
                 organizationMembers = organizationMembers
             )
         )
@@ -112,10 +114,12 @@ class OrganizationService(
         val userCanEdit = authenticationFacade.userId == organization.creatorId || authenticationFacade.isAdmin
         val creator = userService.getUserById(organization.creatorId)
             .orElseThrow { NotFoundException("Organization creator for organization $name not found.") }
+        val userIsMember = organization.organizationMembers.any { it.userId == authenticationFacade.userId }
         return ResponseEntity.ok(
             organization.toDto(
                 creator = creator,
                 userCanEdit = userCanEdit,
+                userIsMember = userIsMember,
                 organizationMembers = organizationMembers
             )
         )
@@ -143,12 +147,14 @@ class OrganizationService(
 
         val organizationMembers = getOrganizationUserDtos(updatedOrganization)
         val userCanEdit = authenticationFacade.isAdmin || authenticationFacade.userId == updatedOrganization.creatorId
+        val userIsMember = updatedOrganization.organizationMembers.any { it.userId == authenticationFacade.userId }
         val creator = userService.getUserById(updatedOrganization.creatorId)
             .orElseThrow { NotFoundException("Organization creator for organization $id not found.") }
         return ResponseEntity.ok(
             updatedOrganization.toDto(
                 creator = creator,
                 userCanEdit = userCanEdit,
+                userIsMember = userIsMember,
                 organizationMembers = organizationMembers
             )
         )

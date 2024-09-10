@@ -7,8 +7,8 @@ import org.jaqpot.api.model.UserDto
 
 fun Organization.toDto(
     creator: UserDto? = null,
+    userIsMember: Boolean = false,
     userCanEdit: Boolean = false,
-    isCreator: Boolean = false,
     organizationMembers: List<OrganizationUserDto>
 ): OrganizationDto {
     return OrganizationDto(
@@ -22,8 +22,8 @@ fun Organization.toDto(
         contactPhone = this.contactPhone,
         website = this.website,
         address = this.address,
+        isMember = userIsMember,
         canEdit = userCanEdit,
-        isCreator = isCreator,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
