@@ -377,6 +377,7 @@ paths:
               required:
                 - name
                 - visibility
+                - task
               properties:
                 name:
                   type: string
@@ -388,6 +389,8 @@ paths:
                   maxLength: 50000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
+                task:
+                  $ref: '#/components/schemas/ModelTask'
                 tags:
                   type: string
                   maxLength: 1000
@@ -884,6 +887,7 @@ components:
         - name
         - visibility
         - type
+        - task
       properties:
         id:
           type: integer
@@ -927,9 +931,8 @@ components:
             $ref: '#/components/schemas/Organization'
         visibility:
           $ref: '#/components/schemas/ModelVisibility'
-        pretrained:
-          type: boolean
-          example: false
+        task:
+          $ref: '#/components/schemas/ModelTask'
         actualModel:
           type: string
           format: byte
@@ -1086,6 +1089,13 @@ components:
         - PUBLIC
         - ORG_SHARED
         - PRIVATE
+    ModelTask:
+      type: string
+      enum:
+        - REGRESSION
+        - CLASSIFICATION
+        - BINARY_CLASSIFICATION
+        - MULTICLASS_CLASSIFICATION
     Library:
       type: object
       required:

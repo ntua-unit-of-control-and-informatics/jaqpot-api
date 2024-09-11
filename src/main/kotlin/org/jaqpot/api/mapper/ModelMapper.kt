@@ -21,7 +21,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         meta = this.meta,
         description = this.description,
         sharedWithOrganizations = this.sharedWithOrganizations.map { it.organization.toDto(organizationMembers = emptyList()) },
-        pretrained = this.pretrained,
+        task = this.task.toDto(),
         creator = userDto,
         canEdit = userCanEdit,
         isAdmin = isAdmin,
@@ -48,7 +48,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         sharedWithOrganizations = mutableListOf(),
         visibility = this.visibility.toEntity(),
         legacyPredictionService = null,
-        pretrained = this.pretrained,
+        task = this.task.toEntity(),
         tags = this.tags,
         extraConfig = this.extraConfig?.let {
             mapOf(

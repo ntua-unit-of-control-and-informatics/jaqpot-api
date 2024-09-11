@@ -1,0 +1,6 @@
+ALTER TABLE model
+    ADD task VARCHAR(255) NOT NULL DEFAULT 'REGRESSION';
+
+ALTER TABLE model
+    DROP COLUMN pretrained;
+

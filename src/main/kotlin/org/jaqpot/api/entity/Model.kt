@@ -62,7 +62,9 @@ class Model(
     @Column(updatable = false)
     val legacyPredictionService: String?,
 
-    val pretrained: Boolean?,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var task: ModelTask,
 
     @Size(min = 3, max = 1000)
     @Column(columnDefinition = "TEXT")

@@ -228,6 +228,7 @@ class ModelService(
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
         partiallyUpdateModelRequestDto.tags.let { existingModel.tags = it }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
+        partiallyUpdateModelRequestDto.task?.let { existingModel.task = it.toEntity() }
 
 
         if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
