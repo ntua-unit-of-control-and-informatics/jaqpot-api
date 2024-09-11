@@ -38,6 +38,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "id": 3,
                         "test": "hello"
                     },
+                    "task": "REGRESSION",
                     "type": "SKLEARN",
                     "visibility": "PRIVATE",
                     "reliability": 5,
@@ -106,6 +107,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "id": 3,
                         "test": "hello"
                     },
+                    "task": "REGRESSION",
                     "type": "TORCH",
                     "visibility": "PRIVATE",
                     "reliability": 5,
