@@ -74,6 +74,7 @@ fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
+        task = this.task.toDto(),
         rawModel = this.decodeRawModel(actualModel),
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
