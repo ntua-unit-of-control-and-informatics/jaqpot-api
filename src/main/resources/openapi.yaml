@@ -1093,7 +1093,6 @@ components:
       type: string
       enum:
         - REGRESSION
-        - CLASSIFICATION
         - BINARY_CLASSIFICATION
         - MULTICLASS_CLASSIFICATION
     Library:
