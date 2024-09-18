@@ -56,6 +56,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
                 "torchConfig" to (this.extraConfig?.torchConfig ?: {}),
                 "preprocessors" to (this.extraConfig?.preprocessors ?: arrayOf<Any>()),
                 "featurizers" to (this.extraConfig?.featurizers ?: arrayOf<Any>()),
+                "doa" to (this.extraConfig?.featurizers ?: arrayOf<Any>()),
             )
         },
         actualModel = this.actualModel,
