@@ -3,7 +3,7 @@ package org.jaqpot.api.entity
 enum class ModelType {
     SKLEARN,
     TORCH,
-
+    XGBOOST,
     // R models
     R_BNLEARN_DISCRETE,
     R_CARET,

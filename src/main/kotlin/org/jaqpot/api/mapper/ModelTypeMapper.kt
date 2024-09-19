@@ -7,6 +7,7 @@ fun ModelTypeDto.toEntity(): ModelType {
     return when (this) {
         ModelTypeDto.SKLEARN -> ModelType.SKLEARN
         ModelTypeDto.TORCH -> ModelType.TORCH
+        ModelTypeDto.XGBOOST -> ModelType.XGBOOST
         ModelTypeDto.R_BNLEARN_DISCRETE -> ModelType.R_BNLEARN_DISCRETE
         ModelTypeDto.R_CARET -> ModelType.R_CARET
         ModelTypeDto.R_GBM -> ModelType.R_GBM
