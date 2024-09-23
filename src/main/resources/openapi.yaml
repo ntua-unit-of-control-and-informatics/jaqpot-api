@@ -866,7 +866,120 @@ paths:
           description: "Bad request, invalid input"
         "404":
           description: "Invitation not found"
+  '/v1/leads':
+    get:
+      summary: Get All Leads
+      description: Retrieve all leads
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - lead
+      operationId: getAllLeads
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lead'
 
+    post:
+      summary: Create a Lead
+      description: Create a new lead
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - lead
+      operationId: createLead
+      responses:
+        '201':
+          description: Lead created successfully
+        '400':
+          description: Invalid request data
+
+  '/v1/leads/{id}':
+    get:
+      summary: Get a Lead by ID
+      description: Retrieve a single lead by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - lead
+      operationId: getLeadById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the lead to retrieve
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: Lead not found
+
+    put:
+      summary: Update a Lead by ID
+      description: Update the details of an existing lead
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - lead
+      operationId: updateLeadById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the lead to update
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+      responses:
+        '200':
+          description: Lead updated successfully
+        '400':
+          description: Invalid request data
+        '404':
+          description: Lead not found
+
+    delete:
+      summary: Delete a Lead by ID
+      description: Delete a single lead by its ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - lead
+      operationId: deleteLeadById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the lead to delete
+          schema:
+            type: integer
+            format: int64
+            example: 0
+      responses:
+        '204':
+          description: Lead deleted successfully
+        '404':
+          description: Lead not found
 
 
 components:
@@ -1399,6 +1512,19 @@ components:
         expirationDate:
           type: DateTime
           description: "Expiration date of the invitation"
+    Lead:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [ PENDING, APPROVED, DENIED ]
     User:
       title: User
       x-stoplight:
