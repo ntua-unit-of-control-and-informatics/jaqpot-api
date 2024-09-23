@@ -36,6 +36,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 private val logger = KotlinLogging.logger {}
+const val MAX_CSV_ROWS = 10
 
 @Service
 class ModelService(
@@ -49,7 +50,6 @@ class ModelService(
     private val csvDataConverter: CSVDataConverter,
     private val storageService: StorageService
 ) : ModelApiDelegate {
-
 
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
@@ -136,7 +136,7 @@ class ModelService(
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
+    @WithRateLimitProtectionByUser(limit = 1, intervalInSeconds = 60)
     override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
         if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
@@ -146,6 +146,11 @@ class ModelService(
             storeActualModelToStorage(model)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
+
+            if (csvData.size > MAX_CSV_ROWS) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "CSV file contains more than $MAX_CSV_ROWS rows")
+            }
+
             val input = csvDataConverter.convertCsvContentToInput(model, csvData)
             val dataset = this.datasetRepository.save(
                 datasetCSVDto.toEntity(
@@ -228,7 +233,7 @@ class ModelService(
         partiallyUpdateModelRequestDto.visibility.let { existingModel.visibility = it.toEntity() }
         partiallyUpdateModelRequestDto.tags.let { existingModel.tags = it }
         partiallyUpdateModelRequestDto.description?.let { existingModel.description = it }
-        partiallyUpdateModelRequestDto.task?.let { existingModel.task = it.toEntity() }
+        partiallyUpdateModelRequestDto.task.let { existingModel.task = it.toEntity() }
 
 
         if (partiallyUpdateModelRequestDto.visibility == ModelVisibilityDto.ORG_SHARED) {
