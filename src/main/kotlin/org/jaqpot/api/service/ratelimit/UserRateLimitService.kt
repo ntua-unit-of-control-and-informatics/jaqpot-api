@@ -22,6 +22,8 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
         // do not rate limit public endpoints
         if (!authenticationFacade.isLoggedIn) return false
 
+        if (authenticationFacade.isAdmin) return false
+
         val userIdBucketKey = getUserIdBucketKey(authenticationFacade.userId, methodName)
         val userBucket =
             Optional.ofNullable(userIdBuckets[userIdBucketKey]).orElseGet {
