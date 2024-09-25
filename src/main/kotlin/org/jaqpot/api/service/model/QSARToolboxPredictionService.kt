@@ -2,11 +2,11 @@ package org.jaqpot.api.service.model
 
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.model.DatasetDto
-import org.jaqpot.api.service.qsartoolbox.QSARToolbox
+import org.jaqpot.api.service.qsartoolbox.QSARToolboxAPI
 import org.springframework.stereotype.Service
 
 @Service
-class QSARToolboxPredictionService(private val qsarToolbox: QSARToolbox) {
+class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
 
     companion object {
         private const val SMILES_KEY = "smiles"
@@ -18,9 +18,11 @@ class QSARToolboxPredictionService(private val qsarToolbox: QSARToolbox) {
             val datasetInput = it as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
             val calculatorGuid = datasetInput[CALCULATOR_GUID_KEY] as String
-            val searchSmiles = qsarToolbox.searchSmiles(smiles)
-            val chemId = searchSmiles!![0].ChemId as String
-            qsarToolbox.calculateQsarProperties(chemId, calculatorGuid)!!
+            val searchSmilesResults = qsarToolboxAPI.searchSmiles(smiles)
+            val chemId =
+                (searchSmilesResults!!.find { it.CasSmilesRelation == "High" } ?: searchSmilesResults.first()) as String
+
+            qsarToolboxAPI.calculateQsarProperties(chemId, calculatorGuid)!!
         }
     }
 

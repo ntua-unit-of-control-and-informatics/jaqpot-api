@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @Component
-class QSARToolbox(private val qsartoolboxConfig: QsartoolboxConfig) {
+class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
