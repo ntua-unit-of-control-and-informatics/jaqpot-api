@@ -2,7 +2,10 @@ package org.jaqpot.api.entity
 
 enum class ModelType {
     SKLEARN,
-    TORCH,
+
+    // torch
+    TORCH_ONNX,
+    TORCHSCRIPT,
 
     // R models
     R_BNLEARN_DISCRETE,
