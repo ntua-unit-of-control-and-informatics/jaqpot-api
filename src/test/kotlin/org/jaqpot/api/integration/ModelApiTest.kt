@@ -108,7 +108,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "test": "hello"
                     },
                     "task": "REGRESSION",
-                    "type": "TORCH_ΟΝΝΧ",
+                    "type": "TORCH_ONNX",
                     "visibility": "PRIVATE",
                     "reliability": 5,
                     "pretrained": false,
