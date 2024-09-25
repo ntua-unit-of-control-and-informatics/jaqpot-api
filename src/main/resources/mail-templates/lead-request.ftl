@@ -5,7 +5,7 @@
     <br><br>
     This email is just to confirm that we have received your request. Our team will review it and get back to you shortly with the next steps.
     <br><br>
-    If you have any questions in the meantime, feel free to reach out.\n
+    If you have any questions in the meantime, feel free to reach out.
     <br><br>
     Looking forward to having you on board!
 </@base.layout>
