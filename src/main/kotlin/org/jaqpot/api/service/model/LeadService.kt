@@ -10,6 +10,9 @@ import org.jaqpot.api.model.LeadDto
 import org.jaqpot.api.repository.LeadRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
+import org.jaqpot.api.service.email.EmailModelHelper
+import org.jaqpot.api.service.email.EmailService
+import org.jaqpot.api.service.email.freemarker.FreemarkerTemplate
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -21,6 +24,7 @@ import java.net.URI
 class LeadService(
     private val leadRepository: LeadRepository,
     val userService: UserService,
+    val emailService: EmailService,
     val authenticationFacade: AuthenticationFacade
 ) : LeadApiDelegate {
     @PreAuthorize("hasAuthority('admin')")
@@ -49,6 +53,17 @@ class LeadService(
 
         val lead = Lead(null, user.email!!, user.username, LeadStatus.PENDING)
         val savedLead = leadRepository.save(lead)
+
+        val model = EmailModelHelper.generateLeadRequestEmailModel(
+            recipientName = user.username.orEmpty()
+        )
+
+        emailService.sendHTMLEmail(
+            user.email!!,
+            "Early access request received",
+            FreemarkerTemplate.LEAD_REQUEST,
+            model
+        )
 
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")

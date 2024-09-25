@@ -183,7 +183,7 @@ class OrganizationInvitationService(
         emailService.sendHTMLEmail(
             organizationInvitation.userEmail,
             ORGANIZATION_INVITATION_EMAIL_SUBJECT,
-            FreemarkerTemplate.DEFAULT,
+            FreemarkerTemplate.ORGANIZATION_INVITATION,
             model
         )
 
