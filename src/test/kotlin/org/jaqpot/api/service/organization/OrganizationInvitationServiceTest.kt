@@ -423,6 +423,7 @@ class OrganizationInvitationServiceTest {
         val invitation = mockk<OrganizationInvitation>(relaxed = true)
         val user = mockk<UserDto>()
         every { user.username } returns "userName"
+        every { user.firstName } returns "firstName"
 
         every { emailService.sendHTMLEmail(any(), any(), any(), any()) } just Runs
 
