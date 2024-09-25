@@ -22,7 +22,6 @@ class EmailModelHelper {
             return mapOf(
                 "title" to "Early access request received",
                 "recipientName" to recipientName,
-                "actionText" to "Join the Organization"
             )
         }
     }
