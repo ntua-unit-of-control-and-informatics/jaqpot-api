@@ -6,7 +6,8 @@ import org.jaqpot.api.model.ModelTypeDto
 fun ModelTypeDto.toEntity(): ModelType {
     return when (this) {
         ModelTypeDto.SKLEARN -> ModelType.SKLEARN
-        ModelTypeDto.TORCH -> ModelType.TORCH
+        ModelTypeDto.TORCH_ONNX -> ModelType.TORCH_ONNX
+        ModelTypeDto.TORCHSCRIPT -> ModelType.TORCHSCRIPT
         ModelTypeDto.R_BNLEARN_DISCRETE -> ModelType.R_BNLEARN_DISCRETE
         ModelTypeDto.R_CARET -> ModelType.R_CARET
         ModelTypeDto.R_GBM -> ModelType.R_GBM
@@ -24,7 +25,8 @@ fun ModelTypeDto.toEntity(): ModelType {
 fun ModelType.toDto(): ModelTypeDto {
     return when (this) {
         ModelType.SKLEARN -> ModelTypeDto.SKLEARN
-        ModelType.TORCH -> ModelTypeDto.TORCH
+        ModelType.TORCH_ONNX -> ModelTypeDto.TORCH_ONNX
+        ModelType.TORCHSCRIPT -> ModelTypeDto.TORCHSCRIPT
         ModelType.R_BNLEARN_DISCRETE -> ModelTypeDto.R_BNLEARN_DISCRETE
         ModelType.R_CARET -> ModelTypeDto.R_CARET
         ModelType.R_GBM -> ModelTypeDto.R_GBM
