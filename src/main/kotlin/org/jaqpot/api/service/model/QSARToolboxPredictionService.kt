@@ -19,8 +19,10 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
             val smiles = datasetInput[SMILES_KEY] as String
             val calculatorGuid = datasetInput[CALCULATOR_GUID_KEY] as String
             val searchSmilesResults = qsarToolboxAPI.searchSmiles(smiles)
-            val chemId =
-                (searchSmilesResults!!.find { it.CasSmilesRelation == "High" } ?: searchSmilesResults.first()) as String
+            val smilesResult =
+                searchSmilesResults!!.find { smilesResponse -> smilesResponse.CasSmilesRelation == "High" }
+                    ?: searchSmilesResults.first()
+            val chemId = smilesResult.ChemId as String
 
             qsarToolboxAPI.calculateQsarProperties(chemId, calculatorGuid)!!
         }
