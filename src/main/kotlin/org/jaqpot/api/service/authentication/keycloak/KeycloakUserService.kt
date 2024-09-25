@@ -27,10 +27,12 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
             val user = keycloakAdminClient.realm(keycloakConfig.realm).users().get(id).toRepresentation()
             return Optional.of(
                 UserDto(
-                    user.id,
-                    user.username,
-                    user.email,
-                    user.isEmailVerified
+                    id = user.id,
+                    username = user.username,
+                    firstName = user.firstName,
+                    lastName = user.lastName,
+                    email = user.email,
+                    emailVerified = user.isEmailVerified
                 )
             )
         } catch (e: Exception) {
@@ -42,12 +44,20 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
     fun getUserByUsername(username: String): Optional<UserDto> {
         try {
             val user = keycloakAdminClient.realm(keycloakConfig.realm).users().searchByUsername(username, true).first()
-            return Optional.of(UserDto(user.id, user.username, user.email, user.isEmailVerified))
+            return Optional.of(
+                UserDto(
+                    id = user.id,
+                    username = user.username,
+                    firstName = user.firstName,
+                    lastName = user.lastName,
+                    email = user.email,
+                    emailVerified = user.isEmailVerified
+                )
+            )
         } catch (e: Exception) {
             logger.error(e) { "Could not retrieve user by username: $username" }
             return Optional.empty()
         }
-
     }
 
     fun getUserByEmail(email: String): Optional<UserDto> {
@@ -59,10 +69,12 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
                 val user = users.first()
                 return Optional.of(
                     UserDto(
-                        user.id,
-                        user.username,
-                        user.email,
-                        user.isEmailVerified
+                        id = user.id,
+                        username = user.username,
+                        firstName = user.firstName,
+                        lastName = user.lastName,
+                        email = user.email,
+                        emailVerified = user.isEmailVerified
                     )
                 )
             } else {

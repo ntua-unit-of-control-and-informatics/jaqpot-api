@@ -1541,6 +1541,10 @@ components:
           type: string
           x-stoplight:
             id: x0pm25vavfibz
+        firstName:
+          type: string
+        lastName:
+          type: string
         email:
           type: string
         emailVerified:

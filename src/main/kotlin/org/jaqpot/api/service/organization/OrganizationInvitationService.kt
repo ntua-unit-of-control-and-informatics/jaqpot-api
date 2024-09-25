@@ -178,7 +178,7 @@ class OrganizationInvitationService(
         val model = EmailModelHelper.generateOrganizationInvitationEmailModel(
             invitationActionUrl,
             orgName,
-            user.map { it.username.orEmpty() }.orElse("")
+            user.map { it.firstName.orEmpty() }.orElse("")
         )
         emailService.sendHTMLEmail(
             organizationInvitation.userEmail,

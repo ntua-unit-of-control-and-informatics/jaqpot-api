@@ -29,6 +29,8 @@ class KeycloakUserServiceTest {
     fun setup() {
         every { userRepresentation.id } returns "id"
         every { userRepresentation.username } returns "username"
+        every { userRepresentation.firstName } returns "firstName"
+        every { userRepresentation.lastName } returns "lastName"
         every { userRepresentation.email } returns "email@email.com"
         every { userRepresentation.isEmailVerified } returns true
         keycloakClient = mockk()

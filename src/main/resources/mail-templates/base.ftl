@@ -75,10 +75,10 @@
                 <h1>${title}</h1>
             </div>
             <div class="content">
-                <h2>Hello, ${recipientName}</h2>
-                <br><br>
+                <h2>${recipientName?has_content?then("Hello " + recipientName + ",", 'Hello,')}</h2>
+                <br>
                 <#nested>
-                <br><br>
+                <br>
                 <p>Cheers,<br> The Jaqpot Team</p>
             </div>
             <div class="footer">

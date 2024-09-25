@@ -10,6 +10,7 @@ class EmailModelHelper {
             return mapOf(
                 "title" to "Invitation to join a Jaqpot Organization",
                 "recipientName" to recipientName,
+                "orgName" to orgName,
                 "actionUrl" to actionUrl,
                 "actionText" to "Join the Organization"
             )
