@@ -51,7 +51,7 @@ class LeadService(
             throw BadRequestException("Early access request with email ${user.email} already exists.")
         }
 
-        val lead = Lead(null, user.email, "${user.firstName} ${user.lastName}", LeadStatus.PENDING)
+        val lead = Lead(null, user.email!!, "${user.firstName} ${user.lastName}", LeadStatus.PENDING)
         val savedLead = leadRepository.save(lead)
 
         val model = EmailModelHelper.generateLeadRequestEmailModel(
@@ -59,7 +59,7 @@ class LeadService(
         )
 
         emailService.sendHTMLEmail(
-            user.email,
+            user.email!!,
             "Early access request received",
             FreemarkerTemplate.LEAD_REQUEST,
             model
