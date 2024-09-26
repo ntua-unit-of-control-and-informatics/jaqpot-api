@@ -1,17 +1,19 @@
-package org.jaqpot.api.service.authentication
+package org.jaqpot.api.service.authentication.apikey
 
 import jakarta.ws.rs.BadRequestException
+import org.apache.commons.lang3.RandomStringUtils
 import org.jaqpot.api.ApiKeysApiDelegate
 import org.jaqpot.api.entity.ApiKey
 import org.jaqpot.api.model.ApiKeyDto
 import org.jaqpot.api.model.CreateApiKey201ResponseDto
 import org.jaqpot.api.repository.ApiKeyRepository
+import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import java.security.SecureRandom
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 
@@ -26,18 +28,27 @@ class ApiKeyService(
     }
 
     fun generateApiKey(): String {
-        val randomBytes = ByteArray(32)
-        SecureRandom().nextBytes(randomBytes)
-        val randomAlphanumeric = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes)
+        val randomAlphanumeric = RandomStringUtils.randomAlphanumeric(32)
         return "jq_$randomAlphanumeric"
     }
 
     fun validateApiKey(apiKey: String?): Optional<ApiKey> {
-        return apiKeyRepository.findAllByExpiresAtIsAfter(OffsetDateTime.now())
+        val todayStart = getStartOfToday()
+        return apiKeyRepository.findAllByExpiresAtIsAfter(todayStart)
             .find { key -> bCryptPasswordEncoder.matches(apiKey, key.key) }
             .let { Optional.ofNullable(it) }
     }
 
+    /**
+     * Using this to properly cache the start of today for the rate limiting.
+     */
+    private fun getStartOfToday(): OffsetDateTime {
+        return OffsetDateTime.now(ZoneOffset.UTC)
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0)
+    }
 
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60 * 10)
     override fun createApiKey(apiKeyDto: ApiKeyDto): ResponseEntity<CreateApiKey201ResponseDto> {

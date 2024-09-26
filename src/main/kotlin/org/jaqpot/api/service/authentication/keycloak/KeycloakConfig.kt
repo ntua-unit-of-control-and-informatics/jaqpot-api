@@ -9,9 +9,11 @@ import org.springframework.context.annotation.Bean
 @ConfigurationProperties(prefix = "keycloak")
 data class KeycloakConfig(
     val serverUrl: String,
-    var realm: String,
-    var clientId: String,
-    var clientSecret: String
+    val realm: String,
+    val clientId: String,
+    val clientSecret: String,
+    val impersonationClientId: String,
+    val impersonationClientSecret: String
 ) {
 
 

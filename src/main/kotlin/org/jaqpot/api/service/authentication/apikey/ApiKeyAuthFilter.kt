@@ -1,9 +1,8 @@
-package org.jaqpot.api.service.authentication.programmatic
+package org.jaqpot.api.service.authentication.apikey
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.jaqpot.api.service.authentication.ApiKeyService
 import org.jaqpot.api.service.authentication.keycloak.KeycloakJwtConverter
 import org.jaqpot.api.service.authentication.keycloak.KeycloakTokenExchanger
 import org.springframework.security.core.context.SecurityContextHolder
