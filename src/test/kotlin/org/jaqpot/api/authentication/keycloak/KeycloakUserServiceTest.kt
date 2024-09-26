@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.representations.idm.UserRepresentation
-import org.springframework.test.util.ReflectionTestUtils
 
 class KeycloakUserServiceTest {
 
@@ -18,6 +17,8 @@ class KeycloakUserServiceTest {
         "realm",
         "clientId",
         "clientSecret",
+        "impersonationClientId",
+        "impersonationClientSecret",
     )
 
     private val userRepresentation: UserRepresentation = mockk()
@@ -34,8 +35,7 @@ class KeycloakUserServiceTest {
         every { userRepresentation.email } returns "email@email.com"
         every { userRepresentation.isEmailVerified } returns true
         keycloakClient = mockk()
-        keycloakUserService = KeycloakUserService(keycloakConfig)
-        ReflectionTestUtils.setField(keycloakUserService, "keycloakAdminClient", keycloakClient)
+        keycloakUserService = KeycloakUserService(keycloakConfig, keycloakClient)
     }
 
     @Test
