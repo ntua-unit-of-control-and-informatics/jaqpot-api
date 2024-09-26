@@ -44,6 +44,14 @@ class CacheConfiguration {
                 .build()
         )
 
+        manager.registerCustomCache(
+            CacheKeys.ALL_API_KEYS,
+            Caffeine.newBuilder()
+                .maximumSize(100_000)
+                .expireAfterAccess(1, TimeUnit.HOURS)
+                .build()
+        )
+
         return manager
     }
 

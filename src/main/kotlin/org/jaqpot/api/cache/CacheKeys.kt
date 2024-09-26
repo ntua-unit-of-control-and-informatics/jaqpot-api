@@ -5,6 +5,7 @@ class CacheKeys {
         const val ALL_PUBLIC_ORGANIZATIONS = "allPublicOrganizations"
         const val USER_ORGANIZATIONS = "userOrganizations"
         const val SEARCH_MODELS = "searchModels"
+        const val ALL_API_KEYS = "allApiKeys"
     }
 }
 
