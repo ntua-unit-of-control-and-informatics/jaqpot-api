@@ -34,13 +34,11 @@ class ApiKeyAuthFilter(
         if (apiKeyOptional.isPresent) {
             val apiKey = apiKeyOptional.get()
             val key = apiKeyService.validateApiKey(apiKey)
-            if (key.isPresent) {
-                val token: String = keycloakTokenExchanger.exchangeToken(key.get().userId)
-                val jwt: Jwt = jwtDecoder.decode(token)
-                val authentication = keycloakJwtConverter.convert(jwt)
+            val token: String = keycloakTokenExchanger.exchangeToken(key.userId)
+            val jwt: Jwt = jwtDecoder.decode(token)
+            val authentication = keycloakJwtConverter.convert(jwt)
 
-                SecurityContextHolder.getContext().authentication = authentication
-            }
+            SecurityContextHolder.getContext().authentication = authentication
         }
 
         filterChain.doFilter(request, response)

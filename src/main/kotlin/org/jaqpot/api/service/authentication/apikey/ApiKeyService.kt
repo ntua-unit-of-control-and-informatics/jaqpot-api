@@ -14,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.util.*
 
 
 @Service
@@ -32,11 +31,11 @@ class ApiKeyService(
         return "jq_$randomAlphanumeric"
     }
 
-    fun validateApiKey(apiKey: String?): Optional<ApiKey> {
+    fun validateApiKey(apiKey: String?): ApiKey {
         val todayStart = getStartOfToday()
         return apiKeyRepository.findAllByExpiresAtIsAfter(todayStart)
             .find { key -> bCryptPasswordEncoder.matches(apiKey, key.key) }
-            .let { Optional.ofNullable(it) }
+            ?: throw BadRequestException("Invalid API key")
     }
 
     /**
