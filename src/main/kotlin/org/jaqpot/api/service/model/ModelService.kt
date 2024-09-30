@@ -37,6 +37,7 @@ import java.net.URI
 
 private val logger = KotlinLogging.logger {}
 const val MAX_CSV_ROWS = 10
+const val JAQPOT_INTERNAL_ID_KEY = "jaqpotInternalId"
 
 @Service
 class ModelService(
@@ -177,13 +178,18 @@ class ModelService(
             storeActualModelToStorage(model)
 
             val userId = authenticationFacade.userId
-            val dataset = this.datasetRepository.save(
-                datasetDto.toEntity(
-                    model,
-                    userId,
-                    DatasetEntryType.ARRAY
-                )
+            val toEntity = datasetDto.toEntity(
+                model,
+                userId,
+                DatasetEntryType.ARRAY
             )
+
+            toEntity.input.forEachIndexed() { index, it: Any ->
+                if (it is Map<*, *>)
+                    (it as MutableMap<String, String>)[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+            }
+
+            val dataset = this.datasetRepository.save(toEntity)
 
             return triggerPredictionAndReturnSuccessStatus(model, dataset)
         }
