@@ -1186,7 +1186,7 @@ components:
         config:
           type: object
           additionalProperties:
-            type: object
+            '$ref': '#/components/schemas/AnyValue'
     ModelVisibility:
       type: string
       enum:
