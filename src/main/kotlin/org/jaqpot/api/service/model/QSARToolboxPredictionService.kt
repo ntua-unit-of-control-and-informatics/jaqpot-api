@@ -15,7 +15,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
     }
 
     fun makePredictionRequest(modelDto: PredictionModelDto, datasetDto: DatasetDto): List<Any> {
-        return datasetDto.input.flatMap {
+        return datasetDto.input.flatMapIndexed { index, it ->
             val datasetInput = it as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
             val calculatorGuid = datasetInput[CALCULATOR_GUID_KEY] as String
@@ -28,19 +28,21 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
             }
 
             results.map { result ->
-                generateQsarResult(result, calculatorGuid)
+                generateQsarResult(result, calculatorGuid, index.toString())
             }
         }
     }
 
     private fun generateQsarResult(
         result: QSARSearchSmilesResponse,
-        calculatorGuid: String
+        calculatorGuid: String,
+        inputId: String
     ): Map<*, *> {
         val qsarProperties =
             qsarToolboxAPI.calculateQsarProperties(result.ChemId as String, calculatorGuid)!!.toMutableMap()
         qsarProperties["Name"] = result.Names.joinToString { it }
         qsarProperties["ChemId"] = result.ChemId
+        qsarProperties[JAQPOT_INTERNAL_ID_KEY] = inputId
         return qsarProperties
     }
 
