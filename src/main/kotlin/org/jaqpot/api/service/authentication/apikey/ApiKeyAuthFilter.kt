@@ -22,6 +22,7 @@ class ApiKeyAuthFilter(
 ) : OncePerRequestFilter() {
     companion object {
         const val API_KEY_HEADER = "X-Api-Key"
+        const val API_SECRET_HEADER = "X-Api-Secret"
     }
 
     override fun doFilterInternal(
@@ -29,12 +30,14 @@ class ApiKeyAuthFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val apiKeyOptional = extractApiKey(request)
+        val apiKeyHeader = extractApiKey(request)
+        val apiKeySecret = extractApiSecret(request)
 
-        if (apiKeyOptional.isPresent) {
-            val apiKey = apiKeyOptional.get()
-            val key = apiKeyService.validateApiKey(apiKey)
-            val token: String = keycloakTokenExchanger.exchangeToken(key.userId)
+        if (apiKeyHeader.isPresent && apiKeySecret.isPresent) {
+            val clientKey = apiKeyHeader.get()
+            val clientSecret = apiKeyHeader.get()
+            val apiKey = apiKeyService.validateApiKey(clientKey, clientSecret)
+            val token: String = keycloakTokenExchanger.exchangeToken(apiKey.userId)
             val jwt: Jwt = jwtDecoder.decode(token)
             val authentication = keycloakJwtConverter.convert(jwt)
 
@@ -46,5 +49,9 @@ class ApiKeyAuthFilter(
 
     private fun extractApiKey(request: HttpServletRequest): Optional<String> {
         return Optional.ofNullable(request.getHeader(API_KEY_HEADER))
+    }
+
+    private fun extractApiSecret(request: HttpServletRequest): Optional<String> {
+        return Optional.ofNullable(request.getHeader(API_SECRET_HEADER))
     }
 }

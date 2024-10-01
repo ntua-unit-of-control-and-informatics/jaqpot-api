@@ -8,9 +8,9 @@ import org.jaqpot.api.model.ApiKeyDto
 import org.jaqpot.api.model.CreateApiKey201ResponseDto
 import org.jaqpot.api.repository.ApiKeyRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
+import org.jaqpot.api.service.authentication.password.PasswordEncoder
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.springframework.http.ResponseEntity
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -19,23 +19,33 @@ import java.time.ZoneOffset
 @Service
 class ApiKeyService(
     private val apiKeyRepository: ApiKeyRepository,
-    private val authenticationFacade: AuthenticationFacade
+    private val authenticationFacade: AuthenticationFacade,
+    private val passwordEncoder: PasswordEncoder
 ) : ApiKeysApiDelegate {
 
-    companion object {
-        val bCryptPasswordEncoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
-    }
 
-    fun generateApiKey(): String {
-        val randomAlphanumeric = RandomStringUtils.randomAlphanumeric(32)
+    fun generateClientKey(): String {
+        val randomAlphanumeric = RandomStringUtils.randomAlphanumeric(24)
         return "jq_$randomAlphanumeric"
     }
 
-    fun validateApiKey(apiKey: String?): ApiKey {
+    fun generateClientSecret(): String {
+        val randomAlphanumeric = RandomStringUtils.randomAlphanumeric(32)
+        return randomAlphanumeric
+    }
+
+    fun validateApiKey(clientKey: String, clientSecret: String): ApiKey {
         val todayStart = getStartOfToday()
-        return apiKeyRepository.findAllByExpiresAtIsAfter(todayStart)
-            .find { key -> bCryptPasswordEncoder.matches(apiKey, key.key) }
-            ?: throw BadRequestException("Invalid API key")
+        return apiKeyRepository.findByClientKey(clientKey)?.let { apiKey ->
+            if (!apiKey.enabled) {
+                throw BadRequestException("API key is disabled")
+            } else if (apiKey.expiresAt.isBefore(todayStart)) {
+                throw BadRequestException("API key has expired")
+            } else if (passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
+                return apiKey
+            }
+            throw BadRequestException("Invalid API key")
+        } ?: throw BadRequestException("Invalid API key")
     }
 
     /**
@@ -51,22 +61,33 @@ class ApiKeyService(
 
     @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60 * 10)
     override fun createApiKey(apiKeyDto: ApiKeyDto): ResponseEntity<CreateApiKey201ResponseDto> {
-        val apiKey = generateApiKey()
-        val hashedKey: String = bCryptPasswordEncoder.encode(apiKey)
-        if (apiKeyDto.expiresAt != null) {
-            if (apiKeyDto.expiresAt!!.isBefore(OffsetDateTime.now())) {
-                throw BadRequestException("The expiration date must be in the future.")
-            } else if (apiKeyDto.expiresAt!!.isAfter(OffsetDateTime.now())) {
-                throw BadRequestException("The expiration date must be within 1 year from now.")
+        val clientKey = generateClientKey()
+        val clientSecret = generateClientSecret()
+        val expiresAt = when (apiKeyDto.expirationTime) {
+            ApiKeyDto.ExpirationTime.THREE_MONTHS -> {
+                OffsetDateTime.now().plusMonths(3)
+            }
+
+            ApiKeyDto.ExpirationTime.SIX_MONTHS -> {
+                OffsetDateTime.now().plusMonths(6)
+            }
+
+            else -> {
+                throw BadRequestException("Invalid expiration time")
             }
         }
-        val expiresAt = apiKeyDto.expiresAt ?: OffsetDateTime.now().plusMonths(3)
+        val apiKey =
+            ApiKey(
+                clientKey = clientKey,
+                clientSecret = passwordEncoder.encode(clientSecret),
+                userId = authenticationFacade.userId,
+                expiresAt = expiresAt,
+                enabled = true
+            )
 
-        val newApiKey = ApiKey(key = hashedKey, authenticationFacade.userId, expiresAt = expiresAt)
+        apiKeyRepository.save(apiKey)
 
-        apiKeyRepository.save(newApiKey)
-
-        // Return the clear text API key to the user. This is the only time it will be available in clear text.
-        return ResponseEntity.ok().body(CreateApiKey201ResponseDto(key = apiKey))
+        // Return the clear text client secret to the user. This is the only time it will be available in clear text.
+        return ResponseEntity.ok().body(CreateApiKey201ResponseDto(clientKey = clientKey, clientSecret = clientSecret))
     }
 }
