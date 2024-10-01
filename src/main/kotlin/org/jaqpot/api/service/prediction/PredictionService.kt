@@ -6,10 +6,10 @@ import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.model.DatasetDto
-import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
+import org.jaqpot.api.service.model.isQsarModel
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -74,10 +74,11 @@ class PredictionService(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): List<Any> {
-        if (predictionModelDto.type == ModelTypeDto.QSAR_TOOLBOX) {
+        if (predictionModelDto.type.isQsarModel()) {
             return qsarToolboxPredictionService.makePredictionRequest(
                 predictionModelDto,
-                datasetDto
+                datasetDto,
+                predictionModelDto.type
             )
         }
 

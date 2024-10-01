@@ -1184,7 +1184,9 @@ components:
         - R_SVM
         - R_TREE_CLASS
         - R_TREE_REGR
-        - QSAR_TOOLBOX
+        - QSAR_TOOLBOX_CALCULATOR
+        - QSAR_TOOLBOX_QSAR_MODEL
+        - QSAR_TOOLBOX_PROFILER
     ModelExtraConfig:
       type: object
       description: A JSON object containing extra configuration for the model
@@ -1218,7 +1220,7 @@ components:
         config:
           type: object
           additionalProperties:
-            type: object
+            '$ref': '#/components/schemas/AnyValue'
     ModelVisibility:
       type: string
       enum:

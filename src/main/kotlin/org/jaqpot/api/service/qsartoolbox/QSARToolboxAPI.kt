@@ -26,7 +26,32 @@ class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
         return response.body
     }
 
-    fun calculateQsarProperties(
+    fun runQsarModel(
+        chemId: String,
+        qsarGuid: String
+    ): Map<*, *>? {
+        val url = "${qsartoolboxConfig.url}/api/v6/qsar/apply/${qsarGuid}/${chemId}"
+
+        val restTemplate = RestTemplate()
+        val response = restTemplate.getForEntity(url, Map::class.java)
+
+        return response.body
+    }
+
+    fun runProfiler(
+        chemId: String,
+        profilerGuid: String
+    ): Map<*, *>? {
+        val url = "${qsartoolboxConfig.url}/api/v6/profiling/${profilerGuid}/${chemId}/"
+
+        val restTemplate = RestTemplate()
+        val response = restTemplate.getForEntity(url, Map::class.java)
+
+        return response.body
+    }
+
+
+    fun runCalculator(
         chemId: String,
         calculatorId: String
     ): Map<*, *>? {
