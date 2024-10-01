@@ -1,14 +1,13 @@
 package org.jaqpot.api.service.authentication.password
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
-class BCryptPasswordEncoder : PasswordEncoder {
+class JaqpotPasswordEncoder : PasswordEncoder {
 
     companion object {
-        private val passwordEncoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
-        private val logger = KotlinLogging.logger {}
+        private val passwordEncoder = BCryptPasswordEncoder()
     }
 
     override fun encode(password: String): String {

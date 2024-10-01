@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.jaqpot.api.service.authentication.keycloak.KeycloakJwtConverter
 import org.jaqpot.api.service.authentication.keycloak.KeycloakTokenExchanger
+import org.jaqpot.api.service.util.IPUtil
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtDecoder
@@ -35,8 +36,9 @@ class ApiKeyAuthFilter(
 
         if (apiKeyHeader.isPresent && apiKeySecret.isPresent) {
             val clientKey = apiKeyHeader.get()
-            val clientSecret = apiKeyHeader.get()
-            val apiKey = apiKeyService.validateApiKey(clientKey, clientSecret)
+            val clientSecret = apiKeySecret.get()
+            val ip = IPUtil.getIPFromHeader(request)
+            val apiKey = apiKeyService.validateApiKey(clientKey, clientSecret, ip)
             val token: String = keycloakTokenExchanger.exchangeToken(apiKey.userId)
             val jwt: Jwt = jwtDecoder.decode(token)
             val authentication = keycloakJwtConverter.convert(jwt)

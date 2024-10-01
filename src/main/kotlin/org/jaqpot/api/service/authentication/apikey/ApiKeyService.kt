@@ -30,11 +30,11 @@ class ApiKeyService(
     }
 
     fun generateClientSecret(): String {
-        val randomAlphanumeric = RandomStringUtils.randomAlphanumeric(32)
+        val randomAlphanumeric = RandomStringUtils.randomAlphanumeric(50)
         return randomAlphanumeric
     }
 
-    fun validateApiKey(clientKey: String, clientSecret: String): ApiKey {
+    fun validateApiKey(clientKey: String, clientSecret: String, ip: String): ApiKey {
         val todayStart = getStartOfToday()
         return apiKeyRepository.findByClientKey(clientKey)?.let { apiKey ->
             if (!apiKey.enabled) {
@@ -42,6 +42,7 @@ class ApiKeyService(
             } else if (apiKey.expiresAt.isBefore(todayStart)) {
                 throw BadRequestException("API key has expired")
             } else if (passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
+                apiKeyRepository.updateLastUsed(apiKey.id, OffsetDateTime.now(), ip)
                 return apiKey
             }
             throw BadRequestException("Invalid API key")
@@ -81,6 +82,7 @@ class ApiKeyService(
                 clientKey = clientKey,
                 clientSecret = passwordEncoder.encode(clientSecret),
                 userId = authenticationFacade.userId,
+                note = apiKeyDto.note,
                 expiresAt = expiresAt,
                 enabled = true
             )
