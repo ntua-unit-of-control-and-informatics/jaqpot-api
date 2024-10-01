@@ -18,10 +18,10 @@ class ApiKey(
     val clientSecret: String,
     @Column(nullable = false)
     val userId: String,
-    val note: String? = null,
+    var note: String? = null,
     @Column(nullable = false)
     val expiresAt: OffsetDateTime,
-    val enabled: Boolean,
+    var enabled: Boolean,
     val lastUsed: OffsetDateTime? = null,
     val lastUsedIp: String? = null
 ) : BaseEntity()

@@ -9,11 +9,13 @@ import org.springframework.data.repository.query.Param
 import java.time.OffsetDateTime
 import java.util.*
 
-interface ApiKeyRepository : CrudRepository<ApiKey, String> {
+interface ApiKeyRepository : CrudRepository<ApiKey, UUID> {
+    fun findAllByUserId(userId: String): List<ApiKey>
     fun findByClientKey(clientKey: String): ApiKey?
 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE ApiKey ak SET ak.lastUsed = :date, ak.lastUsedIp = :ip WHERE ak.id = :id")
     fun updateLastUsed(@Param("id") id: UUID?, @Param("date") date: OffsetDateTime, @Param("ip") ip: String)
+
 }
