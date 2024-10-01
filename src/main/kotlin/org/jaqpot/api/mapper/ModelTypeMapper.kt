@@ -18,7 +18,9 @@ fun ModelTypeDto.toEntity(): ModelType {
         ModelTypeDto.R_SVM -> ModelType.R_SVM
         ModelTypeDto.R_TREE_CLASS -> ModelType.R_TREE_CLASS
         ModelTypeDto.R_TREE_REGR -> ModelType.R_TREE_REGR
-        ModelTypeDto.QSAR_TOOLBOX -> ModelType.QSAR_TOOLBOX
+        ModelTypeDto.QSAR_TOOLBOX_CALCULATOR -> ModelType.QSAR_TOOLBOX_CALCULATOR
+        ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL -> ModelType.QSAR_TOOLBOX_QSAR_MODEL
+        ModelTypeDto.QSAR_TOOLBOX_PROFILER -> ModelType.QSAR_TOOLBOX_PROFILER
     }
 }
 
@@ -37,6 +39,8 @@ fun ModelType.toDto(): ModelTypeDto {
         ModelType.R_SVM -> ModelTypeDto.R_SVM
         ModelType.R_TREE_CLASS -> ModelTypeDto.R_TREE_CLASS
         ModelType.R_TREE_REGR -> ModelTypeDto.R_TREE_REGR
-        ModelType.QSAR_TOOLBOX -> ModelTypeDto.QSAR_TOOLBOX
+        ModelType.QSAR_TOOLBOX_CALCULATOR -> ModelTypeDto.QSAR_TOOLBOX_CALCULATOR
+        ModelType.QSAR_TOOLBOX_QSAR_MODEL -> ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL
+        ModelType.QSAR_TOOLBOX_PROFILER -> ModelTypeDto.QSAR_TOOLBOX_PROFILER
     }
 }
