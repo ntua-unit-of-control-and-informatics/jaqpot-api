@@ -44,15 +44,6 @@ class CacheConfiguration {
                 .build()
         )
 
-        manager.registerCustomCache(
-            CacheKeys.ALL_API_KEYS,
-            Caffeine.newBuilder()
-                // TODO if we ever have more than 100_000 keys, we should consider a different approach xD
-                .maximumSize(100_000)
-                .expireAfterAccess(1, TimeUnit.HOURS)
-                .build()
-        )
-
         return manager
     }
 
