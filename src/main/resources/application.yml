@@ -69,6 +69,8 @@ keycloak:
   client-secret: 62r8Qm79gjwtA6wFMYt41InUK718nwzJ
   realm: jaqpot-local
   server-url: http://localhost.jaqpot.org:8070
+  impersonation-client-id: impersonator
+  impersonation-client-secret: NrKN1ayoM4Obaz1m3tKNizWFKWGw6gZZ
 
 jaqpot:
   frontend:

@@ -1,4 +1,4 @@
-package org.jaqpot.api.service.model
+package org.jaqpot.api.service.lead
 
 import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.LeadApiDelegate
@@ -28,9 +28,9 @@ class LeadService(
     val authenticationFacade: AuthenticationFacade
 ) : LeadApiDelegate {
     @PreAuthorize("hasAuthority('admin')")
-    override fun getLeadById(leadId: Long): ResponseEntity<LeadDto> {
+    override fun getLeadById(id: Long): ResponseEntity<LeadDto> {
         val leadDto =
-            leadRepository.findById(leadId).orElseThrow { JaqpotNotFoundException("No lead with id $leadId found") }
+            leadRepository.findById(id).orElseThrow { JaqpotNotFoundException("No lead with id $id found") }
                 .toDto()
         return ResponseEntity.ok().body(leadDto)
     }
@@ -72,7 +72,7 @@ class LeadService(
     }
 
     @PreAuthorize("hasAuthority('admin')")
-    override fun deleteLeadById(leadId: Long): ResponseEntity<Unit> {
+    override fun deleteLeadById(id: Long): ResponseEntity<Unit> {
         throw NotImplementedError("Not implemented")
     }
 

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
  * Adds keycloak assigned roles to the principal authorities
  */
 @Component
-class KeycloakJwtConverter() : Converter<Jwt, AbstractAuthenticationToken> {
+class KeycloakJwtConverter : Converter<Jwt, AbstractAuthenticationToken> {
 
     companion object {
         const val REALM_ACCESS_KEY = "realm_access"

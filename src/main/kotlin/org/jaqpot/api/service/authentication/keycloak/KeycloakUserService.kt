@@ -2,25 +2,16 @@ package org.jaqpot.api.service.authentication.keycloak
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.model.UserDto
-import org.keycloak.OAuth2Constants
-import org.keycloak.admin.client.KeycloakBuilder
+import org.keycloak.admin.client.Keycloak
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class KeycloakUserService(private val keycloakConfig: KeycloakConfig) {
+class KeycloakUserService(private val keycloakConfig: KeycloakConfig, private val keycloakAdminClient: Keycloak) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
     }
-
-    private val keycloakAdminClient = KeycloakBuilder.builder()
-        .serverUrl(keycloakConfig.serverUrl)
-        .realm(keycloakConfig.realm)
-        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-        .clientId(keycloakConfig.clientId)
-        .clientSecret(keycloakConfig.clientSecret)
-        .build()
 
     fun getUserById(id: String): Optional<UserDto> {
         try {

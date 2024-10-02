@@ -794,7 +794,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /v1/organizations/{name}/invitations/{uuid}:
     get:
       tags:
@@ -898,7 +897,6 @@ paths:
           description: Lead created successfully
         '400':
           description: Invalid request data
-
   '/v1/leads/{id}':
     get:
       summary: Get a Lead by ID
@@ -980,6 +978,159 @@ paths:
           description: Lead deleted successfully
         '404':
           description: Lead not found
+  /v1/user/api-keys:
+    post:
+      summary: Create an API Key for the User
+      description: Generate and return an API key for programmatic access. This API key is associated with the user and can be used for authenticating future requests.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - api-keys
+      operationId: createApiKey
+      requestBody:
+        description: Payload to create a new API key
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKey'
+      responses:
+        '201':
+          description: API Key created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientKey:
+                    type: string
+                    description: The generated API key
+                    example: "jq_abcd1234efgh5678ijkl"
+                  clientSecret:
+                    type: string
+                    description: The generated API secret
+        '400':
+          description: Invalid input, such as a missing user ID
+        '401':
+          description: Unauthorized request, the user must be authenticated
+        '404':
+          description: User not found
+    get:
+      summary: Get All API Keys for the User
+      description: Retrieve all API keys associated with the authenticated user.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - api-keys
+      operationId: getAllApiKeysForUser
+      responses:
+        '200':
+          description: Successful Response with the user's API keys
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    clientKey:
+                      type: string
+                      description: The API key
+                    note:
+                      type: string
+                      description: Description of the API key
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: Creation timestamp of the API key
+                    expiresAt:
+                      type: string
+                      format: date-time
+                      description: Expiration timestamp of the API key (optional)
+                    enabled:
+                      type: boolean
+                      description: Whether the API key is active or disabled
+        '401':
+          description: Unauthorized request, the user must be authenticated
+
+  /v1/user/api-keys/{key}:
+    delete:
+      summary: Delete an API Key
+      description: Delete a specific API key associated with the authenticated user. Only the user or an admin can delete keys.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - api-keys
+      operationId: deleteApiKey
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: The API key to delete
+          schema:
+            type: string
+            example: "jq_abcd1234efgh5678ijkl"
+      responses:
+        '204':
+          description: API key deleted successfully
+        '401':
+          description: Unauthorized request, the user must be authenticated
+        '404':
+          description: API key not found
+
+    patch:
+      summary: Update API Key
+      description: Update an API key's metadata, such as its note or status (enable/disable).
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - api-keys
+      operationId: updateApiKey
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: The API key to update
+          schema:
+            type: string
+            example: "jq_abcd1234efgh5678ijkl"
+      requestBody:
+        description: Payload to update API key metadata
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  description: Updated description for the API key
+                enabled:
+                  type: boolean
+                  description: Set to `false` to disable the API key
+      responses:
+        '200':
+          description: API key updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: The updated API key
+                  note:
+                    type: string
+                    description: The updated description of the API key
+                  enabled:
+                    type: boolean
+                    description: Whether the API key is active or disabled
+        '400':
+          description: Invalid request, such as malformed input
+        '401':
+          description: Unauthorized request, the user must be authenticated
+        '404':
+          description: API key not found
 
 
 components:
@@ -1552,6 +1703,47 @@ components:
           type: string
         emailVerified:
           type: boolean
+    ApiKey:
+      type: object
+      required:
+        - expirationTime
+      properties:
+        clientKey:
+          type: string
+          description: The generated API key
+          example: "jq_abcd1234efgh5678ijkl"
+        note:
+          type: string
+          description: A note for the API key
+        userId:
+          type: string
+          description: The ID of the user associated with the API key
+          example: "12345"
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The expiration time of the API key (if any)
+          example: "2024-12-31T23:59:59Z"
+        expirationTime:
+          type: string
+          enum:
+            - 'THREE_MONTHS'
+            - 'SIX_MONTHS'
+        lastUsed:
+          type: string
+          format: date-time
+          nullable: true
+          description: The last time the API key was used
+          example: "2024-09-23T12:00:00Z"
+        lastUsedIp:
+          type: string
+          nullable: true
+          description: The IP address from which the API key was last used
+          example: "192.168.1.1"
+        enabled:
+          type: boolean
+          description: Whether the API key is active or disabled
     ErrorResponse:
       type: "object"
       properties:
