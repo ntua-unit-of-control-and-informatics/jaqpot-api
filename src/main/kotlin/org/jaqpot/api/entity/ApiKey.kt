@@ -4,9 +4,6 @@ import jakarta.persistence.*
 import java.time.OffsetDateTime
 import java.util.*
 
-// TODO add id for deletion by user and remove @id from key
-// allow user to revoke (delete) token
-
 @Entity
 class ApiKey(
     @Id
