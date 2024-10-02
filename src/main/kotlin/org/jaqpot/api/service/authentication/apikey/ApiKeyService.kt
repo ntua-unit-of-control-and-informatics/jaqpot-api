@@ -50,10 +50,6 @@ class ApiKeyService(
             ApiKeyDto.ExpirationTime.SIX_MONTHS -> {
                 OffsetDateTime.now().plusMonths(6)
             }
-
-            else -> {
-                throw BadRequestException("Invalid expiration time")
-            }
         }
         val apiKey =
             ApiKey(
@@ -72,7 +68,7 @@ class ApiKeyService(
     }
 
     @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
-    @PreAuthorize("@getApiKeyAuthorizationLogic.decide(#root, key)")
+    @PreAuthorize("@getApiKeyAuthorizationLogic.decide(#root, #key)")
     override fun updateApiKey(
         key: String,
         updateApiKeyRequestDto: UpdateApiKeyRequestDto
@@ -90,7 +86,7 @@ class ApiKeyService(
     }
 
     @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
-    @PreAuthorize("@getApiKeyAuthorizationLogic.decide(#root, key)")
+    @PreAuthorize("@getApiKeyAuthorizationLogic.decide(#root, #key)")
     override fun deleteApiKey(key: String): ResponseEntity<Unit> {
         val existingApiKey = apiKeyRepository.findByClientKey(key) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND,

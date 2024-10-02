@@ -12,12 +12,12 @@ class GetApiKeyAuthorizationLogic(
     private val authenticationFacade: AuthenticationFacade,
     private val apiKeyRepository: ApiKeyRepository
 ) {
-    fun decide(operations: MethodSecurityExpressionOperations, apiClientKey: String): Boolean {
+    fun decide(operations: MethodSecurityExpressionOperations, key: String): Boolean {
         if (authenticationFacade.isAdmin) {
             return true
         }
 
-        val apiKey = apiKeyRepository.findByClientKey(apiClientKey) ?: throw ResponseStatusException(
+        val apiKey = apiKeyRepository.findByClientKey(key) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "Api key not found"
         )
 
