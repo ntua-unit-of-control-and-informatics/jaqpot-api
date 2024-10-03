@@ -3,6 +3,8 @@ package org.jaqpot.api.service.qsartoolbox
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.service.qsartoolbox.config.QsartoolboxConfig
 import org.jaqpot.api.service.qsartoolbox.dto.QSARSearchSmilesResponse
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
@@ -41,11 +43,17 @@ class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
     fun runProfiler(
         chemId: String,
         profilerGuid: String
-    ): Map<*, *>? {
-        val url = "${qsartoolboxConfig.url}/api/v6/profiling/${profilerGuid}/${chemId}/"
+    ): List<String>? {
+        val url = "${qsartoolboxConfig.url}/api/v6/profiling/${profilerGuid}/${chemId}"
 
         val restTemplate = RestTemplate()
-        val response = restTemplate.getForEntity(url, Map::class.java)
+        val response =
+            restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                object : ParameterizedTypeReference<List<String>>() {}
+            )
 
         return response.body
     }

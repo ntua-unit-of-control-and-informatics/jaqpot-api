@@ -103,13 +103,17 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                 results = listOf(searchSmilesResults.first())
             }
 
-            results.map { result ->
-                val qsarProperties =
-                    qsarToolboxAPI.runProfiler(result.ChemId as String, profilerGuid)!!.toMutableMap()
-                qsarProperties["Name"] = result.Names.joinToString { it }
-                qsarProperties["ChemId"] = result.ChemId
-                qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
-                qsarProperties
+            results.flatMap { result ->
+                qsarToolboxAPI.runProfiler(result.ChemId as String, profilerGuid)!!
+                    .map { it ->
+                        val qsarProperties = mutableMapOf<String, Any>()
+                        qsarProperties["Value"] = it
+                        qsarProperties["Name"] = result.Names.joinToString { it }
+                        qsarProperties["ChemId"] = result.ChemId
+                        qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                        qsarProperties
+                    }
+
             }
         }
     }
