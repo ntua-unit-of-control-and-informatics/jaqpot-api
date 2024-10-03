@@ -3,11 +3,11 @@ package org.jaqpot.api.service.qsartoolbox.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class QSARSearchSmilesResponse(
-    @JsonProperty("SubstanceType") var SubstanceType: String? = null,
-    @JsonProperty("ChemId") var ChemId: String? = null,
-    @JsonProperty("Cas") var Cas: Int? = null,
-    @JsonProperty("ECNumber") var ECNumber: String? = null,
-    @JsonProperty("Smiles") var Smiles: String? = null,
-    @JsonProperty("Names") var Names: ArrayList<String> = arrayListOf(),
-    @JsonProperty("CasSmilesRelation") var CasSmilesRelation: String? = null
+    @JsonProperty("SubstanceType") val SubstanceType: String? = null,
+    @JsonProperty("ChemId") val ChemId: String? = null,
+    @JsonProperty("Cas") val Cas: Int? = null,
+    @JsonProperty("ECNumber") val ECNumber: String? = null,
+    @JsonProperty("Smiles") val Smiles: String? = null,
+    @JsonProperty("Names") val Names: ArrayList<String> = arrayListOf(),
+    @JsonProperty("CasSmilesRelation") val CasSmilesRelation: String? = null
 )
