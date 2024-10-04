@@ -1217,12 +1217,13 @@ components:
         extraConfig:
           $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
-          type: DateTime
+          type: string
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: DateTime
+          type: string
+          format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
     ModelSummary:
@@ -1264,12 +1265,13 @@ components:
           items:
             $ref: '#/components/schemas/OrganizationSummary'
         createdAt:
-          type: DateTime
+          type: string
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: DateTime
+          type: string
+          format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
 
@@ -1370,12 +1372,13 @@ components:
           type: string
           example: 1.24.0
         createdAt:
-          type: DateTime
+          type: string
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: DateTime
+          type: string
+          format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
     Feature:
@@ -1428,12 +1431,13 @@ components:
           items:
             $ref: '#/components/schemas/FeaturePossibleValue'
         createdAt:
-          type: DateTime
+          type: string
           format: date-time
           description: The date and time when the feature was created.
           example: '2023-01-01T12:00:00Z'
         updatedAt:
-          type: DateTime
+          type: string
+          format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
 
@@ -1505,13 +1509,17 @@ components:
         modelName:
           type: string
         executedAt:
-          type: DateTime
+          type: string
+          format: date-time
         executionFinishedAt:
-          type: DateTime
+          type: string
+          format: date-time
         createdAt:
-          type: DateTime
+          type: string
+          format: date-time
         updatedAt:
-          type: DateTime
+          type: string
+          format: date-time
     DatasetCSV:
       type: object
       required:
@@ -1546,13 +1554,17 @@ components:
         modelName:
           type: string
         executedAt:
-          type: DateTime
+          type: string
+          format: date-time
         executionFinishedAt:
-          type: DateTime
+          type: string
+          format: date-time
         createdAt:
-          type: DateTime
+          type: string
+          format: date-time
         updatedAt:
-          type: DateTime
+          type: string
+          format: date-time
 
 
     Organization:
@@ -1603,9 +1615,11 @@ components:
           description: If the current user is a member of the organization
           type: boolean
         created_at:
-          type: DateTime
+          type: string
+          format: date-time
         updated_at:
-          type: DateTime
+          type: string
+          format: date-time
 
     OrganizationUser:
       type: object
@@ -1664,7 +1678,8 @@ components:
             - "ACCEPTED"
           description: "Status of the invitation"
         expirationDate:
-          type: DateTime
+          type: string
+          format: date-time
           description: "Expiration date of the invitation"
     Lead:
       type: object
