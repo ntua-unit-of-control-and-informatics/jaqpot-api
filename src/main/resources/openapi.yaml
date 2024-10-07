@@ -1396,7 +1396,7 @@ components:
           type: object
           description: A JSON object containing meta information.
           additionalProperties:
-            type: object
+            '$ref': '#/components/schemas/AnyValue'
         key:
           type: string
           pattern: "^[a-zA-Z][a-zA-Z0-9_-]*$"
