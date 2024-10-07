@@ -88,22 +88,22 @@ class ModelService(
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
         val savedModel = modelRepository.save(toEntity)
-        storeActualModelToStorage(savedModel)
+        storeRawModelToStorage(savedModel)
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(savedModel.id).toUri()
         return ResponseEntity.created(location).build()
     }
 
-    private fun storeActualModelToStorage(model: Model) {
-        if (model.actualModel == null) {
+    private fun storeRawModelToStorage(model: Model) {
+        if (model.rawModel == null) {
             // model is already stored in storage
             return
         }
-        logger.info { "Storing actual model to storage for model with id ${model.id}" }
+        logger.info { "Storing raw model to storage for model with id ${model.id}" }
         if (storageService.storeRawModel(model)) {
-            logger.info { "Successfully moved actual model to storage for model ${model.id}" }
-            modelRepository.setActualModelToNull(model.id)
+            logger.info { "Successfully moved raw model to storage for model ${model.id}" }
+            modelRepository.setRawModelToNull(model.id)
         }
     }
 
@@ -144,7 +144,7 @@ class ModelService(
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
             val userId = authenticationFacade.userId
-            storeActualModelToStorage(model)
+            storeRawModelToStorage(model)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
 
@@ -175,7 +175,7 @@ class ModelService(
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
-            storeActualModelToStorage(model)
+            storeRawModelToStorage(model)
 
             val userId = authenticationFacade.userId
             val toEntity = datasetDto.toEntity(

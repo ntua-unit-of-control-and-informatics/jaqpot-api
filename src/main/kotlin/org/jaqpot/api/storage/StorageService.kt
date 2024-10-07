@@ -24,7 +24,7 @@ class StorageService(
             this.storage.putObject(
                 awsS3Config.modelsBucketName,
                 model.id.toString(),
-                model.actualModel!!,
+                model.rawModel!!,
                 calculateMetadata(model)
             )
             return true
@@ -37,7 +37,7 @@ class StorageService(
     private fun calculateMetadata(model: Model): Map<String, String> {
         return mapOf(
             "version" to METADATA_VERSION,
-            "encoding" to fileEncodingProcessor.determineEncoding(model.actualModel!!).name
+            "encoding" to fileEncodingProcessor.determineEncoding(model.rawModel!!).name
         )
     }
 
@@ -51,9 +51,9 @@ class StorageService(
 
         if (rawModelFromStorage.isPresent) {
             return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id)
-        } else if (model.actualModel != null) {
+        } else if (model.rawModel != null) {
             logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to actual model from database" }
-            return fileEncodingProcessor.readFile(model.actualModel!!, model.id)
+            return fileEncodingProcessor.readFile(model.rawModel!!, model.id)
         }
 
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")

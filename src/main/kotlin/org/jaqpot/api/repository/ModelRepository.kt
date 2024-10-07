@@ -63,6 +63,6 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
 
     @Modifying
     @Transactional
-    @Query("UPDATE Model m SET m.actualModel = NULL WHERE m.id = :id")
-    fun setActualModelToNull(@Param("id") id: Long?)
+    @Query("UPDATE Model m SET m.rawModel = NULL WHERE m.id = :id")
+    fun setRawModelToNull(@Param("id") id: Long?)
 }

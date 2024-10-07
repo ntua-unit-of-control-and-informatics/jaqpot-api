@@ -69,7 +69,7 @@ class Model(
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column
-    var actualModel: ByteArray?,
+    var rawModel: ByteArray?,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "extra_config", columnDefinition = "jsonb")

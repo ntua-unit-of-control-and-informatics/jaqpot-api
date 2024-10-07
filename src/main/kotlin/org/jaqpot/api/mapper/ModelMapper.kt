@@ -16,7 +16,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         visibility = this.visibility.toDto(),
-        actualModel = byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
+        rawModel = byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         id = this.id,
         description = this.description,
         sharedWithOrganizations = this.sharedWithOrganizations.map { it.organization.toDto(organizationMembers = emptyList()) },
@@ -57,7 +57,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
                 "doa" to (this.extraConfig?.doa ?: arrayOf<Any>()),
             )
         },
-        actualModel = this.actualModel,
+        rawModel = this.rawModel,
     )
 
     m.libraries.addAll(this.libraries.map { it.toEntity(m) })
@@ -67,14 +67,14 @@ fun ModelDto.toEntity(creatorId: String): Model {
     return m
 }
 
-fun Model.toPredictionModelDto(actualModel: ByteArray): PredictionModelDto {
+fun Model.toPredictionModelDto(rawModel: ByteArray): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
         task = this.task.toDto(),
-        rawModel = this.decodeRawModel(actualModel),
+        rawModel = this.decodeRawModel(rawModel),
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
