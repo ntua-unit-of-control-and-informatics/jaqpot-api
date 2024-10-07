@@ -1,6 +1,7 @@
 package org.jaqpot.api.storage
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
@@ -19,13 +20,26 @@ class StorageService(
         private const val METADATA_VERSION = "1"
     }
 
+    fun storeDoa(doa: Doa) {
+        try {
+            this.storage.putObject(
+                awsS3Config.doasBucketName,
+                doa.id.toString(),
+                doa.rawDoa!!,
+                calculateMetadata(doa.rawDoa!!)
+            )
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store doa with id ${doa.id}" }
+        }
+    }
+
     fun storeRawModel(model: Model): Boolean {
         try {
             this.storage.putObject(
                 awsS3Config.modelsBucketName,
                 model.id.toString(),
                 model.rawModel!!,
-                calculateMetadata(model)
+                calculateMetadata(model.rawModel!!)
             )
             return true
         } catch (e: Exception) {
@@ -34,10 +48,10 @@ class StorageService(
         }
     }
 
-    private fun calculateMetadata(model: Model): Map<String, String> {
+    private fun calculateMetadata(rawData: ByteArray): Map<String, String> {
         return mapOf(
             "version" to METADATA_VERSION,
-            "encoding" to fileEncodingProcessor.determineEncoding(model.rawModel!!).name
+            "encoding" to fileEncodingProcessor.determineEncoding(rawData).name
         )
     }
 
@@ -52,7 +66,7 @@ class StorageService(
         if (rawModelFromStorage.isPresent) {
             return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id)
         } else if (model.rawModel != null) {
-            logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to actual model from database" }
+            logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to raw model from database" }
             return fileEncodingProcessor.readFile(model.rawModel!!, model.id)
         }
 

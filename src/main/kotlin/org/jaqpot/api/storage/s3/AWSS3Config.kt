@@ -13,7 +13,9 @@ class AWSS3Config(
     @Value("\${aws.s3.models-bucket}")
     val modelsBucketName: String,
     @Value("\${aws.s3.datasets-bucket}")
-    val datasetsBucketName: String
+    val datasetsBucketName: String,
+    @Value("\${aws.s3.doas-bucket}")
+    val doasBucketName: String,
 ) {
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {
