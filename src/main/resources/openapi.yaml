@@ -1158,10 +1158,9 @@ components:
           format: int64
           example: 0
         meta:
-          type: object
           description: A JSON object containing meta information.
           additionalProperties:
-            type: object
+            $ref: '#/components/schemas/AnyValue'
         name:
           type: string
           minLength: 3
@@ -1315,7 +1314,7 @@ components:
         torchConfig:
           type: object
           additionalProperties:
-            type: object
+            $ref: '#/components/schemas/AnyValue'
         preprocessors:
           type: array
           items:
