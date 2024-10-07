@@ -43,13 +43,6 @@ class Feature(
     var featureType: FeatureType,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "meta", columnDefinition = "jsonb")
-    val meta: Map<String, Any>?,
-
-    @Column
-    val visible: Boolean?,
-
-    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     var possibleValues: List<FeaturePossibleValue>? = null,
 

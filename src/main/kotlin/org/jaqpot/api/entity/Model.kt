@@ -19,10 +19,6 @@ class Model(
     @Column(nullable = false, updatable = false)
     val creatorId: String,
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "meta", columnDefinition = "jsonb")
-    val meta: Map<String, Any>?,
-
     @Size(min = 3, max = 255)
     @Column(nullable = false)
     var name: String,

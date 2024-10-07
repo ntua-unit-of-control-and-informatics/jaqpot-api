@@ -1157,10 +1157,6 @@ components:
           type: integer
           format: int64
           example: 0
-        meta:
-          description: A JSON object containing meta information.
-          additionalProperties:
-            $ref: '#/components/schemas/AnyValue'
         name:
           type: string
           minLength: 3
@@ -1391,11 +1387,6 @@ components:
           type: integer
           format: int64
           example: 1
-        meta:
-          type: object
-          description: A JSON object containing meta information.
-          additionalProperties:
-            '$ref': '#/components/schemas/AnyValue'
         key:
           type: string
           pattern: "^[a-zA-Z][a-zA-Z0-9_-]*$"

@@ -18,7 +18,6 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         visibility = this.visibility.toDto(),
         actualModel = byteArrayOf(), // returning empty byte array until https://github.com/OpenAPITools/openapi-generator/issues/17544 is fixed
         id = this.id,
-        meta = this.meta,
         description = this.description,
         sharedWithOrganizations = this.sharedWithOrganizations.map { it.organization.toDto(organizationMembers = emptyList()) },
         task = this.task.toDto(),
@@ -37,7 +36,6 @@ fun ModelDto.toEntity(creatorId: String): Model {
         id = this.id,
         legacyId = null,
         creatorId = creatorId,
-        meta = this.meta,
         name = this.name,
         description = this.description,
         type = this.type.toEntity(),
