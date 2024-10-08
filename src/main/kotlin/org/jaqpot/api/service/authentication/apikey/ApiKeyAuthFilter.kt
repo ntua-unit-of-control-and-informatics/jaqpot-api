@@ -40,7 +40,7 @@ class ApiKeyAuthFilter(
             val ip = IPUtil.getIPFromHeader(request)
             val apiKey = try {
                 apiKeyService.validateApiKey(clientKey, clientSecret, ip)
-            } catch (e: InvalidKeyException) {
+            } catch (e: InvalidApiKeyException) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.message)
                 return
             }

@@ -109,15 +109,15 @@ class ApiKeyService(
         val todayStart = getStartOfToday()
         return apiKeyRepository.findByClientKey(clientKey)?.let { apiKey ->
             if (!apiKey.enabled) {
-                throw InvalidKeyException("API key is disabled")
+                throw InvalidApiKeyException("API key is disabled")
             } else if (apiKey.expiresAt.isBefore(todayStart)) {
-                throw InvalidKeyException("API key has expired")
+                throw InvalidApiKeyException("API key has expired")
             } else if (passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
                 apiKeyRepository.updateLastUsed(apiKey.id, OffsetDateTime.now(), ip)
                 return apiKey
             }
-            throw InvalidKeyException("Invalid API key")
-        } ?: throw InvalidKeyException("Invalid API key")
+            throw InvalidApiKeyException("Invalid API key")
+        } ?: throw InvalidApiKeyException("Invalid API key")
     }
 
     /**

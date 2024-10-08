@@ -1,6 +1,6 @@
 package org.jaqpot.api.service.authentication.apikey
 
-class InvalidKeyException : Exception {
+class InvalidApiKeyException : Exception {
     constructor(message: String) : super(message)
     constructor(message: String, cause: Throwable) : super(message, cause)
 }
