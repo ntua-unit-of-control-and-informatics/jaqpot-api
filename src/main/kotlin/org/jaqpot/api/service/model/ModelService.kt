@@ -36,7 +36,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 private val logger = KotlinLogging.logger {}
-const val MAX_CSV_ROWS = 10
+const val MAX_INPUT_ROWS = 10
 const val JAQPOT_INTERNAL_ID_KEY = "jaqpotInternalId"
 
 @Service
@@ -49,7 +49,8 @@ class ModelService(
     private val organizationRepository: OrganizationRepository,
     private val csvParser: CSVParser,
     private val csvDataConverter: CSVDataConverter,
-    private val storageService: StorageService
+    private val storageService: StorageService,
+    private val doaService: DoaService
 ) : ModelApiDelegate {
 
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
@@ -89,6 +90,8 @@ class ModelService(
         val toEntity = modelDto.toEntity(creatorId)
         val savedModel = modelRepository.save(toEntity)
         storeRawModelToStorage(savedModel)
+        savedModel.doas.forEach(doaService::storeRawDoaToStorage)
+
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
             .buildAndExpand(savedModel.id).toUri()
@@ -144,12 +147,16 @@ class ModelService(
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
             val userId = authenticationFacade.userId
+            // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
 
-            if (csvData.size > MAX_CSV_ROWS) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "CSV file contains more than $MAX_CSV_ROWS rows")
+            if (csvData.size > MAX_INPUT_ROWS) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CSV file contains more than $MAX_INPUT_ROWS rows, please provide a smaller dataset"
+                )
             }
 
             val input = csvDataConverter.convertCsvContentToInput(model, csvData)
@@ -175,6 +182,7 @@ class ModelService(
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
+            // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model)
 
             val userId = authenticationFacade.userId
@@ -183,6 +191,13 @@ class ModelService(
                 userId,
                 DatasetEntryType.ARRAY
             )
+
+            if (toEntity.input.size > MAX_INPUT_ROWS) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Input contains more than $MAX_INPUT_ROWS rows, please provide a smaller dataset"
+                )
+            }
 
             toEntity.input.forEachIndexed() { index, it: Any ->
                 if (it is Map<*, *>)
@@ -202,9 +217,10 @@ class ModelService(
         dataset: Dataset
     ): ResponseEntity<Unit> {
         val rawModel = storageService.readRawModel(model)
+        val doaDtos = model.doas.map { it.toDto(storageService.readRawDoa(it)) }
 
         this.predictionService.executePredictionAndSaveResults(
-            model.toPredictionModelDto(rawModel),
+            model.toPredictionModelDto(rawModel, doaDtos),
             dataset
         )
 

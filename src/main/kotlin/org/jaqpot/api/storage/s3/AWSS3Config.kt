@@ -20,6 +20,8 @@ class AWSS3Config(
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {
         return S3Client.builder()
+            // for local development with AWS toolkit
+//            .credentialsProvider { ProfileCredentialsProvider.create("<profile-name>").resolveCredentials() }
             .credentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
             .region(Region.of(awsConfig.region))
             .build()

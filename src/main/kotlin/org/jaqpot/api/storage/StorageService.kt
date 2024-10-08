@@ -20,26 +20,42 @@ class StorageService(
         private const val METADATA_VERSION = "1"
     }
 
-    fun storeDoa(doa: Doa) {
+    fun storeDoa(doa: Doa): Boolean {
         try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to fileEncodingProcessor.determineEncoding(doa.rawDoa!!).name,
+                "modelId" to doa.model.id.toString(),
+                "method" to doa.method.name
+            )
+
             this.storage.putObject(
                 awsS3Config.doasBucketName,
-                doa.id.toString(),
+                getDoaStorageKey(doa),
                 doa.rawDoa!!,
-                calculateMetadata(doa.rawDoa!!)
+                metadata
             )
+            return true
         } catch (e: Exception) {
             logger.error(e) { "Failed to store doa with id ${doa.id}" }
+            return false
         }
     }
 
+    private fun getDoaStorageKey(doa: Doa) = "${doa.model.id}/${doa.method.name}"
+
     fun storeRawModel(model: Model): Boolean {
         try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to fileEncodingProcessor.determineEncoding(model.rawModel!!).name
+            )
+
             this.storage.putObject(
                 awsS3Config.modelsBucketName,
-                model.id.toString(),
+                getModelStorageKey(model),
                 model.rawModel!!,
-                calculateMetadata(model.rawModel!!)
+                metadata
             )
             return true
         } catch (e: Exception) {
@@ -48,17 +64,10 @@ class StorageService(
         }
     }
 
-    private fun calculateMetadata(rawData: ByteArray): Map<String, String> {
-        return mapOf(
-            "version" to METADATA_VERSION,
-            "encoding" to fileEncodingProcessor.determineEncoding(rawData).name
-        )
-    }
-
     fun readRawModel(model: Model): ByteArray {
         var rawModelFromStorage = Optional.empty<ByteArray>()
         try {
-            rawModelFromStorage = this.storage.getObject(awsS3Config.modelsBucketName, model.id.toString())
+            rawModelFromStorage = this.storage.getObject(awsS3Config.modelsBucketName, getModelStorageKey(model))
         } catch (e: Exception) {
             logger.warn(e) { "Failed to read model with id ${model.id}" }
         }
@@ -71,5 +80,26 @@ class StorageService(
         }
 
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
+    }
+
+    private fun getModelStorageKey(model: Model) = model.id.toString()
+
+
+    fun readRawDoa(doa: Doa): ByteArray {
+        var rawDoaFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawDoaFromStorage = this.storage.getObject(awsS3Config.doasBucketName, getDoaStorageKey(doa))
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read doa with id ${doa.id}" }
+        }
+
+        if (rawDoaFromStorage.isPresent) {
+            return rawDoaFromStorage.get()
+        } else if (doa.rawDoa != null) {
+            logger.warn { "Failed to find raw doa with id ${doa.id} in storage, falling back to raw doa from database" }
+            return doa.rawDoa!!
+        }
+
+        throw JaqpotRuntimeException("Failed to find raw doa with id ${doa.id}")
     }
 }

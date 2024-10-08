@@ -1145,7 +1145,6 @@ components:
       required:
         - jaqpotpyVersion
         - libraries
-        - doas
         - dependentFeatures
         - independentFeatures
         - rawModel

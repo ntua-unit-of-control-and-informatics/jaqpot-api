@@ -3,6 +3,7 @@ package org.jaqpot.api.mapper
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.model.DoaDto
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 import java.util.*
@@ -63,28 +64,29 @@ fun ModelDto.toEntity(creatorId: String): Model {
     )
 
     m.libraries.addAll(this.libraries.map { it.toEntity(m) })
-    m.doas.addAll(this.doas.map { it.toEntity(m) })
+    this.doas?.let { doaDtos -> m.doas.addAll(doaDtos.map { it.toEntity(m) }) }
     m.dependentFeatures.addAll(this.dependentFeatures.map { it.toEntity(m, FeatureDependency.DEPENDENT) })
     m.independentFeatures.addAll(this.independentFeatures.map { it.toEntity(m, FeatureDependency.INDEPENDENT) })
 
     return m
 }
 
-fun Model.toPredictionModelDto(rawModel: ByteArray): PredictionModelDto {
+fun Model.toPredictionModelDto(rawModel: ByteArray, doaDtos: List<DoaDto>): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
         task = this.task.toDto(),
-        rawModel = this.decodeRawModel(rawModel),
+        rawModel = this.encodeRawModel(rawModel),
+        doas = doaDtos,
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )
 }
 
-fun Model.decodeRawModel(rawModel: ByteArray): String {
+fun Model.encodeRawModel(rawModel: ByteArray): String {
     return if (isRModel()) {
         // https://upci-ntua.atlassian.net/browse/JAQPOT-199
         // R models require special deserialization and base64 messes up the model
