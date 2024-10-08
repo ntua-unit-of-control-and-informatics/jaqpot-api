@@ -33,6 +33,13 @@ abstract class RuntimeBase {
         val request = createRequestBody(predictionModelDto, datasetDto)
 
         try {
+
+            // uncomment to test request json
+//            val objectMapper = ObjectMapper()
+//            objectMapper.registerModule(JavaTimeModule())
+//            val json = objectMapper.writeValueAsString(request)
+//            logger.info { json }
+
             val response: ResponseEntity<PredictionResponseDto> =
                 restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)
 
