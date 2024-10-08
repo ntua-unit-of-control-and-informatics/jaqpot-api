@@ -1,6 +1,5 @@
 package org.jaqpot.api.service.authentication.apikey
 
-import jakarta.ws.rs.BadRequestException
 import org.apache.commons.lang3.RandomStringUtils
 import org.jaqpot.api.ApiKeysApiDelegate
 import org.jaqpot.api.entity.ApiKey
@@ -110,15 +109,15 @@ class ApiKeyService(
         val todayStart = getStartOfToday()
         return apiKeyRepository.findByClientKey(clientKey)?.let { apiKey ->
             if (!apiKey.enabled) {
-                throw BadRequestException("API key is disabled")
+                throw InvalidKeyException("API key is disabled")
             } else if (apiKey.expiresAt.isBefore(todayStart)) {
-                throw BadRequestException("API key has expired")
+                throw InvalidKeyException("API key has expired")
             } else if (passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
                 apiKeyRepository.updateLastUsed(apiKey.id, OffsetDateTime.now(), ip)
                 return apiKey
             }
-            throw BadRequestException("Invalid API key")
-        } ?: throw BadRequestException("Invalid API key")
+            throw InvalidKeyException("Invalid API key")
+        } ?: throw InvalidKeyException("Invalid API key")
     }
 
     /**

@@ -38,7 +38,13 @@ class ApiKeyAuthFilter(
             val clientKey = apiKeyHeader.get()
             val clientSecret = apiKeySecret.get()
             val ip = IPUtil.getIPFromHeader(request)
-            val apiKey = apiKeyService.validateApiKey(clientKey, clientSecret, ip)
+            val apiKey = try {
+                apiKeyService.validateApiKey(clientKey, clientSecret, ip)
+            } catch (e: InvalidKeyException) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.message)
+                return
+            }
+
             val token: String = keycloakTokenExchanger.exchangeToken(apiKey.userId)
             val jwt: Jwt = jwtDecoder.decode(token)
             val authentication = keycloakJwtConverter.convert(jwt)
