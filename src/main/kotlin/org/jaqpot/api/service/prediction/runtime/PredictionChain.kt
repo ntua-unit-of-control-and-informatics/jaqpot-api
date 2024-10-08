@@ -28,7 +28,6 @@ class PredictionChain(
     }
 
     fun getPredictionResults(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): PredictionResponseDto {
-        logger.info {}
         if (predictionModelDto.isRModel()) {
             return jaqpotRV6Runtime.sendPredictionRequest(predictionModelDto, datasetDto)
                 .orElseThrow { JaqpotRuntimeException("Failed to succeed on the latest R runtime, modelId: ${predictionModelDto.id}") }

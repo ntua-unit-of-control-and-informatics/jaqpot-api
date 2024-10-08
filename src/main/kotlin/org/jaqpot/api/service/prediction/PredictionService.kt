@@ -82,13 +82,6 @@ class PredictionService(
             )
         }
 
-        // uncomment to test request json
-//        val objectMapper = ObjectMapper()
-//        objectMapper.registerModule(JavaTimeModule())
-//        val json = objectMapper.writeValueAsString(request)
-//        logger.info { json }
-
-
         val response: PredictionResponseDto =
             predictionChain.getPredictionResults(predictionModelDto, datasetDto)
 
