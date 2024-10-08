@@ -13,6 +13,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         type = this.type.toDto(),
         jaqpotpyVersion = this.jaqpotpyVersion,
         libraries = this.libraries.map { it.toDto() },
+        doas = this.doas.map { it.toDto(byteArrayOf()) }, // returning empty byte array
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         visibility = this.visibility.toDto(),
@@ -41,6 +42,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         type = this.type.toEntity(),
         jaqpotpyVersion = this.jaqpotpyVersion,
         libraries = mutableListOf(),
+        doas = mutableListOf(),
         dependentFeatures = mutableListOf(),
         independentFeatures = mutableListOf(),
         sharedWithOrganizations = mutableListOf(),
@@ -61,6 +63,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
     )
 
     m.libraries.addAll(this.libraries.map { it.toEntity(m) })
+    m.doas.addAll(this.doas.map { it.toEntity(m) })
     m.dependentFeatures.addAll(this.dependentFeatures.map { it.toEntity(m, FeatureDependency.DEPENDENT) })
     m.independentFeatures.addAll(this.independentFeatures.map { it.toEntity(m, FeatureDependency.INDEPENDENT) })
 

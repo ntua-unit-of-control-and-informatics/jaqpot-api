@@ -1145,6 +1145,7 @@ components:
       required:
         - jaqpotpyVersion
         - libraries
+        - doas
         - dependentFeatures
         - independentFeatures
         - rawModel
@@ -1172,6 +1173,10 @@ components:
         jaqpotpyVersion:
           type: string
           example: 1.0.0
+        doas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doa'
         libraries:
           type: array
           items:
@@ -1366,6 +1371,42 @@ components:
         version:
           type: string
           example: 1.24.0
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
+    Doa:
+      type: object
+      required:
+        - method
+        - rawDoa
+      properties:
+        # For example:
+        # Define the properties of Library here
+        id:
+          type: integer
+          format: int64
+        method:
+          type: string
+          enum:
+            - LEVERAGE
+            - BOUNDING_BOX
+            - KERNEL_BASED
+            - MEAN_VAR
+            - MAHALANOBIS
+            - CITY_BLOCK
+          example: LEVERAGE
+        rawDoa:
+          type: string
+          format: byte
+          description: A base64 representation of the raw doa.
+          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
         createdAt:
           type: string
           format: date-time

@@ -57,6 +57,7 @@ aws:
   s3:
     models-bucket:
     datasets-bucket:
+    doas-bucket:
 
 server:
   error:
