@@ -1359,8 +1359,6 @@ components:
         - name
         - version
       properties:
-        # For example:
-        # Define the properties of Library here
         id:
           type: integer
           format: int64
@@ -1386,8 +1384,6 @@ components:
         - method
         - rawDoa
       properties:
-        # For example:
-        # Define the properties of Library here
         id:
           type: integer
           format: int64
