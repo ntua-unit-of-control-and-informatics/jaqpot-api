@@ -15,7 +15,7 @@ class DoaService(private val doaRepository: DoaRepository, private val storageSe
 
     fun storeRawDoaToStorage(doa: Doa) {
         if (doa.rawDoa == null) {
-            // model is already stored in storage
+            // doa is already stored in storage
             return
         }
         logger.info { "Storing raw doa to storage for doa with id ${doa.id} and model ${doa.model.id}" }
