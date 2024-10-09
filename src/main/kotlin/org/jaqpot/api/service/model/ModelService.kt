@@ -1,14 +1,13 @@
 package org.jaqpot.api.service.model
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.*
-import org.jaqpot.api.mapper.toDto
-import org.jaqpot.api.mapper.toEntity
-import org.jaqpot.api.mapper.toGetModels200ResponseDto
-import org.jaqpot.api.mapper.toPredictionModelDto
+import org.jaqpot.api.mapper.*
 import org.jaqpot.api.model.*
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
@@ -217,7 +216,12 @@ class ModelService(
         dataset: Dataset
     ): ResponseEntity<Unit> {
         val rawModel = storageService.readRawModel(model)
-        val doaDtos = model.doas.map { it.toDto(storageService.readRawDoa(it)) }
+        val doaDtos = model.doas.map {
+            val rawDoaData = storageService.readRawDoa(it)
+            val type = object : TypeToken<Map<String, Any>>() {}.type
+            val doaData: Map<String, Any> = Gson().fromJson(rawDoaData.decodeToString(), type)
+            it.toPredictionDto(doaData)
+        }
 
         this.predictionService.executePredictionAndSaveResults(
             model.toPredictionModelDto(rawModel, doaDtos),

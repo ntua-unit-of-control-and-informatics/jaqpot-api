@@ -1,9 +1,9 @@
 package org.jaqpot.api.mapper
 
+import org.jaqpot.api.dto.prediction.PredictionDoaDto
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
-import org.jaqpot.api.model.DoaDto
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.UserDto
 import java.util.*
@@ -14,7 +14,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         type = this.type.toDto(),
         jaqpotpyVersion = this.jaqpotpyVersion,
         libraries = this.libraries.map { it.toDto() },
-        doas = this.doas.map { it.toDto(byteArrayOf()) }, // returning empty byte array
+        doas = this.doas.map { it.toDto() }, // returning empty byte array
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         visibility = this.visibility.toDto(),
@@ -57,7 +57,6 @@ fun ModelDto.toEntity(creatorId: String): Model {
                 "torchConfig" to (this.extraConfig?.torchConfig ?: {}),
                 "preprocessors" to (this.extraConfig?.preprocessors ?: arrayOf<Any>()),
                 "featurizers" to (this.extraConfig?.featurizers ?: arrayOf<Any>()),
-                "doa" to (this.extraConfig?.doa ?: arrayOf<Any>()),
             )
         },
         rawModel = this.rawModel,
@@ -71,7 +70,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
     return m
 }
 
-fun Model.toPredictionModelDto(rawModel: ByteArray, doaDtos: List<DoaDto>): PredictionModelDto {
+fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<PredictionDoaDto>): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
@@ -79,7 +78,7 @@ fun Model.toPredictionModelDto(rawModel: ByteArray, doaDtos: List<DoaDto>): Pred
         type = this.type.toDto(),
         task = this.task.toDto(),
         rawModel = this.encodeRawModel(rawModel),
-        doas = doaDtos,
+        doas = doas,
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
