@@ -1422,7 +1422,7 @@ components:
         hStar:
           type: number
           format: float
-        data:
+        array:
           type: array
           items:
             type: array

@@ -20,6 +20,17 @@ class DoaValidator : ConstraintValidator<ValidDoa, List<DoaDto>?> {
                     }
                     return false
                 }
+
+                if (it.data.array == null) {
+                    context?.let { constraintValidatorContext ->
+                        (constraintValidatorContext as ConstraintValidatorContextImpl).addMessageParameter(
+                            "message",
+                            "array for leverage is required"
+                        )
+                    }
+                    return false
+                }
+
             }
         }
 
