@@ -14,5 +14,4 @@ interface Storage {
         obj: ByteArray,
         metadata: Map<String, String> = mapOf(),
     )
-
 }

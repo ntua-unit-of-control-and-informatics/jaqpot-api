@@ -8,10 +8,9 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
-    kotlin("plugin.serialization") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.9.23"
 
-    id("org.openapi.generator") version "7.5.0"
+    id("org.openapi.generator") version "7.9.0"
 
     id("org.flywaydb.flyway") version "10.13.0"
 }
@@ -97,9 +96,6 @@ dependencies {
     implementation("org.apache.commons:commons-csv:1.11.0")
 
     runtimeOnly("org.postgresql:postgresql")
-
-    // kotlin serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // aws
     implementation(platform("software.amazon.awssdk:bom:2.21.1"))

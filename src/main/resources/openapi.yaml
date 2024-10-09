@@ -1172,6 +1172,11 @@ components:
         jaqpotpyVersion:
           type: string
           example: 1.0.0
+        doas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doa'
+          x-field-extra-annotation: "@get:org.jaqpot.api.service.model.constraints.ValidDoa"
         libraries:
           type: array
           items:
@@ -1319,10 +1324,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Transformer'
-        doa:
-          type: array
-          items:
-            $ref: '#/components/schemas/Transformer'
     Transformer:
       type: object
       description: A preprocessor for the model
@@ -1355,8 +1356,6 @@ components:
         - name
         - version
       properties:
-        # For example:
-        # Define the properties of Library here
         id:
           type: integer
           format: int64
@@ -1376,6 +1375,88 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+
+    Doa:
+      type: object
+      required:
+        - method
+        - data
+      properties:
+        id:
+          type: integer
+          format: int64
+        method:
+          type: string
+          enum:
+            - LEVERAGE
+            - BOUNDING_BOX
+            - KERNEL_BASED
+            - MEAN_VAR
+            - MAHALANOBIS
+            - CITY_BLOCK
+          example: LEVERAGE
+        data:
+          type: object
+          description: The doa calculated data
+          oneOf:
+            - '$ref': '#/components/schemas/LeverageDoa'
+            - '$ref': '#/components/schemas/BoundingBoxDoa'
+            - '$ref': '#/components/schemas/KernelBasedDoa'
+            - '$ref': '#/components/schemas/MeanVarDoa'
+            - '$ref': '#/components/schemas/MahalanobisDoa'
+            - '$ref': '#/components/schemas/CityBlockDoa'
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
+
+    LeverageDoa:
+      type: object
+      properties:
+        hStar:
+          type: number
+          format: float
+        array:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
+
+
+    BoundingBoxDoa:
+      type: object
+      properties:
+        data:
+          type: object
+    KernelBasedDoa:
+      type: object
+      properties:
+        data:
+          type: object
+    MeanVarDoa:
+      type: object
+      properties:
+        data:
+          type: object
+    MahalanobisDoa:
+      type: object
+      properties:
+        data:
+          type: object
+    CityBlockDoa:
+      type: object
+      properties:
+        data:
+          type: object
+
     Feature:
       type: object
       required:

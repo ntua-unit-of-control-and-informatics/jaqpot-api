@@ -38,6 +38,9 @@ class Model(
     val libraries: MutableList<Library>,
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val doas: MutableList<Doa>,
+
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @OrderColumn(name = "sort_order")
     @SQLRestriction("feature_dependency = 'DEPENDENT'")
     val dependentFeatures: MutableList<Feature>,
