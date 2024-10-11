@@ -33,7 +33,7 @@ class SecurityConfig(
                     authorize(it, permitAll)
                 }
                 authorize("/actuator/health", permitAll)
-                authorize("/actuator/prometheus", hasRole("MONITORING"))
+                authorize("/actuator/prometheus", hasAuthority("monitoring"))
                 authorize("/actuator/**", permitAll)
                 authorize("/v1/models/legacy/{modelId:[a-zA-Z0-9]+}", permitAll)
                 authorize("/v1/models/{modelId:\\d+}", permitAll)
