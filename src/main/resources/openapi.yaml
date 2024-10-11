@@ -1201,7 +1201,6 @@ components:
           type: string
           format: byte
           description: A base64 representation of the raw model.
-          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonProperty(access = JsonProperty.Access.WRITE_ONLY)'
         creator:
           $ref: '#/components/schemas/User'
         canEdit:
