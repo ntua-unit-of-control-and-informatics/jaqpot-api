@@ -51,6 +51,11 @@ management:
     health:
       probes:
         enabled: true
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 aws:
   region: eu-west-1
