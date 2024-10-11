@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.util.matcher.DispatcherTypeRequestMatcher
 
+
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
@@ -31,6 +32,8 @@ class SecurityConfig(
                 arrayOf("/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").map { it ->
                     authorize(it, permitAll)
                 }
+                authorize("/actuator/health", permitAll)
+                authorize("/actuator/prometheus", hasAuthority("monitoring"))
                 authorize("/actuator/**", permitAll)
                 authorize("/v1/models/legacy/{modelId:[a-zA-Z0-9]+}", permitAll)
                 authorize("/v1/models/{modelId:\\d+}", permitAll)

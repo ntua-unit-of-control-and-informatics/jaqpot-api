@@ -9,9 +9,9 @@ import jakarta.servlet.http.HttpServletResponse
 import org.jaqpot.api.error.ApiErrorResponse
 import org.jaqpot.api.model.ErrorCodeDto
 import org.springframework.http.HttpStatus
-import org.springframework.stereotype.Component
 
-@Component
+//@Component
+@Deprecated("This filter is not used anymore.")
 class EmailVerificationFilter(private val authenticationFacade: AuthenticationFacade) : Filter {
 
     override fun doFilter(request: ServletRequest, response: ServletResponse?, chain: FilterChain) {

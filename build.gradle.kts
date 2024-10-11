@@ -50,6 +50,9 @@ dependencies {
     // cache
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
+    // prometheus
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
     // freemarker
     implementation("org.freemarker:freemarker:2.3.33")
 
