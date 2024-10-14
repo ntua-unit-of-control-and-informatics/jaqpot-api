@@ -82,5 +82,11 @@ class Model(
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 
-    ) : BaseEntity()
+    ) : BaseEntity() {
+    fun isQsarToolboxModel() = this.type in listOf(
+        ModelType.QSAR_TOOLBOX_CALCULATOR,
+        ModelType.QSAR_TOOLBOX_QSAR_MODEL,
+        ModelType.QSAR_TOOLBOX_PROFILER
+    )
+}
 

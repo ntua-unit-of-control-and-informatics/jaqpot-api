@@ -215,7 +215,11 @@ class ModelService(
         model: Model,
         dataset: Dataset
     ): ResponseEntity<Unit> {
-        val rawModel = storageService.readRawModel(model)
+        val rawModel = if (model.isQsarToolboxModel()) {
+            byteArrayOf()
+        } else {
+            storageService.readRawModel(model)
+        }
         val doaDtos = model.doas.map {
             val rawDoaData = storageService.readRawDoa(it)
             val type = object : TypeToken<Map<String, Any>>() {}.type

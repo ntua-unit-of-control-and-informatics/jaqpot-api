@@ -9,10 +9,7 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
-import org.jaqpot.api.service.model.isQsarModel
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
@@ -32,12 +29,6 @@ class PredictionService(
     @Async
     fun executePredictionAndSaveResults(predictionModelDto: PredictionModelDto, dataset: Dataset) {
         val datasetDto = dataset.toDto()
-
-
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.accept = listOf(MediaType.APPLICATION_JSON)
-
 
         updateDatasetToExecuting(dataset)
 
@@ -74,18 +65,10 @@ class PredictionService(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): List<Any> {
-        if (predictionModelDto.type.isQsarModel()) {
-            return qsarToolboxPredictionService.makePredictionRequest(
-                predictionModelDto,
-                datasetDto,
-                predictionModelDto.type
-            )
-        }
-
         val response: PredictionResponseDto =
             predictionChain.getPredictionResults(predictionModelDto, datasetDto)
 
-        val results: List<Any> = response.predictions ?: emptyList()
+        val results: List<Any> = response.predictions
         return results
     }
 }
