@@ -12,7 +12,7 @@ import org.jaqpot.api.mapper.toPredictionModelDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
-import org.jaqpot.api.service.model.isQsarModel
+import org.jaqpot.api.service.model.isQsarToolboxModel
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
 import org.jaqpot.api.storage.StorageService
 import org.springframework.scheduling.annotation.Async
@@ -71,7 +71,7 @@ class PredictionService(
         dataset: Dataset
     ): List<Any> {
         val datasetDto = dataset.toDto()
-        if (model.isQsarModel()) {
+        if (model.isQsarToolboxModel()) {
             return qsarToolboxPredictionService.makePredictionRequest(
                 datasetDto,
                 model.type
