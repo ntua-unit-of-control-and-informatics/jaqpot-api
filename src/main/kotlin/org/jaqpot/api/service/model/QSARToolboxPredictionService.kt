@@ -1,7 +1,8 @@
 package org.jaqpot.api.service.model
 
-import org.jaqpot.api.entity.ModelType
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.service.qsartoolbox.QSARToolboxAPI
 import org.springframework.stereotype.Service
 
@@ -64,19 +65,20 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
     }
 
     fun makePredictionRequest(
+        predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto,
-        type: ModelType
+        type: ModelTypeDto
     ): List<Any> {
         return when (type) {
-            ModelType.QSAR_TOOLBOX_CALCULATOR -> {
+            ModelTypeDto.QSAR_TOOLBOX_CALCULATOR -> {
                 makeCalculatorPredictionRequest(datasetDto)
             }
 
-            ModelType.QSAR_TOOLBOX_QSAR_MODEL -> {
+            ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL -> {
                 makeQsarModelPredictionRequest(datasetDto)
             }
 
-            ModelType.QSAR_TOOLBOX_PROFILER -> {
+            ModelTypeDto.QSAR_TOOLBOX_PROFILER -> {
                 makeProfilerPredictionRequest(datasetDto)
             }
 
