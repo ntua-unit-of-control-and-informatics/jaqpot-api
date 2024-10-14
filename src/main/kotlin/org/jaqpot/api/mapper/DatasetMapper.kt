@@ -8,15 +8,15 @@ import org.jaqpot.api.model.DatasetCSVDto
 import org.jaqpot.api.model.DatasetDto
 
 
-fun Dataset.toDto(): DatasetDto {
+fun Dataset.toDto(input: List<Any>, result: List<Any>?): DatasetDto {
     return DatasetDto(
         type = this.type.toDto(),
         id = this.id,
         entryType = this.entryType.toDto(),
         status = this.status.toDto(),
         failureReason = this.failureReason,
-        input = this.input,
-        result = this.result,
+        input = input,
+        result = result,
         userId = this.userId,
         modelId = this.model.id,
         modelName = this.model.name,

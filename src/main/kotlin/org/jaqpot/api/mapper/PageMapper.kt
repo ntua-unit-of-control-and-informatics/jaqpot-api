@@ -19,7 +19,7 @@ fun Page<Model>.toGetModels200ResponseDto(creatorDto: UserDto?): GetModels200Res
 
 fun Page<Dataset>.toGetDatasets200ResponseDto(): GetDatasets200ResponseDto {
     return GetDatasets200ResponseDto(
-        this.content.map { it.toDto() },
+        this.content.map { it.toDto(listOf(), listOf()) }, // return empty input and result for datasets page
         this.totalElements.toInt(),
         this.totalPages,
         this.pageable.pageSize,

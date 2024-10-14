@@ -191,7 +191,7 @@ class ModelService(
                 DatasetEntryType.ARRAY
             )
 
-            if (toEntity.input.size > MAX_INPUT_ROWS) {
+            if (toEntity.input!!.size > MAX_INPUT_ROWS) {
                 throw ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Input contains more than $MAX_INPUT_ROWS rows, please provide a smaller dataset"

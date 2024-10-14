@@ -8,6 +8,7 @@ import org.jaqpot.api.model.GetDatasets200ResponseDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
+import org.jaqpot.api.storage.StorageService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -17,7 +18,8 @@ import org.springframework.stereotype.Service
 @Service
 class DatasetService(
     private val datasetRepository: DatasetRepository,
-    private val authenticationFacade: AuthenticationFacade
+    private val authenticationFacade: AuthenticationFacade,
+    private val storageService: StorageService
 ) : DatasetApiDelegate {
 
     @PostAuthorize("@getDatasetAuthorizationLogic.decide(#root)")
@@ -25,7 +27,9 @@ class DatasetService(
         val dataset = datasetRepository.findById(id)
 
         return dataset.map {
-            ResponseEntity.ok(it.toDto())
+            val input = storageService.readRawDatasetInput(it)
+            val result = storageService.readRawDatasetResult(it)
+            ResponseEntity.ok(it.toDto(input, result))
         }
             .orElse(ResponseEntity.notFound().build())
     }

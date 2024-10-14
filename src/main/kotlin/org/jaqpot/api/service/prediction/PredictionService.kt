@@ -41,7 +41,7 @@ class PredictionService(
             val results: List<Any> = makePredictionRequest(model, dataset)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
-            logger.error(e) { "Prediction for dataset with id ${dataset.id} failed" }
+            logger.warn(e) { "Prediction failed for dataset with id ${dataset.id}" }
             storeDatasetFailure(dataset, e)
         }
     }
@@ -57,6 +57,9 @@ class PredictionService(
         dataset.result = results
         dataset.executionFinishedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
+        if (storageService.storeDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
     }
 
     private fun storeDatasetFailure(dataset: Dataset, err: Exception) {
@@ -64,13 +67,16 @@ class PredictionService(
         dataset.failureReason = err.toString()
 
         datasetRepository.save(dataset)
+        if (storageService.storeDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
     }
 
     private fun makePredictionRequest(
         model: Model,
         dataset: Dataset
     ): List<Any> {
-        val datasetDto = dataset.toDto()
+        val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
         if (model.isQsarToolboxModel()) {
             return qsarToolboxPredictionService.makePredictionRequest(
                 datasetDto,
