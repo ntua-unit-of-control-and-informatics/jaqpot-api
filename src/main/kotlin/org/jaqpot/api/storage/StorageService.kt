@@ -154,7 +154,7 @@ class StorageService(
             val input: List<Any> = Gson().fromJson(rawData.decodeToString(), type)
             return input
         } else if (dataset.input != null) {
-            logger.warn { "Failed to find raw dataset with id ${dataset.id} in storage, falling back to raw dataset from database" }
+            logger.warn { "Failed to find input with id ${dataset.id} in storage, falling back to input from database" }
             return dataset.input
         }
 
@@ -176,7 +176,7 @@ class StorageService(
             val result: List<Any> = Gson().fromJson(rawData.decodeToString(), type)
             return result
         } else if (dataset.result != null) {
-            logger.warn { "Failed to find raw dataset with id ${dataset.id} in storage, falling back to raw dataset from database" }
+            logger.warn { "Failed to find dataset result with id ${dataset.id} in storage, falling back to result from database" }
             return dataset.result!!
         }
 
