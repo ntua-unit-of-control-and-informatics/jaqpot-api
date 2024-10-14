@@ -4,6 +4,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.ModelTypeDto
+import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
 import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotPyV6Runtime
 import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotRV6Runtime
@@ -22,12 +24,22 @@ class PredictionChain(
     private val legacyPythonGeneric023Runtime: LegacyPythonGeneric023Runtime,
     private val legacyPythonGeneric024Runtime: LegacyPythonGeneric024Runtime,
     private val legacyJaqpotInferenceRuntime: LegacyJaqpotInferenceRuntime,
+    private val qsarToolboxPredictionService: QSARToolboxPredictionService
 ) {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
     fun getPredictionResults(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): PredictionResponseDto {
+        if (predictionModelDto.isQsarModel()) {
+            val predictions = qsarToolboxPredictionService.makePredictionRequest(
+                predictionModelDto,
+                datasetDto,
+                predictionModelDto.type
+            )
+            return PredictionResponseDto(predictions as List<Map<String, Any>>)
+        }
+
         if (predictionModelDto.isRModel()) {
             return jaqpotRV6Runtime.sendPredictionRequest(predictionModelDto, datasetDto)
                 .orElseThrow { JaqpotRuntimeException("Failed to succeed on the latest R runtime, modelId: ${predictionModelDto.id}") }
@@ -76,6 +88,12 @@ class PredictionChain(
         }
     }
 }
+
+private fun PredictionModelDto.isQsarModel(): Boolean = this.type in listOf(
+    ModelTypeDto.QSAR_TOOLBOX_CALCULATOR,
+    ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL,
+    ModelTypeDto.QSAR_TOOLBOX_PROFILER
+)
 
 private fun PredictionModelDto.isLegacyModel(): Boolean {
     return this.legacyPredictionService != null
