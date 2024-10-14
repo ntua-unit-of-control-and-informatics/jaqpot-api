@@ -1,20 +1,18 @@
 package org.jaqpot.api.service.prediction
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
-import org.jaqpot.api.entity.Model
 import org.jaqpot.api.mapper.toDto
-import org.jaqpot.api.mapper.toPredictionDto
-import org.jaqpot.api.mapper.toPredictionModelDto
+import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
-import org.jaqpot.api.service.model.isQsarToolboxModel
+import org.jaqpot.api.service.model.isQsarModel
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
-import org.jaqpot.api.storage.StorageService
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
@@ -24,7 +22,6 @@ import java.time.OffsetDateTime
 class PredictionService(
     private val datasetRepository: DatasetRepository,
     private val predictionChain: PredictionChain,
-    private val storageService: StorageService,
     private val qsarToolboxPredictionService: QSARToolboxPredictionService
 ) {
 
@@ -33,12 +30,19 @@ class PredictionService(
     }
 
     @Async
-    fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
+    fun executePredictionAndSaveResults(predictionModelDto: PredictionModelDto, dataset: Dataset) {
+        val datasetDto = dataset.toDto()
+
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.accept = listOf(MediaType.APPLICATION_JSON)
+
 
         updateDatasetToExecuting(dataset)
 
         try {
-            val results: List<Any> = makePredictionRequest(model, dataset)
+            val results: List<Any> = makePredictionRequest(predictionModelDto, datasetDto)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
             logger.error(e) { "Prediction for dataset with id ${dataset.id} failed" }
@@ -67,25 +71,16 @@ class PredictionService(
     }
 
     private fun makePredictionRequest(
-        model: Model,
-        dataset: Dataset
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto
     ): List<Any> {
-        val datasetDto = dataset.toDto()
-        if (model.isQsarToolboxModel()) {
+        if (predictionModelDto.type.isQsarModel()) {
             return qsarToolboxPredictionService.makePredictionRequest(
+                predictionModelDto,
                 datasetDto,
-                model.type
+                predictionModelDto.type
             )
         }
-
-        val rawModel = storageService.readRawModel(model)
-        val doaDtos = model.doas.map {
-            val rawDoaData = storageService.readRawDoa(it)
-            val type = object : TypeToken<Map<String, Any>>() {}.type
-            val doaData: Map<String, Any> = Gson().fromJson(rawDoaData.decodeToString(), type)
-            it.toPredictionDto(doaData)
-        }
-        val predictionModelDto = model.toPredictionModelDto(rawModel, doaDtos)
 
         val response: PredictionResponseDto =
             predictionChain.getPredictionResults(predictionModelDto, datasetDto)
