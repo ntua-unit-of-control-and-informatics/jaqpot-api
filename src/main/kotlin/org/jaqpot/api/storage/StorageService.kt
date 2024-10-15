@@ -38,18 +38,20 @@ class StorageService(
             this.storage.putObject(
                 awsS3Config.datasetsBucketName,
                 "${dataset.id.toString()}/input",
-                Gson().toJson(dataset.input).toByteArray(),
+                Gson().toJson(dataset.input!!).toByteArray(),
                 metadata
             )
 
-            this.storage.putObject(
-                awsS3Config.datasetsBucketName,
-                "${dataset.id.toString()}/result",
-                Gson().toJson(dataset.result).toByteArray(),
-                metadata
-            )
+            if (dataset.result != null) {
+                this.storage.putObject(
+                    awsS3Config.datasetsBucketName,
+                    "${dataset.id.toString()}/result",
+                    Gson().toJson(dataset.result).toByteArray(),
+                    metadata
+                )
+            }
 
-            return true;
+            return true
         } catch (e: Exception) {
             logger.error(e) { "Failed to store dataset with id ${dataset.id}" }
             return false
@@ -137,6 +139,49 @@ class StorageService(
         }
 
         throw JaqpotRuntimeException("Failed to find raw doa with id ${doa.id}")
+    }
+
+    fun readRawDatasetInputs(datasets: List<Dataset>): Map<String, List<Any>> {
+        var rawDatasetsFromStorage = mutableMapOf<String, ByteArray>()
+        try {
+            rawDatasetsFromStorage =
+                this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/input" })
+                    .mapKeys { it.key.substringBefore("/") }.toMutableMap()
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read datasets" }
+        }
+
+        return if (rawDatasetsFromStorage.isNotEmpty()) {
+            rawDatasetsFromStorage.mapValues { (key, value) ->
+                val type = object : TypeToken<List<Any>>() {}.type
+                val input: List<Any> = Gson().fromJson(value.decodeToString(), type)
+                input
+            }
+        } else {
+            return datasets.associateBy({ it.id.toString() }, { it.input!! })
+        }
+    }
+
+
+    fun readRawDatasetResults(datasets: List<Dataset>): Map<String, List<Any>?> {
+        var rawDatasetsFromStorage = mutableMapOf<String, ByteArray>()
+        try {
+            rawDatasetsFromStorage =
+                this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/result" })
+                    .mapKeys { it.key.substringBefore("/") }.toMutableMap()
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read datasets" }
+        }
+
+        return if (rawDatasetsFromStorage.isNotEmpty()) {
+            rawDatasetsFromStorage.mapValues { (key, value) ->
+                val type = object : TypeToken<List<Any>>() {}.type
+                val result: List<Any> = Gson().fromJson(value.decodeToString(), type)
+                result
+            }
+        } else {
+            return datasets.associateBy({ it.id.toString() }, { it.result })
+        }
     }
 
     fun readRawDatasetInput(dataset: Dataset): List<Any> {

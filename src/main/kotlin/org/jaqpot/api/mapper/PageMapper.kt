@@ -17,9 +17,19 @@ fun Page<Model>.toGetModels200ResponseDto(creatorDto: UserDto?): GetModels200Res
     )
 }
 
-fun Page<Dataset>.toGetDatasets200ResponseDto(): GetDatasets200ResponseDto {
+fun Page<Dataset>.toGetDatasets200ResponseDto(
+    inputs: Map<String, List<Any>>,
+    results: Map<String, List<Any>?>
+): GetDatasets200ResponseDto {
+
+
     return GetDatasets200ResponseDto(
-        this.content.map { it.toDto(listOf(), listOf()) }, // return empty input and result for datasets page
+        this.content.map {
+            it.toDto(
+                inputs[it.id.toString()] ?: emptyList(),
+                results[it.id.toString()] ?: emptyList()
+            )
+        }, // return empty input and result for datasets page
         this.totalElements.toInt(),
         this.totalPages,
         this.pageable.pageSize,

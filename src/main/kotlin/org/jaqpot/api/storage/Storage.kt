@@ -8,6 +8,8 @@ interface Storage {
         keyName: String,
     ): Optional<ByteArray>
 
+    fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray>
+
     fun putObject(
         bucketName: String,
         keyName: String,

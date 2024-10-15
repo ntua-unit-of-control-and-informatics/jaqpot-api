@@ -39,6 +39,9 @@ class DatasetService(
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val datasets = datasetRepository.findAllByUserId(userId, pageable)
 
-        return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto())
+        val inputsMap = storageService.readRawDatasetInputs(datasets.content)
+        val resultsMap = storageService.readRawDatasetResults(datasets.content)
+
+        return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(inputsMap, resultsMap))
     }
 }

@@ -1,6 +1,8 @@
 package org.jaqpot.api.storage.s3
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.jaqpot.api.aws.AWSConfig
 import org.jaqpot.api.storage.Storage
 import org.springframework.stereotype.Service
@@ -35,6 +37,33 @@ class S3Storage(
             return Optional.empty()
         }
     }
+
+    override fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray> =
+        runBlocking {
+            val results = mutableMapOf<String, ByteArray>()
+
+            val jobs = keyNames.map { keyName ->
+                async {
+                    logger.info { "Downloading object from S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
+                    val request = GetObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(keyName)
+                        .build()
+
+                    try {
+                        val responseInputStream = s3Client.getObjectAsBytes(request)
+                        results[keyName] = responseInputStream.asByteArray()
+                    } catch (e: NoSuchKeyException) {
+                        logger.warn { "Object with key $keyName not found in bucket $bucketName" }
+                    } catch (e: Exception) {
+                        logger.error(e) { "Failed to download object with key $keyName from bucket $bucketName" }
+                    }
+                }
+            }
+
+            jobs.forEach { it.await() }
+            return@runBlocking results
+        }
 
     override fun putObject(bucketName: String, keyName: String, obj: ByteArray, metadata: Map<String, String>) {
         logger.info { "Uploading object to S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
