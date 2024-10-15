@@ -79,6 +79,8 @@ keycloak:
   impersonation-client-secret: NrKN1ayoM4Obaz1m3tKNizWFKWGw6gZZ
 
 jaqpot:
+  model:
+    max-input-prediction-rows: 100
   frontend:
     url: http://localhost.jaqpot.org:3000
   runtime:
