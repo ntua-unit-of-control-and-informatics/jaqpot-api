@@ -33,11 +33,11 @@ class Dataset(
     val entryType: DatasetEntryType = DatasetEntryType.ARRAY,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "input", columnDefinition = "jsonb", nullable = false)
-    var input: List<Any>,
+    @Column(name = "input", columnDefinition = "jsonb")
+    val input: List<Any>? = null,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "result", columnDefinition = "jsonb", nullable = true)
+    @Column(name = "result", columnDefinition = "jsonb")
     var result: List<Any>? = null,
 
     @Size(min = 3, max = 15000)

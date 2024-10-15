@@ -56,6 +56,10 @@ dependencies {
     // freemarker
     implementation("org.freemarker:freemarker:2.3.33")
 
+    // coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0")
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -90,7 +94,7 @@ dependencies {
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
 
     // keycloak admin client
-    implementation("org.keycloak:keycloak-admin-client:24.0.3")
+    implementation("org.keycloak:keycloak-admin-client:24.0.5")
 
     // bucket4j for rate limiting
     implementation("com.bucket4j:bucket4j-core:8.10.1")

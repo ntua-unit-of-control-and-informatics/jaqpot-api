@@ -1,9 +1,13 @@
 package org.jaqpot.api.storage
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.error.JaqpotRuntimeException
+import org.jaqpot.api.storage.encoding.Encoding
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
 import org.springframework.stereotype.Service
@@ -20,11 +24,45 @@ class StorageService(
         private const val METADATA_VERSION = "1"
     }
 
+    fun storeDataset(dataset: Dataset): Boolean {
+        try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to Encoding.RAW.name,
+                "modelId" to dataset.model.id.toString(),
+                "userId" to dataset.userId,
+                "type" to dataset.type.name,
+                "entryType" to dataset.entryType.name,
+            )
+
+            this.storage.putObject(
+                awsS3Config.datasetsBucketName,
+                "${dataset.id.toString()}/input",
+                Gson().toJson(dataset.input!!).toByteArray(),
+                metadata
+            )
+
+            if (dataset.result != null) {
+                this.storage.putObject(
+                    awsS3Config.datasetsBucketName,
+                    "${dataset.id.toString()}/result",
+                    Gson().toJson(dataset.result).toByteArray(),
+                    metadata
+                )
+            }
+
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store dataset with id ${dataset.id}" }
+            return false
+        }
+    }
+
     fun storeDoa(doa: Doa): Boolean {
         try {
             val metadata = mapOf(
                 "version" to METADATA_VERSION,
-                "encoding" to fileEncodingProcessor.determineEncoding(doa.rawDoa!!).name,
+                "encoding" to Encoding.RAW.name,
                 "modelId" to doa.model.id.toString(),
                 "method" to doa.method.name
             )
@@ -101,5 +139,92 @@ class StorageService(
         }
 
         throw JaqpotRuntimeException("Failed to find raw doa with id ${doa.id}")
+    }
+
+    fun readRawDatasetInputs(datasets: List<Dataset>): Map<String, List<Any>> {
+        var rawDatasetsFromStorage = mutableMapOf<String, ByteArray>()
+        try {
+            rawDatasetsFromStorage =
+                this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/input" })
+                    .mapKeys { it.key.substringBefore("/") }.toMutableMap()
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read datasets" }
+        }
+
+        return if (rawDatasetsFromStorage.isNotEmpty()) {
+            rawDatasetsFromStorage.mapValues { (key, value) ->
+                val type = object : TypeToken<List<Any>>() {}.type
+                val input: List<Any> = Gson().fromJson(value.decodeToString(), type)
+                input
+            }
+        } else {
+            return datasets.associateBy({ it.id.toString() }, { it.input!! })
+        }
+    }
+
+
+    fun readRawDatasetResults(datasets: List<Dataset>): Map<String, List<Any>?> {
+        var rawDatasetsFromStorage = mutableMapOf<String, ByteArray>()
+        try {
+            rawDatasetsFromStorage =
+                this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/result" })
+                    .mapKeys { it.key.substringBefore("/") }.toMutableMap()
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read datasets" }
+        }
+
+        return if (rawDatasetsFromStorage.isNotEmpty()) {
+            rawDatasetsFromStorage.mapValues { (key, value) ->
+                val type = object : TypeToken<List<Any>>() {}.type
+                val result: List<Any> = Gson().fromJson(value.decodeToString(), type)
+                result
+            }
+        } else {
+            return datasets.associateBy({ it.id.toString() }, { it.result })
+        }
+    }
+
+    fun readRawDatasetInput(dataset: Dataset): List<Any> {
+        var rawDatasetFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawDatasetFromStorage =
+                this.storage.getObject(awsS3Config.datasetsBucketName, "${dataset.id.toString()}/input")
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read dataset with id ${dataset.id}" }
+        }
+
+        if (rawDatasetFromStorage.isPresent) {
+            val rawData = rawDatasetFromStorage.get()
+            val type = object : TypeToken<List<Any>>() {}.type
+            val input: List<Any> = Gson().fromJson(rawData.decodeToString(), type)
+            return input
+        } else if (dataset.input != null) {
+            logger.warn { "Failed to find input with id ${dataset.id} in storage, falling back to input from database" }
+            return dataset.input
+        }
+
+        throw JaqpotRuntimeException("Failed to find raw dataset input with id ${dataset.id}")
+    }
+
+    fun readRawDatasetResult(dataset: Dataset): List<Any>? {
+        var rawDatasetFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawDatasetFromStorage =
+                this.storage.getObject(awsS3Config.datasetsBucketName, "${dataset.id.toString()}/result")
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read dataset with id ${dataset.id}" }
+        }
+
+        if (rawDatasetFromStorage.isPresent) {
+            val rawData = rawDatasetFromStorage.get()
+            val type = object : TypeToken<List<Any>>() {}.type
+            val result: List<Any> = Gson().fromJson(rawData.decodeToString(), type)
+            return result
+        } else if (dataset.result != null) {
+            logger.warn { "Failed to find dataset result with id ${dataset.id} in storage, falling back to result from database" }
+            return dataset.result!!
+        }
+
+        return null
     }
 }

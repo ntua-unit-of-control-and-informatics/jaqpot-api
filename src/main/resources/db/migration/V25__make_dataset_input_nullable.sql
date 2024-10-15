@@ -1,0 +1,2 @@
+ALTER TABLE dataset
+    ALTER COLUMN input DROP NOT NULL;
