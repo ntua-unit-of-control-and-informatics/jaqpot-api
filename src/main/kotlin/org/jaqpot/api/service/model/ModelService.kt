@@ -17,6 +17,7 @@ import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
+import org.jaqpot.api.service.model.config.ModelConfiguration
 import org.jaqpot.api.service.prediction.PredictionService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
@@ -35,7 +36,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 private val logger = KotlinLogging.logger {}
-const val MAX_INPUT_ROWS = 10
 const val JAQPOT_INTERNAL_ID_KEY = "jaqpotInternalId"
 
 @Service
@@ -49,7 +49,8 @@ class ModelService(
     private val csvParser: CSVParser,
     private val csvDataConverter: CSVDataConverter,
     private val storageService: StorageService,
-    private val doaService: DoaService
+    private val doaService: DoaService,
+    private val modelConfiguration: ModelConfiguration
 ) : ModelApiDelegate {
 
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
@@ -139,43 +140,10 @@ class ModelService(
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 1, intervalInSeconds = 60)
-    override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
-        if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
-            val model = modelRepository.findById(modelId).orElseThrow {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
-            }
-            val userId = authenticationFacade.userId
-            // TODO once there are no models with rawModel in the database, remove this
-            storeRawModelToStorage(model)
-
-            val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
-
-            if (csvData.size > MAX_INPUT_ROWS) {
-                throw ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "CSV file contains more than $MAX_INPUT_ROWS rows, please provide a smaller dataset"
-                )
-            }
-
-            val input = csvDataConverter.convertCsvContentToInput(model, csvData)
-            val dataset = this.datasetRepository.save(
-                datasetCSVDto.toEntity(
-                    model,
-                    userId,
-                    DatasetEntryType.ARRAY,
-                    input
-                )
-            )
-
-            return triggerPredictionAndReturnSuccessStatus(model, dataset)
-        }
-
-        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
-    }
-
-    @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
+    @WithRateLimitProtectionByUser(
+        limit = 30,
+        intervalInSeconds = 60 * 60
+    ) // 30 requests per hour, up to 100 predictions per request
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetTypeDto.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
@@ -191,10 +159,10 @@ class ModelService(
                 DatasetEntryType.ARRAY
             )
 
-            if (toEntity.input!!.size > MAX_INPUT_ROWS) {
+            if (toEntity.input!!.size > modelConfiguration.maxInputPredictionRows.toInt()) {
                 throw ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Input contains more than $MAX_INPUT_ROWS rows, please provide a smaller dataset"
+                    "Input contains more than ${modelConfiguration.maxInputPredictionRows} rows, please provide a smaller dataset"
                 )
             }
 
@@ -204,6 +172,45 @@ class ModelService(
             }
 
             val dataset = this.datasetRepository.save(toEntity)
+
+            return triggerPredictionAndReturnSuccessStatus(model, dataset)
+        }
+
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
+    }
+
+    @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
+    @WithRateLimitProtectionByUser(
+        limit = 30,
+        intervalInSeconds = 60 * 60
+    ) // 30 requests per hour, up to 100 predictions per request
+    override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
+        if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
+            val model = modelRepository.findById(modelId).orElseThrow {
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+            }
+            val userId = authenticationFacade.userId
+            // TODO once there are no models with rawModel in the database, remove this
+            storeRawModelToStorage(model)
+
+            val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
+
+            if (csvData.size > modelConfiguration.maxInputPredictionRows.toInt()) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CSV file contains more than ${modelConfiguration.maxInputPredictionRows} rows, please provide a smaller dataset"
+                )
+            }
+
+            val input = csvDataConverter.convertCsvContentToInput(model, csvData)
+            val dataset = this.datasetRepository.save(
+                datasetCSVDto.toEntity(
+                    model,
+                    userId,
+                    DatasetEntryType.ARRAY,
+                    input
+                )
+            )
 
             return triggerPredictionAndReturnSuccessStatus(model, dataset)
         }

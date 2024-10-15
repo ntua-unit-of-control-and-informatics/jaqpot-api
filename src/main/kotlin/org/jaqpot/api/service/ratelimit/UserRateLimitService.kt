@@ -2,6 +2,7 @@ package org.jaqpot.api.service.ratelimit
 
 import io.github.bucket4j.BandwidthBuilder.BandwidthBuilderCapacityStage
 import io.github.bucket4j.Bucket
+import io.github.bucket4j.ConsumptionProbe
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.springframework.stereotype.Service
@@ -28,11 +29,10 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
         private val logger = KotlinLogging.logger {}
     }
 
-    fun shouldLimitUserAccess(methodName: String, limit: Long, intervalInSeconds: Long): Boolean {
+    private fun isUserRateLimited(methodName: String): Boolean {
         // do not rate limit public endpoints
         if (!authenticationFacade.isLoggedIn) return false
 
-        logger.info { "Rate limiting user access for method $methodName" }
         if (authenticationFacade.isAdmin) {
             return false
         } else if (rateLimitedEndpointsByPlan.contains(methodName)) {
@@ -42,23 +42,41 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
                 // TODO implement logic with pro user rate limit based on prediction credits
             }
         }
+        return true
+    }
 
-        val userIdBucketKey = getUserIdBucketKey(authenticationFacade.userId, methodName)
+    fun incrementMethodUsage(methodName: String, limit: Long, intervalInSeconds: Long): Optional<ConsumptionProbe> {
+        if (!isUserRateLimited(methodName)) {
+            return Optional.empty()
+        }
+
         val userBucket =
-            Optional.ofNullable(userIdBuckets[userIdBucketKey]).orElseGet {
-                // create map if not exists
-                userIdBuckets[userIdBucketKey] = createBucket(
-                    limit,
-                    intervalInSeconds
-                )
+            retrieveRateLimitingBucket(methodName, limit, intervalInSeconds)
 
-                userIdBuckets[userIdBucketKey]
-            }
+        val consumptionProbe = userBucket.tryConsumeAndReturnRemaining(1)
 
+        if (consumptionProbe.remainingTokens <= 0) {
+            throw RateLimitException("Rate limit exceeded for method $methodName by user ${authenticationFacade.userId}")
+        }
 
-        val limitIsReached = !userBucket.tryConsume(1)
+        return Optional.of(consumptionProbe)
+    }
 
-        return limitIsReached
+    private fun retrieveRateLimitingBucket(
+        methodName: String,
+        limit: Long,
+        intervalInSeconds: Long
+    ): Bucket {
+        val userIdBucketKey = getUserIdBucketKey(authenticationFacade.userId, methodName)
+        return if (userIdBuckets.containsKey(userIdBucketKey)) {
+            userIdBuckets[userIdBucketKey]!!
+        } else {
+            userIdBuckets[userIdBucketKey] = createBucket(
+                limit,
+                intervalInSeconds
+            )
+            return userIdBuckets[userIdBucketKey]!!
+        }
     }
 
     private fun createBucket(
