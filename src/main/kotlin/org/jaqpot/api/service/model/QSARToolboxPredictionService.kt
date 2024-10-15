@@ -1,7 +1,8 @@
 package org.jaqpot.api.service.model
 
-import org.jaqpot.api.entity.ModelType
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.service.qsartoolbox.QSARToolboxAPI
 import org.springframework.stereotype.Service
 
@@ -15,7 +16,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
         private const val PROFILER_GUID_KEY = "profilerGuid"
     }
 
-    private fun makeQsarModelPredictionRequest(datasetDto: DatasetDto): List<Any> {
+    private fun makeQsarModelPredictionRequest(datasetDto: DatasetDto): List<Map<*, *>> {
         return datasetDto.input.flatMapIndexed { index, it ->
             val datasetInput = it as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
@@ -39,7 +40,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
         }
     }
 
-    private fun makeCalculatorPredictionRequest(datasetDto: DatasetDto): List<Any> {
+    private fun makeCalculatorPredictionRequest(datasetDto: DatasetDto): List<Map<*, *>> {
         return datasetDto.input.flatMapIndexed { index, it ->
             val datasetInput = it as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
@@ -63,32 +64,9 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
         }
     }
 
-    fun makePredictionRequest(
-        datasetDto: DatasetDto,
-        type: ModelType
-    ): List<Any> {
-        return when (type) {
-            ModelType.QSAR_TOOLBOX_CALCULATOR -> {
-                makeCalculatorPredictionRequest(datasetDto)
-            }
-
-            ModelType.QSAR_TOOLBOX_QSAR_MODEL -> {
-                makeQsarModelPredictionRequest(datasetDto)
-            }
-
-            ModelType.QSAR_TOOLBOX_PROFILER -> {
-                makeProfilerPredictionRequest(datasetDto)
-            }
-
-            else -> {
-                throw IllegalArgumentException("Unsupported model type: $type")
-            }
-        }
-    }
-
     private fun makeProfilerPredictionRequest(
         datasetDto: DatasetDto
-    ): List<Any> {
+    ): List<Map<String, Any>> {
         return datasetDto.input.flatMapIndexed { index, it ->
             val datasetInput = it as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
@@ -112,6 +90,30 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                         qsarProperties
                     }
 
+            }
+        }
+    }
+
+    fun makePredictionRequest(
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto,
+        type: ModelTypeDto
+    ): List<Map<*, *>> {
+        return when (type) {
+            ModelTypeDto.QSAR_TOOLBOX_CALCULATOR -> {
+                makeCalculatorPredictionRequest(datasetDto)
+            }
+
+            ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL -> {
+                makeQsarModelPredictionRequest(datasetDto)
+            }
+
+            ModelTypeDto.QSAR_TOOLBOX_PROFILER -> {
+                makeProfilerPredictionRequest(datasetDto)
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unsupported model type: $type")
             }
         }
     }

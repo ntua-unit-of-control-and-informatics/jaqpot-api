@@ -1,18 +1,14 @@
 package org.jaqpot.api.service.prediction
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
-import org.jaqpot.api.entity.Model
 import org.jaqpot.api.mapper.toDto
-import org.jaqpot.api.mapper.toPredictionDto
-import org.jaqpot.api.mapper.toPredictionModelDto
+import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
-import org.jaqpot.api.service.model.isQsarToolboxModel
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
 import org.jaqpot.api.storage.StorageService
 import org.springframework.scheduling.annotation.Async
@@ -33,12 +29,13 @@ class PredictionService(
     }
 
     @Async
-    fun executePredictionAndSaveResults(model: Model, dataset: Dataset) {
+    fun executePredictionAndSaveResults(predictionModelDto: PredictionModelDto, dataset: Dataset) {
+        val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
 
         updateDatasetToExecuting(dataset)
 
         try {
-            val results: List<Any> = makePredictionRequest(model, dataset)
+            val results: List<Any> = makePredictionRequest(predictionModelDto, datasetDto)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
             logger.warn(e) { "Prediction failed for dataset with id ${dataset.id}" }
@@ -73,30 +70,13 @@ class PredictionService(
     }
 
     private fun makePredictionRequest(
-        model: Model,
-        dataset: Dataset
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto
     ): List<Any> {
-        val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
-        if (model.isQsarToolboxModel()) {
-            return qsarToolboxPredictionService.makePredictionRequest(
-                datasetDto,
-                model.type
-            )
-        }
-
-        val rawModel = storageService.readRawModel(model)
-        val doaDtos = model.doas.map {
-            val rawDoaData = storageService.readRawDoa(it)
-            val type = object : TypeToken<Map<String, Any>>() {}.type
-            val doaData: Map<String, Any> = Gson().fromJson(rawDoaData.decodeToString(), type)
-            it.toPredictionDto(doaData)
-        }
-        val predictionModelDto = model.toPredictionModelDto(rawModel, doaDtos)
-
         val response: PredictionResponseDto =
             predictionChain.getPredictionResults(predictionModelDto, datasetDto)
 
-        val results: List<Any> = response.predictions ?: emptyList()
+        val results: List<Any> = response.predictions
         return results
     }
 }
