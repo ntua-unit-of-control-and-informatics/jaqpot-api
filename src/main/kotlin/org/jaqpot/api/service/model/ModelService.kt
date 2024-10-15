@@ -35,7 +35,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 private val logger = KotlinLogging.logger {}
-const val MAX_INPUT_ROWS = 10
+const val MAX_INPUT_ROWS = 100
 const val JAQPOT_INTERNAL_ID_KEY = "jaqpotInternalId"
 
 @Service
@@ -139,7 +139,7 @@ class ModelService(
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 1, intervalInSeconds = 60)
+    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60 * 60)
     override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
         if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
@@ -175,7 +175,7 @@ class ModelService(
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 60)
+    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60 * 60)
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetTypeDto.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
