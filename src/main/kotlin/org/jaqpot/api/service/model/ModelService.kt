@@ -140,43 +140,10 @@ class ModelService(
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60 * 60)
-    override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
-        if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
-            val model = modelRepository.findById(modelId).orElseThrow {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
-            }
-            val userId = authenticationFacade.userId
-            // TODO once there are no models with rawModel in the database, remove this
-            storeRawModelToStorage(model)
-
-            val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
-
-            if (csvData.size > modelConfiguration.maxInputPredictionRows.toInt()) {
-                throw ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "CSV file contains more than ${modelConfiguration.maxInputPredictionRows} rows, please provide a smaller dataset"
-                )
-            }
-
-            val input = csvDataConverter.convertCsvContentToInput(model, csvData)
-            val dataset = this.datasetRepository.save(
-                datasetCSVDto.toEntity(
-                    model,
-                    userId,
-                    DatasetEntryType.ARRAY,
-                    input
-                )
-            )
-
-            return triggerPredictionAndReturnSuccessStatus(model, dataset)
-        }
-
-        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
-    }
-
-    @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
-    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60 * 60)
+    @WithRateLimitProtectionByUser(
+        limit = 30,
+        intervalInSeconds = 60 * 60
+    ) // 30 requests per hour, up to 100 predictions per request
     override fun predictWithModel(modelId: Long, datasetDto: DatasetDto): ResponseEntity<Unit> {
         if (datasetDto.type == DatasetTypeDto.PREDICTION) {
             val model = modelRepository.findById(modelId).orElseThrow {
@@ -205,6 +172,45 @@ class ModelService(
             }
 
             val dataset = this.datasetRepository.save(toEntity)
+
+            return triggerPredictionAndReturnSuccessStatus(model, dataset)
+        }
+
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
+    }
+
+    @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
+    @WithRateLimitProtectionByUser(
+        limit = 30,
+        intervalInSeconds = 60 * 60
+    ) // 30 requests per hour, up to 100 predictions per request
+    override fun predictWithModelCSV(modelId: Long, datasetCSVDto: DatasetCSVDto): ResponseEntity<Unit> {
+        if (datasetCSVDto.type == DatasetTypeDto.PREDICTION) {
+            val model = modelRepository.findById(modelId).orElseThrow {
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+            }
+            val userId = authenticationFacade.userId
+            // TODO once there are no models with rawModel in the database, remove this
+            storeRawModelToStorage(model)
+
+            val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
+
+            if (csvData.size > modelConfiguration.maxInputPredictionRows.toInt()) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CSV file contains more than ${modelConfiguration.maxInputPredictionRows} rows, please provide a smaller dataset"
+                )
+            }
+
+            val input = csvDataConverter.convertCsvContentToInput(model, csvData)
+            val dataset = this.datasetRepository.save(
+                datasetCSVDto.toEntity(
+                    model,
+                    userId,
+                    DatasetEntryType.ARRAY,
+                    input
+                )
+            )
 
             return triggerPredictionAndReturnSuccessStatus(model, dataset)
         }
