@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
+import java.time.OffsetDateTime
 
 
 interface DatasetRepository : CrudRepository<Dataset, Long> {
     fun findAllByUserId(userId: String, pageable: Pageable): Page<Dataset>
+
+    fun findAllByCreatedAtBefore(date: OffsetDateTime): List<Dataset>
 
     @Modifying(clearAutomatically = true)
     @Transactional
