@@ -1421,7 +1421,7 @@ components:
         hStar:
           type: number
           format: float
-        doa_matrix:
+        doaMatrix:
           type: array
           items:
             type: array
@@ -1433,7 +1433,7 @@ components:
     BoundingBoxDoa:
       type: object
       properties:
-        bounding_box:
+        boundingBox:
           type: array
           items:
             type: array
