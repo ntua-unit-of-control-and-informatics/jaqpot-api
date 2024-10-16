@@ -17,8 +17,8 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
     }
 
     private fun makeQsarModelPredictionRequest(datasetDto: DatasetDto): List<Map<*, *>> {
-        return datasetDto.input.flatMapIndexed { index, it ->
-            val datasetInput = it as DatasetInput
+        return datasetDto.input.flatMapIndexed { index, input ->
+            val datasetInput = input as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
             val qsarGuid = datasetInput[QSAR_MODEL_GUID_KEY] as String
             val searchSmilesResults = qsarToolboxAPI.searchSmiles(smiles)
@@ -34,15 +34,30 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                     qsarToolboxAPI.runQsarModel(result.ChemId as String, qsarGuid)!!.toMutableMap()
                 qsarProperties["Name"] = result.Names.joinToString { it }
                 qsarProperties["ChemId"] = result.ChemId
-                qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                addJaqpotMetadata(qsarProperties, index, input)
                 qsarProperties
             }
         }
     }
 
+    private fun addJaqpotMetadata(
+        qsarProperties: MutableMap<Any?, Any?>,
+        index: Int,
+        input: DatasetInput
+    ) {
+        val jaqpotMetadata = mutableMapOf<String, Any>()
+
+        jaqpotMetadata[JAQPOT_ROW_ID_KEY] = index.toString()
+        if (input[JAQPOT_ROW_LABEL_KEY] != null) {
+            jaqpotMetadata[JAQPOT_ROW_LABEL_KEY] = input[JAQPOT_ROW_LABEL_KEY].toString()
+        }
+        
+        qsarProperties[JAQPOT_METADATA_KEY] = jaqpotMetadata
+    }
+
     private fun makeCalculatorPredictionRequest(datasetDto: DatasetDto): List<Map<*, *>> {
-        return datasetDto.input.flatMapIndexed { index, it ->
-            val datasetInput = it as DatasetInput
+        return datasetDto.input.flatMapIndexed { index, input ->
+            val datasetInput = input as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
             val calculatorGuid = datasetInput[CALCULATOR_GUID_KEY] as String
             val searchSmilesResults = qsarToolboxAPI.searchSmiles(smiles)
@@ -58,7 +73,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                     qsarToolboxAPI.runCalculator(result.ChemId as String, calculatorGuid)!!.toMutableMap()
                 qsarProperties["Name"] = result.Names.joinToString { it }
                 qsarProperties["ChemId"] = result.ChemId
-                qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                addJaqpotMetadata(qsarProperties, index, input)
                 qsarProperties
             }
         }
@@ -67,8 +82,8 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
     private fun makeProfilerPredictionRequest(
         datasetDto: DatasetDto
     ): List<Map<String, Any>> {
-        return datasetDto.input.flatMapIndexed { index, it ->
-            val datasetInput = it as DatasetInput
+        return datasetDto.input.flatMapIndexed { index, input ->
+            val datasetInput = input as DatasetInput
             val smiles = datasetInput[SMILES_KEY] as String
             val profilerGuid = datasetInput[PROFILER_GUID_KEY] as String
             val searchSmilesResults = qsarToolboxAPI.searchSmiles(smiles)
@@ -86,7 +101,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                         qsarProperties["Value"] = it
                         qsarProperties["Name"] = result.Names.joinToString { it }
                         qsarProperties["ChemId"] = result.ChemId
-                        qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                        addJaqpotMetadata(qsarProperties as MutableMap<Any?, Any?>, index, input)
                         qsarProperties
                     }
 

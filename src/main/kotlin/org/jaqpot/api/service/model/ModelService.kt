@@ -36,7 +36,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 private val logger = KotlinLogging.logger {}
-const val JAQPOT_INTERNAL_ID_KEY = "jaqpotInternalId"
+const val JAQPOT_METADATA_KEY = "jaqpotMetadata"
+const val JAQPOT_ROW_ID_KEY = "jaqpotRowId"
+const val JAQPOT_ROW_LABEL_KEY = "jaqpotRowLabel"
 
 @Service
 class ModelService(
@@ -166,9 +168,9 @@ class ModelService(
                 )
             }
 
-            toEntity.input.forEachIndexed() { index, it: Any ->
+            toEntity.input.forEachIndexed { index, it: Any ->
                 if (it is Map<*, *>)
-                    (it as MutableMap<String, String>)[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                    (it as MutableMap<String, String>)[JAQPOT_ROW_ID_KEY] = index.toString()
             }
 
             val dataset = this.datasetRepository.save(toEntity)
