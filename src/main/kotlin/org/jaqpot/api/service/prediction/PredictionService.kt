@@ -9,10 +9,8 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
-import org.jaqpot.api.service.model.isQsarModel
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
+import org.jaqpot.api.storage.StorageService
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
@@ -22,6 +20,7 @@ import java.time.OffsetDateTime
 class PredictionService(
     private val datasetRepository: DatasetRepository,
     private val predictionChain: PredictionChain,
+    private val storageService: StorageService,
     private val qsarToolboxPredictionService: QSARToolboxPredictionService
 ) {
 
@@ -31,13 +30,7 @@ class PredictionService(
 
     @Async
     fun executePredictionAndSaveResults(predictionModelDto: PredictionModelDto, dataset: Dataset) {
-        val datasetDto = dataset.toDto()
-
-
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.accept = listOf(MediaType.APPLICATION_JSON)
-
+        val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
 
         updateDatasetToExecuting(dataset)
 
@@ -45,7 +38,7 @@ class PredictionService(
             val results: List<Any> = makePredictionRequest(predictionModelDto, datasetDto)
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
-            logger.error(e) { "Prediction for dataset with id ${dataset.id} failed" }
+            logger.warn(e) { "Prediction failed for dataset with id ${dataset.id}" }
             storeDatasetFailure(dataset, e)
         }
     }
@@ -61,6 +54,9 @@ class PredictionService(
         dataset.result = results
         dataset.executionFinishedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
+        if (storageService.storeDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
     }
 
     private fun storeDatasetFailure(dataset: Dataset, err: Exception) {
@@ -68,24 +64,19 @@ class PredictionService(
         dataset.failureReason = err.toString()
 
         datasetRepository.save(dataset)
+        if (storageService.storeDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
     }
 
     private fun makePredictionRequest(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): List<Any> {
-        if (predictionModelDto.type.isQsarModel()) {
-            return qsarToolboxPredictionService.makePredictionRequest(
-                predictionModelDto,
-                datasetDto,
-                predictionModelDto.type
-            )
-        }
-
         val response: PredictionResponseDto =
             predictionChain.getPredictionResults(predictionModelDto, datasetDto)
 
-        val results: List<Any> = response.predictions ?: emptyList()
+        val results: List<Any> = response.predictions
         return results
     }
 }

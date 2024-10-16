@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 
 @SpringBootApplication
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableAsync
 @EnableMethodSecurity
 @EnableCaching
+@EnableScheduling
 class JaqpotApiApplication
 
 fun main(args: Array<String>) {

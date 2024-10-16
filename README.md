@@ -1,4 +1,4 @@
-[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/build.yml) [![Publish Docker image](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml)
+[![Build & Test](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/build.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ntua-unit-of-control-and-informatics_jaqpot-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ntua-unit-of-control-and-informatics_jaqpot-api) [![Publish Docker image](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml/badge.svg)](https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api/actions/workflows/publish.yml)
 
 # Jaqpot API
 
