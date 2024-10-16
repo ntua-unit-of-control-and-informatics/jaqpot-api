@@ -34,7 +34,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                     qsarToolboxAPI.runQsarModel(result.ChemId as String, qsarGuid)!!.toMutableMap()
                 qsarProperties["Name"] = result.Names.joinToString { it }
                 qsarProperties["ChemId"] = result.ChemId
-                qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                qsarProperties[JAQPOT_ROW_ID_KEY] = index.toString()
                 qsarProperties
             }
         }
@@ -58,7 +58,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                     qsarToolboxAPI.runCalculator(result.ChemId as String, calculatorGuid)!!.toMutableMap()
                 qsarProperties["Name"] = result.Names.joinToString { it }
                 qsarProperties["ChemId"] = result.ChemId
-                qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                qsarProperties[JAQPOT_ROW_ID_KEY] = index.toString()
                 qsarProperties
             }
         }
@@ -86,7 +86,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
                         qsarProperties["Value"] = it
                         qsarProperties["Name"] = result.Names.joinToString { it }
                         qsarProperties["ChemId"] = result.ChemId
-                        qsarProperties[JAQPOT_INTERNAL_ID_KEY] = index.toString()
+                        qsarProperties[JAQPOT_ROW_ID_KEY] = index.toString()
                         qsarProperties
                     }
 
