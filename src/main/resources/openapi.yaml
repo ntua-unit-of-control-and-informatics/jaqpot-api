@@ -1421,7 +1421,7 @@ components:
         hStar:
           type: number
           format: float
-        array:
+        doa_matrix:
           type: array
           items:
             type: array
@@ -1433,8 +1433,13 @@ components:
     BoundingBoxDoa:
       type: object
       properties:
-        data:
-          type: object
+        _bounding_box:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
     KernelBasedDoa:
       type: object
       properties:
@@ -1443,8 +1448,13 @@ components:
     MeanVarDoa:
       type: object
       properties:
-        data:
-          type: object
+        _bounds:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
     MahalanobisDoa:
       type: object
       properties:
