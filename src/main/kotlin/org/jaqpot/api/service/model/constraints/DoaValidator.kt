@@ -21,7 +21,7 @@ class DoaValidator : ConstraintValidator<ValidDoa, List<DoaDto>?> {
                     return false
                 }
 
-                if (it.data.array == null) {
+                if (it.data.doaMatrix == null) {
                     context?.let { constraintValidatorContext ->
                         (constraintValidatorContext as ConstraintValidatorContextImpl).addMessageParameter(
                             "message",

@@ -1433,7 +1433,7 @@ components:
     BoundingBoxDoa:
       type: object
       properties:
-        _bounding_box:
+        bounding_box:
           type: array
           items:
             type: array
@@ -1448,7 +1448,7 @@ components:
     MeanVarDoa:
       type: object
       properties:
-        _bounds:
+        bounds:
           type: array
           items:
             type: array
