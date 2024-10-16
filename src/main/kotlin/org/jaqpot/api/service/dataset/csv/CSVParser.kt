@@ -16,9 +16,7 @@ class CSVParser {
 
     fun readCsv(inputStream: InputStream): List<List<String>> {
         try {
-
             return csvParser.parse(inputStream.reader())
-                .drop(1) // Dropping the header
                 .map {
                     it.toList()
                 }

@@ -36,7 +36,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 private val logger = KotlinLogging.logger {}
+const val JAQPOT_METADATA_KEY = "jaqpotMetadata"
 const val JAQPOT_ROW_ID_KEY = "jaqpotRowId"
+const val JAQPOT_ROW_LABEL_KEY = "jaqpotRowLabel"
 
 @Service
 class ModelService(
