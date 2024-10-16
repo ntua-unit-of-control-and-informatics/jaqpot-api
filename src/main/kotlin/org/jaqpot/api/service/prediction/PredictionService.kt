@@ -7,7 +7,6 @@ import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.repository.DatasetRepository
-import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.model.dto.PredictionResponseDto
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
 import org.jaqpot.api.storage.StorageService
@@ -21,13 +20,20 @@ class PredictionService(
     private val datasetRepository: DatasetRepository,
     private val predictionChain: PredictionChain,
     private val storageService: StorageService,
-    private val qsarToolboxPredictionService: QSARToolboxPredictionService
 ) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
+    /**
+     * Executes the prediction and saves the results.
+     * <p>
+     * Be careful with the Hibernate session here. The session is not getting transferred over
+     * because of the @Async annotation. If there are any lazy model fields or dataset fields,
+     * the session will break randomly.
+     * </p>
+     */
     @Async
     fun executePredictionAndSaveResults(predictionModelDto: PredictionModelDto, dataset: Dataset) {
         val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
