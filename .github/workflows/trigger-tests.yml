@@ -9,7 +9,7 @@ on:
 
 jobs:
   trigger-e2e-tests:
-    uses: ntua-unit-of-control-and-informatics/github-actions/.github/reusable_trigger_workflow.yml@main
+    uses: ntua-unit-of-control-and-informatics/github-actions/.github/workflows/reusable_trigger_workflow.yml@main
     with:
       target_repo: ntua-unit-of-control-and-informatics/jaqpot-e2e-tests
       event_type: run_e2e_tests
