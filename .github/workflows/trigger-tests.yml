@@ -16,6 +16,7 @@ jobs:
         with:
           app-id: ${{ secrets.UPCI_NTUA_APP_ID }}
           private-key: ${{ secrets.UPCI_NTUA_APP_SECRET }}
+          owner: ${{ github.repository_owner }}
 
       - name: Trigger tests in other repo
         run: |
