@@ -8,20 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  trigger:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ secrets.UPCI_NTUA_APP_ID }}
-          private-key: ${{ secrets.UPCI_NTUA_APP_SECRET }}
-          owner: ${{ github.repository_owner }}
-
-      - name: Trigger tests in other repo
-        run: |
-          curl -X POST \
-            -H "Authorization: token ${{ steps.app-token.outputs.token }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/ntua-unit-of-control-and-informatics/jaqpot-e2e-tests/dispatches \
-            -d '{"event_type": "run_e2e_tests"}'
+  trigger-e2e-tests:
+    uses: ntua-unit-of-control-and-informatics/github-actions/.github/reusable_trigger_workflow.yml@main
+    with:
+      target_repo: ntua-unit-of-control-and-informatics/jaqpot-e2e-tests
+      event_type: run_e2e_tests
+    secrets:
+      APP_ID: ${{ secrets.UPCI_NTUA_APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.UPCI_NTUA_APP_SECRET }}
