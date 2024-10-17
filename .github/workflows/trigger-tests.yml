@@ -18,6 +18,7 @@ jobs:
           app_id: ${{ secrets.UPCI_NTUA_APP_ID }}
           private_key: ${{ secrets.UPCI_NTUA_APP_SECRET }}
 
+
       - name: Trigger tests in other repo
         run: |
           curl -X POST \
