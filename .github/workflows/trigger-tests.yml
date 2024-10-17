@@ -11,18 +11,16 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@v2
+      - uses: actions/create-github-app-token@v1
+        id: app-token
         with:
-          app_id: ${{ secrets.UPCI_NTUA_APP_ID }}
-          private_key: ${{ secrets.UPCI_NTUA_APP_SECRET }}
-
+          app-id: ${{ secrets.UPCI_NTUA_APP_ID }}
+          private-key: ${{ secrets.UPCI_NTUA_APP_SECRET }}
 
       - name: Trigger tests in other repo
         run: |
           curl -X POST \
-            -H "Authorization: token ${{ steps.generate_token.outputs.token }}" \
+            -H "Authorization: token ${{ steps.app-token.outputs.token }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/ntua-unit-of-control-and-informatics/jaqpot-e2e-tests/dispatches \
             -d '{"event_type": "run_e2e_tests"}'
