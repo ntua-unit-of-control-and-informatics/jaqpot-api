@@ -82,7 +82,10 @@ class Model(
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 
-    ) : BaseEntity() {
+    @OneToOne(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var metrics: Metrics? = null
+
+) : BaseEntity() {
     fun isQsarToolboxModel() = this.type in listOf(
         ModelType.QSAR_TOOLBOX_CALCULATOR,
         ModelType.QSAR_TOOLBOX_QSAR_MODEL,
