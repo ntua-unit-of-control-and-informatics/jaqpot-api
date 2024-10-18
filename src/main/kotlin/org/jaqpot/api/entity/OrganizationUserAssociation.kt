@@ -12,7 +12,7 @@ class OrganizationUserAssociation(
         sequenceName = "organization_users_id_seq",
         allocationSize = 1
     )
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @Column(nullable = false)
     val userId: String,

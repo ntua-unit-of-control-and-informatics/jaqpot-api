@@ -4,7 +4,7 @@ plugins {
     val kotlinVersion = "1.9.24"
 
     java
-    id("org.springframework.boot") version "3.2.5"
+    id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.4"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
@@ -59,6 +59,9 @@ dependencies {
     // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0")
+
+    // map hibernate types to kotlin types
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.3")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

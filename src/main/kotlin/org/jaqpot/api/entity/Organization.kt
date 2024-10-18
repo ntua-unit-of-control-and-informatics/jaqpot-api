@@ -9,7 +9,7 @@ class Organization(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "organization_id_seq")
     @SequenceGenerator(name = "organization_id_seq", sequenceName = "organization_id_seq", allocationSize = 1)
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @Size(min = 3, max = 255)
     @Column(unique = true, nullable = false)

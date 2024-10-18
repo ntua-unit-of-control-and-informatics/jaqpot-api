@@ -1213,6 +1213,15 @@ components:
           maxLength: 1000
         legacyPredictionService:
           type: string
+        metrics:
+          type: object
+          properties:
+            regression:
+              $ref: '#/components/schemas/RegressionMetrics'
+            binaryClassification:
+              $ref: '#/components/schemas/BinaryClassificationMetrics'
+            multiclassClassification:
+              $ref: '#/components/schemas/MulticlassClassificationMetrics'
         extraConfig:
           $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
@@ -1225,6 +1234,9 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+
+
+
     ModelSummary:
       type: object
       required:
@@ -1273,6 +1285,112 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+
+    RegressionMetrics:
+      type: object
+      properties:
+        r2:
+          type: number
+          format: float
+        mae:
+          type: number
+          format: float
+        rmse:
+          type: number
+          format: float
+        rSquaredDiffRZero:
+          type: number
+          format: float
+        rSquaredDiffRZeroHat:
+          type: number
+          format: float
+        absDiffRZeroHat:
+          type: number
+          format: float
+        k:
+          type: number
+          format: float
+        kHat:
+          type: number
+          format: float
+    BinaryClassificationMetrics:
+      type: object
+      properties:
+        accuracy:
+          type: number
+          format: float
+        balancedAccuracy:
+          type: number
+          format: float
+        precision:
+          type: array
+          items:
+            type: number
+            format: float
+        recall:
+          type: array
+          items:
+            type: number
+            format: float
+        f1Score:
+          type: array
+          items:
+            type: number
+            format: float
+        jaccard:
+          type: array
+          items:
+            type: number
+            format: float
+        matthewsCorrCoef:
+          type: number
+          format: float
+        confusionMatrix:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
+    MulticlassClassificationMetrics:
+      type: object
+      properties:
+        accuracy:
+          type: number
+          format: float
+        balancedAccuracy:
+          type: number
+          format: float
+        precision:
+          type: array
+          items:
+            type: number
+            format: float
+        recall:
+          type: array
+          items:
+            type: number
+            format: float
+        f1Score:
+          type: array
+          items:
+            type: number
+            format: float
+        jaccard:
+          type: array
+          items:
+            type: number
+            format: float
+        matthewsCorrCoef:
+          type: number
+          format: float
+        confusionMatrix:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
 
     OrganizationSummary:
       type: object
