@@ -11,7 +11,7 @@ class Dataset(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dataset_id_seq")
     @SequenceGenerator(name = "dataset_id_seq", sequenceName = "dataset_id_seq", allocationSize = 1)
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", updatable = false, nullable = false)

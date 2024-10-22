@@ -28,6 +28,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         isAdmin = isAdmin,
         tags = this.tags,
         legacyPredictionService = this.legacyPredictionService,
+        metrics = this.metrics?.toDto(),
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )
@@ -51,6 +52,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         legacyPredictionService = null,
         task = this.task.toEntity(),
         tags = this.tags,
+        metrics = null,
         extraConfig = this.extraConfig?.let {
             mapOf(
                 // TODO force specific type for torch config
@@ -66,6 +68,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
     this.doas?.let { doaDtos -> m.doas.addAll(doaDtos.map { it.toEntity(m) }) }
     m.dependentFeatures.addAll(this.dependentFeatures.map { it.toEntity(m, FeatureDependency.DEPENDENT) })
     m.independentFeatures.addAll(this.independentFeatures.map { it.toEntity(m, FeatureDependency.INDEPENDENT) })
+    m.metrics = this.metrics?.toEntity(m)
 
     return m
 }

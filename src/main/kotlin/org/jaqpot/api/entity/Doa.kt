@@ -9,7 +9,7 @@ class Doa(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doa_id_seq")
     @SequenceGenerator(name = "doa_id_seq", sequenceName = "doa_id_seq", allocationSize = 1)
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", updatable = false, nullable = false)

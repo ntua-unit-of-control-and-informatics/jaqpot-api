@@ -12,7 +12,7 @@ class ModelOrganizationAssociation(
         sequenceName = "organization_models_id_seq",
         allocationSize = 1
     )
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @ManyToOne
     @JoinColumn(name = "model_id", nullable = false)

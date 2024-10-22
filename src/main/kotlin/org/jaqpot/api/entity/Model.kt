@@ -11,7 +11,7 @@ class Model(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "model_id_seq")
     @SequenceGenerator(name = "model_id_seq", sequenceName = "model_id_seq", allocationSize = 1)
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @Column(updatable = false)
     val legacyId: String?,
@@ -82,7 +82,10 @@ class Model(
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 
-    ) : BaseEntity() {
+    @OneToOne(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var metrics: Metrics? = null
+
+) : BaseEntity() {
     fun isQsarToolboxModel() = this.type in listOf(
         ModelType.QSAR_TOOLBOX_CALCULATOR,
         ModelType.QSAR_TOOLBOX_QSAR_MODEL,

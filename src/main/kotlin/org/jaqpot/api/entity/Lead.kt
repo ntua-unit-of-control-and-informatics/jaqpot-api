@@ -9,7 +9,7 @@ class Lead(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lead_id_seq")
     @SequenceGenerator(name = "lead_id_seq", sequenceName = "lead_id_seq", allocationSize = 1)
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @NotBlank
     @Email
