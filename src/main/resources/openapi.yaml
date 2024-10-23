@@ -1213,15 +1213,15 @@ components:
           maxLength: 1000
         legacyPredictionService:
           type: string
-        metrics:
+        scores:
           type: object
           properties:
-            regression:
-              $ref: '#/components/schemas/RegressionMetrics'
-            binaryClassification:
-              $ref: '#/components/schemas/BinaryClassificationMetrics'
-            multiclassClassification:
-              $ref: '#/components/schemas/MulticlassClassificationMetrics'
+            train:
+              $ref: '#/components/schemas/Scores'
+            test:
+              $ref: '#/components/schemas/Scores'
+            crossValidation:
+              $ref: '#/components/schemas/Scores'
         extraConfig:
           $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
@@ -1286,7 +1286,16 @@ components:
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
 
-    RegressionMetrics:
+    Scores:
+      type: object
+      properties:
+        regression:
+          $ref: '#/components/schemas/RegressionScores'
+        binaryClassification:
+          $ref: '#/components/schemas/BinaryClassificationScores'
+        multiclassClassification:
+          $ref: '#/components/schemas/MulticlassClassificationScores'
+    RegressionScores:
       type: object
       properties:
         r2:
@@ -1313,7 +1322,7 @@ components:
         kHat:
           type: number
           format: float
-    BinaryClassificationMetrics:
+    BinaryClassificationScores:
       type: object
       properties:
         accuracy:
@@ -1352,7 +1361,7 @@ components:
             items:
               type: number
               format: float
-    MulticlassClassificationMetrics:
+    MulticlassClassificationScores:
       type: object
       properties:
         accuracy:
