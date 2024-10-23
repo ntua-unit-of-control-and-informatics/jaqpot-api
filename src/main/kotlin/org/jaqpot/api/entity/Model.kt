@@ -82,9 +82,20 @@ class Model(
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 
-    @OneToOne(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var metrics: Metrics? = null
+    // @OneToMany because @SQLRestriction does not work with @OneToOne
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @SQLRestriction("score_type = 'TRAIN'")
+    var trainScores: List<Scores>? = null,
 
+    // @OneToMany because @SQLRestriction does not work with @OneToOne
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @SQLRestriction("score_type = 'TEST'")
+    var testScores: List<Scores>? = null,
+
+    // @OneToMany because @SQLRestriction does not work with @OneToOne
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @SQLRestriction("score_type = 'CROSS_VALIDATION'")
+    var crossValidationScores: List<Scores>? = null,
 ) : BaseEntity() {
     fun isQsarToolboxModel() = this.type in listOf(
         ModelType.QSAR_TOOLBOX_CALCULATOR,

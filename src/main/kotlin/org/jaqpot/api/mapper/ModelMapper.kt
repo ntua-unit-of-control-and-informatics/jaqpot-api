@@ -4,7 +4,9 @@ import org.jaqpot.api.dto.prediction.PredictionDoaDto
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.entity.ScoreType
 import org.jaqpot.api.model.ModelDto
+import org.jaqpot.api.model.ModelScoresDto
 import org.jaqpot.api.model.UserDto
 import java.util.*
 
@@ -28,7 +30,11 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         isAdmin = isAdmin,
         tags = this.tags,
         legacyPredictionService = this.legacyPredictionService,
-        metrics = this.metrics?.toDto(),
+        scores = ModelScoresDto(
+            train = this.trainScores?.firstOrNull()?.toDto(),
+            test = this.testScores?.firstOrNull()?.toDto(),
+            crossValidation = this.crossValidationScores?.firstOrNull()?.toDto(),
+        ),
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )
@@ -52,7 +58,6 @@ fun ModelDto.toEntity(creatorId: String): Model {
         legacyPredictionService = null,
         task = this.task.toEntity(),
         tags = this.tags,
-        metrics = null,
         extraConfig = this.extraConfig?.let {
             mapOf(
                 // TODO force specific type for torch config
@@ -68,7 +73,11 @@ fun ModelDto.toEntity(creatorId: String): Model {
     this.doas?.let { doaDtos -> m.doas.addAll(doaDtos.map { it.toEntity(m) }) }
     m.dependentFeatures.addAll(this.dependentFeatures.map { it.toEntity(m, FeatureDependency.DEPENDENT) })
     m.independentFeatures.addAll(this.independentFeatures.map { it.toEntity(m, FeatureDependency.INDEPENDENT) })
-    m.metrics = this.metrics?.toEntity(m)
+    this.scores?.test?.let { m.testScores = listOf(this.scores.test.toEntity(m, ScoreType.TEST)) }
+    this.scores?.train?.let { m.trainScores = listOf(this.scores.train.toEntity(m, ScoreType.TRAIN)) }
+    this.scores?.crossValidation?.let {
+        m.crossValidationScores = listOf(this.scores.crossValidation.toEntity(m, ScoreType.CROSS_VALIDATION))
+    }
 
     return m
 }

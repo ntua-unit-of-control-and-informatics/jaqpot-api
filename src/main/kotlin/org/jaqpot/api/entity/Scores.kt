@@ -5,17 +5,21 @@ import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 
 @Entity
-class Metrics(
+class Scores(
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metrics_id_seq")
-    @SequenceGenerator(name = "metrics_id_seq", sequenceName = "metrics_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "scores_id_seq")
+    @SequenceGenerator(name = "scores_id_seq", sequenceName = "scores_id_seq", allocationSize = 1)
     val id: Long? = null,
 
     @OneToOne
     @JoinColumn(name = "model_id", nullable = false)
     val model: Model,
 
-//    // Regression Metrics
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val scoreType: ScoreType,
+
+    // Regression Scores
     val r2: Float?,
     val mae: Float?,
     val rmse: Float?,
@@ -25,7 +29,7 @@ class Metrics(
     val k: Float?,
     val kHat: Float?,
 //
-//    // Binary Classification Metrics
+    // Binary Classification Metrics
     val accuracy: Float?,
     val balancedAccuracy: Float?,
     val precision: FloatArray?,
@@ -36,8 +40,8 @@ class Metrics(
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     val confusionMatrix: Array<FloatArray>?,
-//
-//    // Multiclass Classification Metrics
+
+    // Multiclass Classification Metrics
     val multiClassAccuracy: Float?,
     val multiClassBalancedAccuracy: Float?,
     val multiClassPrecision: FloatArray?,
@@ -50,7 +54,3 @@ class Metrics(
     val multiClassConfusionMatrix: Array<FloatArray>?
 ) : BaseEntity()
 
-fun main() {
-    System.out.println(org.hibernate.Version.getVersionString());
-
-}
