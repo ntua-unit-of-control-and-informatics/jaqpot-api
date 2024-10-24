@@ -1670,6 +1670,7 @@ components:
         - STRING
         - TEXT
         - FLOAT_ARRAY
+        - STRING_ARRAY
       example: FLOAT
     DatasetType:
       type: string
