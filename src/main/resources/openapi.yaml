@@ -1669,6 +1669,7 @@ components:
         - SMILES
         - STRING
         - TEXT
+        - FLOAT_ARRAY
       example: FLOAT
     DatasetType:
       type: string
