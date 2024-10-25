@@ -68,8 +68,6 @@ In our project, we leverage the OpenAPI Generator to streamline our development 
 Using this approach, we keep our API definitions centralized, up-to-date, and aligned with the overall architectural
 requirements.
 
-## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 
