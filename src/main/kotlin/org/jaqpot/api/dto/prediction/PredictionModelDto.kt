@@ -11,6 +11,7 @@ class PredictionModelDto(
     val type: ModelTypeDto,
     val rawModel: String,
     val doas: List<PredictionDoaDto>,
+    val selectedFeatures: List<String>,
     val task: ModelTaskDto,
     val extraConfig: Map<String, Any>? = emptyMap(),
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),

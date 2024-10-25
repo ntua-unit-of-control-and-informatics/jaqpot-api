@@ -65,6 +65,8 @@ class Model(
     @Column(nullable = false)
     var task: ModelTask,
 
+    val selectedFeatures: List<String>?,
+
     @Size(min = 3, max = 1000)
     @Column(columnDefinition = "TEXT")
     var tags: String?,

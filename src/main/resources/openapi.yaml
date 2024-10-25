@@ -463,6 +463,7 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/FeaturePossibleValue'
+                  maxItems: 1000
       responses:
         '200':
           description: Feature updated successfully
@@ -1177,18 +1178,22 @@ components:
           items:
             $ref: '#/components/schemas/Doa'
           x-field-extra-annotation: "@get:org.jaqpot.api.service.model.constraints.ValidDoa"
+          maxItems: 50
         libraries:
           type: array
           items:
             $ref: '#/components/schemas/Library'
+          maxItems: 1000
         dependentFeatures:
           type: array
           items:
             $ref: '#/components/schemas/Feature'
+          maxItems: 1000
         independentFeatures:
           type: array
           items:
             $ref: '#/components/schemas/Feature'
+          maxItems: 1000
         sharedWithOrganizations:
           type: array
           items:
@@ -1208,6 +1213,11 @@ components:
           type: boolean
         isAdmin:
           type: boolean
+        selectedFeatures:
+          type: array
+          items:
+            type: string
+          maxItems: 1000
         tags:
           type: string
           maxLength: 1000
@@ -1336,21 +1346,25 @@ components:
           items:
             type: number
             format: float
+          maxItems: 1000
         recall:
           type: array
           items:
             type: number
             format: float
+          maxItems: 1000
         f1Score:
           type: array
           items:
             type: number
             format: float
+          maxItems: 1000
         jaccard:
           type: array
           items:
             type: number
             format: float
+          maxItems: 1000
         matthewsCorrCoef:
           type: number
           format: float
@@ -1361,6 +1375,8 @@ components:
             items:
               type: number
               format: float
+            maxItems: 1000
+          maxItems: 1000
     MulticlassClassificationScores:
       type: object
       properties:
@@ -1375,21 +1391,25 @@ components:
           items:
             type: number
             format: float
+          maxItems: 1000
         recall:
           type: array
           items:
             type: number
             format: float
+          maxItems: 1000
         f1Score:
           type: array
           items:
             type: number
             format: float
+          maxItems: 1000
         jaccard:
           type: array
           items:
             type: number
             format: float
+          maxItems: 1000
         matthewsCorrCoef:
           type: number
           format: float
@@ -1400,6 +1420,8 @@ components:
             items:
               type: number
               format: float
+            maxItems: 1000
+          maxItems: 1000
 
     OrganizationSummary:
       type: object
@@ -1446,10 +1468,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Transformer'
+          maxItems: 50
         featurizers:
           type: array
           items:
             $ref: '#/components/schemas/Transformer'
+          maxItems: 50
     Transformer:
       type: object
       description: A preprocessor for the model
@@ -1555,6 +1579,8 @@ components:
             items:
               type: number
               format: float
+            maxItems: 1000
+          maxItems: 1000
 
 
     BoundingBoxDoa:
@@ -1567,6 +1593,8 @@ components:
             items:
               type: number
               format: float
+            maxItems: 1000
+          maxItems: 1000
     KernelBasedDoa:
       type: object
       properties:
@@ -1582,6 +1610,8 @@ components:
             items:
               type: number
               format: float
+              maxItems: 1000
+            maxItems: 1000
     MahalanobisDoa:
       type: object
       properties:
@@ -1637,6 +1667,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FeaturePossibleValue'
+          maxItems: 1000
         createdAt:
           type: string
           format: date-time
@@ -1698,6 +1729,7 @@ components:
         input:
           type: array
           items: { }
+          maxItems: 100
         result:
           type: array
           items: { }
