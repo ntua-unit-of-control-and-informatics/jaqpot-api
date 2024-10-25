@@ -29,6 +29,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         canEdit = userCanEdit,
         isAdmin = isAdmin,
         tags = this.tags,
+        selectedFeatures = this.selectedFeatures,
         legacyPredictionService = this.legacyPredictionService,
         scores = ModelScoresDto(
             train = this.trainScores?.firstOrNull()?.toDto(),
@@ -58,6 +59,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         legacyPredictionService = null,
         task = this.task.toEntity(),
         tags = this.tags,
+        selectedFeatures = this.selectedFeatures,
         extraConfig = this.extraConfig?.let {
             mapOf(
                 // TODO force specific type for torch config
@@ -91,6 +93,7 @@ fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<PredictionDoaDto>
         task = this.task.toDto(),
         rawModel = this.encodeRawModel(rawModel),
         doas = doas,
+        selectedFeatures = this.selectedFeatures ?: emptyList(),
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
