@@ -453,6 +453,10 @@ paths:
                   type: string
                   description: The units that this feature is using
                   example: mg/L
+                range:
+                  type: string
+                  description: The range that this feature is using
+                  example: 0-100
                 description:
                   type: string
                   maxLength: 2000
@@ -1646,9 +1650,14 @@ components:
           example: A feature name
         units:
           type: string
-          description: A name for the feature that will appear on top of the form field
+          description: The units for the feature
           maxLength: 255
-          example: A feature unit
+          example: mg/s
+        range:
+          type: string
+          description: The range for the feature
+          maxLength: 255
+          example: 0-100
         description:
           type: string
           maxLength: 2000

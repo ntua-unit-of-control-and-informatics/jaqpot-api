@@ -15,6 +15,7 @@ fun Feature.toDto(): FeatureDto {
         featureDependency = this.featureDependency.toDto(),
         possibleValues = this.possibleValues?.map { it.toDto() },
         units = this.units,
+        range = this.range,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )
@@ -30,6 +31,7 @@ fun FeatureDto.toEntity(model: Model, featureDependency: FeatureDependency): Fea
         featureDependency = featureDependency,
         featureType = this.featureType.toEntity(),
         possibleValues = this.possibleValues?.map { it.toEntity() },
-        units = this.units
+        units = this.units,
+        range = this.range
     )
 }

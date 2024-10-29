@@ -30,6 +30,9 @@ class Feature(
     @Column
     var units: String?,
 
+    @Column
+    var range: String?,
+
     @Size(min = 3, max = 5000)
     @Column(columnDefinition = "TEXT")
     var description: String?,
