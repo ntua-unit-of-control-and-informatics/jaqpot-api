@@ -6,11 +6,11 @@ import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.DoaDataDto
 import org.jaqpot.api.model.DoaDto
 
-fun Doa.toDto(doaData: Any?): DoaDto {
+fun Doa.toDto(doaData: DoaDataDto): DoaDto {
     return DoaDto(
         id = this.id,
         method = this.method.toDto(),
-        data = doaData as DoaDataDto,
+        data = doaData,
     )
 }
 

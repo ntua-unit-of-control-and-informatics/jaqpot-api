@@ -13,7 +13,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         type = this.type.toDto(),
         jaqpotpyVersion = this.jaqpotpyVersion,
         libraries = this.libraries.map { it.toDto() },
-        doas = this.doas.map { it.toDto(null) }, // returning empty byte array
+        doas = this.doas.map { it.toDto(DoaDataDto()) }, // returning empty doa data as they're only used for inference
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         visibility = this.visibility.toDto(),

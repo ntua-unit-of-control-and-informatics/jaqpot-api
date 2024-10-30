@@ -234,8 +234,8 @@ class ModelService(
         }
         val doaDtos = model.doas.map {
             val rawDoaData = storageService.readRawDoa(it)
-            val type = object : TypeToken<Map<String, Any>>() {}.type
-            val doaData: Map<String, Any> = Gson().fromJson(rawDoaData.decodeToString(), type)
+            val type = object : TypeToken<DoaDataDto>() {}.type
+            val doaData: DoaDataDto = Gson().fromJson(rawDoaData.decodeToString(), type)
             it.toDto(doaData)
         }
 
