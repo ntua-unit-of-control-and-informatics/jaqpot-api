@@ -16,6 +16,8 @@ class AWSS3Config(
     val datasetsBucketName: String,
     @Value("\${aws.s3.doas-bucket}")
     val doasBucketName: String,
+    @Value("\${aws.s3.preprocessors-bucket}")
+    val preprocessorsBucketName: String,
 ) {
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {

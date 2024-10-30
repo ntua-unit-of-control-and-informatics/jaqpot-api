@@ -74,6 +74,11 @@ class Model(
     @Lob
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column
+    var rawPreprocessor: ByteArray?,
+
+    @Lob
+    @JdbcTypeCode(SqlTypes.BINARY)
+    @Column
     var rawModel: ByteArray?,
 
     @JdbcTypeCode(SqlTypes.JSON)
