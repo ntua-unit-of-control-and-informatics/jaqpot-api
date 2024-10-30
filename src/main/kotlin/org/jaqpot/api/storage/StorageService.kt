@@ -130,7 +130,7 @@ class StorageService(
             )
 
             this.storage.putObject(
-                awsS3Config.modelsBucketName,
+                awsS3Config.preprocessorsBucketName,
                 getModelStorageKey(model),
                 model.rawPreprocessor!!,
                 metadata
