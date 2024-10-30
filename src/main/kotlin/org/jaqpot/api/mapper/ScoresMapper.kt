@@ -12,6 +12,7 @@ import org.jaqpot.api.model.ScoresDto
 fun Scores.toDto(): ScoresDto {
     return ScoresDto(
         regression = RegressionScoresDto(
+            yName = this.yName,
             r2 = this.r2,
             mae = this.mae,
             rmse = this.rmse,
@@ -22,6 +23,7 @@ fun Scores.toDto(): ScoresDto {
             kHat = this.kHat
         ),
         binaryClassification = BinaryClassificationScoresDto(
+            yName = this.yName,
             accuracy = this.accuracy,
             balancedAccuracy = this.balancedAccuracy,
             precision = this.precision?.toList(),
@@ -32,6 +34,7 @@ fun Scores.toDto(): ScoresDto {
             confusionMatrix = this.confusionMatrix?.toList()?.map { it.toList() }
         ),
         multiclassClassification = MulticlassClassificationScoresDto(
+            yName = this.yName,
             accuracy = this.multiClassAccuracy,
             balancedAccuracy = this.multiClassBalancedAccuracy,
             precision = this.multiClassPrecision?.toList(),
@@ -39,7 +42,7 @@ fun Scores.toDto(): ScoresDto {
             f1Score = this.multiClassF1Score?.toList(),
             jaccard = this.multiClassJaccard?.toList(),
             matthewsCorrCoef = this.multiClassMatthewsCorrCoef,
-            confusionMatrix = this.multiClassConfusionMatrix?.toList()?.map { it.toList() },
+            confusionMatrix = this.multiClassConfusionMatrix?.toList()?.map { it.toList().map { it1 -> it1.toList() } },
         )
     )
 }
@@ -48,6 +51,8 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
     return Scores(
         model = model,
         scoreType = scoreType,
+        yName = this.regression?.yName ?: this.binaryClassification?.yName
+        ?: this.multiclassClassification?.yName ?: "",
         r2 = this.regression?.r2,
         mae = this.regression?.mae,
         rmse = this.regression?.rmse,
@@ -72,7 +77,9 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
         multiClassF1Score = this.multiclassClassification?.f1Score?.toFloatArray(),
         multiClassJaccard = this.multiclassClassification?.jaccard?.toFloatArray(),
         multiClassMatthewsCorrCoef = this.multiclassClassification?.matthewsCorrCoef,
-        multiClassConfusionMatrix = this.multiclassClassification?.confusionMatrix?.map { it.toFloatArray() }
+        multiClassConfusionMatrix = this.multiclassClassification?.confusionMatrix?.map {
+            it.map { it1 -> it1.toFloatArray() }.toTypedArray()
+        }
             ?.toTypedArray()
     )
 }

@@ -97,17 +97,14 @@ class Model(
     @SQLRestriction("transformer_type = 'PREPROCESSOR'")
     val preprocessors: MutableList<ModelTransformer>,
 
-    // @OneToMany because @SQLRestriction does not work with @OneToOne
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("score_type = 'TRAIN'")
     var trainScores: List<Scores>? = null,
 
-    // @OneToMany because @SQLRestriction does not work with @OneToOne
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("score_type = 'TEST'")
     var testScores: List<Scores>? = null,
 
-    // @OneToMany because @SQLRestriction does not work with @OneToOne
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("score_type = 'CROSS_VALIDATION'")
     var crossValidationScores: List<Scores>? = null,

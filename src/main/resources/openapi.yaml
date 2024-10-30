@@ -1246,11 +1246,17 @@ components:
           type: object
           properties:
             train:
-              $ref: '#/components/schemas/Scores'
+              type: array
+              items:
+                $ref: '#/components/schemas/Scores'
             test:
-              $ref: '#/components/schemas/Scores'
+              type: array
+              items:
+                $ref: '#/components/schemas/Scores'
             crossValidation:
-              $ref: '#/components/schemas/Scores'
+              type: array
+              items:
+                $ref: '#/components/schemas/Scores'
         extraConfig:
           $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
@@ -1326,7 +1332,11 @@ components:
           $ref: '#/components/schemas/MulticlassClassificationScores'
     RegressionScores:
       type: object
+      required:
+        - yName
       properties:
+        yName:
+          type: string
         r2:
           type: number
           format: float
@@ -1353,7 +1363,11 @@ components:
           format: float
     BinaryClassificationScores:
       type: object
+      required:
+        - yName
       properties:
+        yName:
+          type: string
         accuracy:
           type: number
           format: float
@@ -1398,7 +1412,11 @@ components:
           maxItems: 1000
     MulticlassClassificationScores:
       type: object
+      required:
+        - yName
       properties:
+        yName:
+          type: string
         accuracy:
           type: number
           format: float
@@ -1437,10 +1455,13 @@ components:
           items:
             type: array
             items:
-              type: number
-              format: float
-            maxItems: 1000
-          maxItems: 1000
+              type: array
+              items:
+                type: number
+                format: float
+              maxItems: 2
+            maxItems: 2
+          maxItems: 100
 
     OrganizationSummary:
       type: object
