@@ -2055,6 +2055,7 @@ components:
           additionalProperties:
             $ref: '#/components/schemas/AnyValue'
           description: "Optional configuration for additional settings."
+      additionalProperties: false
     PredictionResponse:
       type: object
       required:
@@ -2065,6 +2066,7 @@ components:
           items:
             $ref: '#/components/schemas/AnyValue'
           description: "List of predictions"
+      additionalProperties: false
 
     User:
       title: User
