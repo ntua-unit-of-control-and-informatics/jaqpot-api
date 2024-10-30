@@ -63,6 +63,7 @@ aws:
     models-bucket:
     datasets-bucket:
     doas-bucket:
+    preprocessors-bucket:
 
 server:
   error:

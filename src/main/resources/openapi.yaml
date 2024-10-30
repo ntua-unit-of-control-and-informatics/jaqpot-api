@@ -1221,6 +1221,10 @@ components:
           items:
             $ref: '#/components/schemas/Transformer'
           maxItems: 50
+        rawPreprocessor:
+          type: string
+          format: byte
+          description: A base64 representation of the raw preprocessor.
         rawModel:
           type: string
           format: byte
@@ -1623,9 +1627,6 @@ components:
             items:
               type: number
               format: float
-            maxItems: 1000
-          maxItems: 1000
-
 
     BoundingBoxDoa:
       type: object
@@ -2014,6 +2015,9 @@ components:
         rawModel:
           type: string
           description: "Raw model data in serialized format"
+        rawPreprocessor:
+          type: string
+          description: "Raw preprocessor data in serialized format"
         doas:
           type: array
           items:

@@ -122,6 +122,44 @@ class StorageService(
 
     private fun getModelStorageKey(model: Model) = model.id.toString()
 
+    fun storeRawPreprocessor(model: Model): Boolean {
+        try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to Encoding.RAW.name
+            )
+
+            this.storage.putObject(
+                awsS3Config.modelsBucketName,
+                getModelStorageKey(model),
+                model.rawPreprocessor!!,
+                metadata
+            )
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store preprocessor for model with id ${model.id}" }
+            return false
+        }
+    }
+
+    fun readRawPreprocessor(model: Model): ByteArray? {
+        var rawPreprocessorFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawPreprocessorFromStorage =
+                this.storage.getObject(awsS3Config.preprocessorsBucketName, getModelStorageKey(model))
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read preprocessor for model with id ${model.id}" }
+        }
+
+        if (rawPreprocessorFromStorage.isPresent) {
+            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id)
+        } else if (model.rawPreprocessor != null) {
+            logger.warn { "Failed to find raw preprocessor for model with id ${model.id} in storage, falling back to raw preprocessor from database" }
+            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id)
+        }
+
+        return null
+    }
 
     fun readRawDoa(doa: Doa): ByteArray {
         var rawDoaFromStorage = Optional.empty<ByteArray>()

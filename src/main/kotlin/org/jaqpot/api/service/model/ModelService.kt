@@ -115,6 +115,18 @@ class ModelService(
         }
     }
 
+    private fun storeRawPreprocessorToStorage(model: Model) {
+        if (model.rawPreprocessor == null) {
+            // model is already stored in storage
+            return
+        }
+        logger.info { "Storing raw preprocessor to storage for model with id ${model.id}" }
+        if (storageService.storeRawPreprocessor(model)) {
+            logger.info { "Successfully moved raw model to storage for model ${model.id}" }
+            modelRepository.setRawPreprocessorToNull(model.id)
+        }
+    }
+
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     override fun getModelById(id: Long): ResponseEntity<ModelDto> {
         val model = modelRepository.findById(id)
@@ -232,6 +244,8 @@ class ModelService(
         } else {
             storageService.readRawModel(model)
         }
+        val rawPreprocessor = storageService.readRawPreprocessor(model)
+
         val doaDtos = model.doas.map {
             val rawDoaData = storageService.readRawDoa(it)
             val type = object : TypeToken<DoaDataDto>() {}.type
@@ -240,7 +254,7 @@ class ModelService(
         }
 
         this.predictionService.executePredictionAndSaveResults(
-            model.toPredictionModelDto(rawModel, doaDtos),
+            model.toPredictionModelDto(rawModel, doaDtos, rawPreprocessor),
             dataset
         )
 

@@ -71,6 +71,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
                 "featurizers" to (this.extraConfig?.featurizers ?: arrayOf<Any>()),
             )
         },
+        rawPreprocessor = this.rawPreprocessor,
         rawModel = this.rawModel,
     )
 
@@ -103,7 +104,11 @@ fun ModelDto.toEntity(creatorId: String): Model {
     return m
 }
 
-fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<DoaDto>): PredictionModelDto {
+fun Model.toPredictionModelDto(
+    rawModel: ByteArray,
+    doas: List<DoaDto>,
+    rawPreprocessor: ByteArray?
+): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
@@ -111,6 +116,7 @@ fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<DoaDto>): Predict
         type = this.type.toDto(),
         task = this.task.toDto(),
         rawModel = this.encodeRawModel(rawModel),
+        rawPreprocessor = this.encodeRawPreprocessor(rawPreprocessor),
         doas = doas,
         selectedFeatures = this.selectedFeatures ?: emptyList(),
         featurizers = this.featurizers.map { it.toDto() },
@@ -120,6 +126,14 @@ fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<DoaDto>): Predict
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )
+}
+
+private fun Model.encodeRawPreprocessor(rawPreprocessor: ByteArray?): String? {
+    return if (rawPreprocessor == null) {
+        null
+    } else {
+        Base64.getEncoder().encodeToString(rawPreprocessor)
+    }
 }
 
 fun Model.encodeRawModel(rawModel: ByteArray): String {
