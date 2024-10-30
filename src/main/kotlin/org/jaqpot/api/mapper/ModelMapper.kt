@@ -1,14 +1,10 @@
 package org.jaqpot.api.mapper
 
-import org.jaqpot.api.dto.prediction.PredictionDoaDto
-import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.entity.ModelTransformerType
 import org.jaqpot.api.entity.ScoreType
-import org.jaqpot.api.model.ModelDto
-import org.jaqpot.api.model.ModelScoresDto
-import org.jaqpot.api.model.UserDto
+import org.jaqpot.api.model.*
 import java.util.*
 
 fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin: Boolean? = null): ModelDto {
@@ -17,7 +13,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         type = this.type.toDto(),
         jaqpotpyVersion = this.jaqpotpyVersion,
         libraries = this.libraries.map { it.toDto() },
-        doas = this.doas.map { it.toDto() }, // returning empty byte array
+        doas = this.doas.map { it.toDto(null) }, // returning empty byte array
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         visibility = this.visibility.toDto(),
@@ -63,6 +59,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         selectedFeatures = this.selectedFeatures,
         featurizers = mutableListOf(),
         preprocessors = mutableListOf(),
+        torchConfig = this.torchConfig,
         extraConfig = this.extraConfig?.let {
             mapOf(
                 // TODO force specific type for torch config
@@ -103,7 +100,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
     return m
 }
 
-fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<PredictionDoaDto>): PredictionModelDto {
+fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<DoaDto>): PredictionModelDto {
     return PredictionModelDto(
         id = this.id,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
@@ -114,7 +111,8 @@ fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<PredictionDoaDto>
         doas = doas,
         selectedFeatures = this.selectedFeatures ?: emptyList(),
         featurizers = this.featurizers.map { it.toDto() },
-        preprocessros = this.preprocessors.map { it.toDto() },
+        preprocessors = this.preprocessors.map { it.toDto() },
+        torchConfig = this.torchConfig,
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService

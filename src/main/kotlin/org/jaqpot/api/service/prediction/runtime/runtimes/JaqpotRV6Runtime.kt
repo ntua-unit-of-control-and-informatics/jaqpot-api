@@ -1,8 +1,8 @@
 package org.jaqpot.api.service.prediction.runtime.runtimes
 
-import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
+import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.service.model.dto.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.springframework.http.HttpEntity
@@ -33,7 +33,10 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
         return "/${R_RUNTIME_PATHS[predictionModelDto.type]}"
     }
 
-    override fun createRequestBody(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): HttpEntity<Any> {
+    override fun createRequestBody(
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto
+    ): HttpEntity<Any> {
         val predictionRequestDto = PredictionRequestDto(
             predictionModelDto,
             datasetDto,

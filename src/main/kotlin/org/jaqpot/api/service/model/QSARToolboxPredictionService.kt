@@ -1,8 +1,8 @@
 package org.jaqpot.api.service.model
 
-import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
+import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.service.qsartoolbox.QSARToolboxAPI
 import org.springframework.stereotype.Service
 
@@ -51,7 +51,7 @@ class QSARToolboxPredictionService(private val qsarToolboxAPI: QSARToolboxAPI) {
         if (input[JAQPOT_ROW_LABEL_KEY] != null) {
             jaqpotMetadata[JAQPOT_ROW_LABEL_KEY] = input[JAQPOT_ROW_LABEL_KEY].toString()
         }
-        
+
         qsarProperties[JAQPOT_METADATA_KEY] = jaqpotMetadata
     }
 

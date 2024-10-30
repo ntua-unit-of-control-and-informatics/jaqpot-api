@@ -77,6 +77,11 @@ class Model(
     var rawModel: ByteArray?,
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "torch_config", columnDefinition = "jsonb")
+    val torchConfig: Map<String, Any>? = emptyMap(),
+
+    @Deprecated("Use featurizers, preprocessors and torchConfig instead")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "extra_config", columnDefinition = "jsonb")
     val extraConfig: Map<String, Any>? = emptyMap(),
 

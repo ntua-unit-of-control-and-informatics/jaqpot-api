@@ -1,7 +1,7 @@
 package org.jaqpot.api.service.prediction.runtime.runtimes.legacy
 
-import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
 import org.springframework.http.HttpEntity
@@ -18,7 +18,10 @@ class LegacyPythonGeneric024Runtime(private val runtimeConfiguration: RuntimeCon
         return runtimeConfiguration.legacyGenericPython24
     }
 
-    override fun createRequestBody(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): HttpEntity<Any> {
+    override fun createRequestBody(
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto
+    ): HttpEntity<Any> {
         return HttpEntity(generateLegacyPredictionRequest(predictionModelDto, datasetDto))
     }
 }

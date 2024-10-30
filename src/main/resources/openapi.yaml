@@ -1963,6 +1963,81 @@ components:
         status:
           type: string
           enum: [ PENDING, APPROVED, DENIED ]
+    PredictionModel:
+      type: object
+      required:
+        - dependentFeatures
+        - independentFeatures
+        - type
+        - rawModel
+        - task
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: true
+          description: "Unique identifier for the prediction model"
+        dependentFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+          description: "List of dependent features for the model"
+        independentFeatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+          description: "List of independent features for the model"
+        type:
+          $ref: '#/components/schemas/ModelType'
+          description: "Type of the model"
+        rawModel:
+          type: string
+          description: "Raw model data in serialized format"
+        doas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doa'
+          description: "List of Domain of Applicability (DoA) configurations"
+        selectedFeatures:
+          type: array
+          items:
+            type: string
+          description: "List of feature names selected for the model"
+        task:
+          $ref: '#/components/schemas/ModelTask'
+          description: "Task configuration for the model"
+        featurizers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transformer'
+          description: "List of featurizer configurations applied to the model"
+        preprocessors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transformer'
+          description: "List of preprocessor configurations applied to the model"
+        torchConfig:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+          description: "Torch configuration settings, optional"
+          nullable: true
+        extraConfig:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+          description: "Additional configuration settings, optional"
+          nullable: true
+        legacyAdditionalInfo:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+          description: "Legacy additional information settings, optional"
+          nullable: true
+        legacyPredictionService:
+          type: string
+          nullable: true
+          description: "Legacy prediction service information, if available"
     User:
       title: User
       x-stoplight:
@@ -2028,6 +2103,7 @@ components:
         enabled:
           type: boolean
           description: Whether the API key is active or disabled
+
     ErrorResponse:
       type: "object"
       properties:
