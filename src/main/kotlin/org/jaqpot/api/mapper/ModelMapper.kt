@@ -29,9 +29,9 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         selectedFeatures = this.selectedFeatures,
         legacyPredictionService = this.legacyPredictionService,
         scores = ModelScoresDto(
-            train = this.trainScores?.firstOrNull()?.toDto(),
-            test = this.testScores?.firstOrNull()?.toDto(),
-            crossValidation = this.crossValidationScores?.firstOrNull()?.toDto(),
+            train = this.trainScores?.map { it.toDto() },
+            test = this.testScores?.map { it.toDto() },
+            crossValidation = this.crossValidationScores?.map { it.toDto() },
         ),
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
@@ -60,6 +60,9 @@ fun ModelDto.toEntity(creatorId: String): Model {
         featurizers = mutableListOf(),
         preprocessors = mutableListOf(),
         torchConfig = this.torchConfig,
+        trainScores = mutableListOf(),
+        testScores = mutableListOf(),
+        crossValidationScores = mutableListOf(),
         extraConfig = this.extraConfig?.let {
             mapOf(
                 // TODO force specific type for torch config
@@ -91,10 +94,10 @@ fun ModelDto.toEntity(creatorId: String): Model {
             )
         })
     }
-    this.scores?.test?.let { m.testScores = listOf(this.scores.test.toEntity(m, ScoreType.TEST)) }
-    this.scores?.train?.let { m.trainScores = listOf(this.scores.train.toEntity(m, ScoreType.TRAIN)) }
+    this.scores?.train?.let { m.trainScores = this.scores.train.map { it.toEntity(m, ScoreType.TRAIN) } }
+    this.scores?.test?.let { m.testScores = this.scores.test.map { it.toEntity(m, ScoreType.TEST) } }
     this.scores?.crossValidation?.let {
-        m.crossValidationScores = listOf(this.scores.crossValidation.toEntity(m, ScoreType.CROSS_VALIDATION))
+        m.crossValidationScores = this.scores.crossValidation.map { it.toEntity(m, ScoreType.CROSS_VALIDATION) }
     }
 
     return m
