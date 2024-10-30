@@ -4,6 +4,7 @@ import org.jaqpot.api.dto.prediction.PredictionDoaDto
 import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.FeatureDependency
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.entity.ModelTransformerType
 import org.jaqpot.api.entity.ScoreType
 import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.model.ModelScoresDto
@@ -60,6 +61,8 @@ fun ModelDto.toEntity(creatorId: String): Model {
         task = this.task.toEntity(),
         tags = this.tags,
         selectedFeatures = this.selectedFeatures,
+        featurizers = mutableListOf(),
+        preprocessors = mutableListOf(),
         extraConfig = this.extraConfig?.let {
             mapOf(
                 // TODO force specific type for torch config
@@ -75,6 +78,22 @@ fun ModelDto.toEntity(creatorId: String): Model {
     this.doas?.let { doaDtos -> m.doas.addAll(doaDtos.map { it.toEntity(m) }) }
     m.dependentFeatures.addAll(this.dependentFeatures.map { it.toEntity(m, FeatureDependency.DEPENDENT) })
     m.independentFeatures.addAll(this.independentFeatures.map { it.toEntity(m, FeatureDependency.INDEPENDENT) })
+    this.featurizers?.let {
+        m.featurizers.addAll(this.featurizers.map {
+            it.toEntity(
+                m,
+                ModelTransformerType.FEATURIZER
+            )
+        })
+    }
+    this.preprocessors?.let {
+        m.preprocessors.addAll(this.preprocessors.map {
+            it.toEntity(
+                m,
+                ModelTransformerType.PREPROCESSOR
+            )
+        })
+    }
     this.scores?.test?.let { m.testScores = listOf(this.scores.test.toEntity(m, ScoreType.TEST)) }
     this.scores?.train?.let { m.trainScores = listOf(this.scores.train.toEntity(m, ScoreType.TRAIN)) }
     this.scores?.crossValidation?.let {
@@ -94,6 +113,8 @@ fun Model.toPredictionModelDto(rawModel: ByteArray, doas: List<PredictionDoaDto>
         rawModel = this.encodeRawModel(rawModel),
         doas = doas,
         selectedFeatures = this.selectedFeatures ?: emptyList(),
+        featurizers = this.featurizers.map { it.toDto() },
+        preprocessros = this.preprocessors.map { it.toDto() },
         extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService

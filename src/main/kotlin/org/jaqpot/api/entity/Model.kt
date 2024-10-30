@@ -84,6 +84,14 @@ class Model(
     @Column(name = "legacy_additional_info", columnDefinition = "jsonb")
     val legacyAdditionalInfo: Map<String, Any>? = emptyMap(),
 
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @SQLRestriction("transformer_type = 'FEATURIZER'")
+    val featurizers: MutableList<ModelTransformer>,
+
+    @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @SQLRestriction("transformer_type = 'PREPROCESSOR'")
+    val preprocessors: MutableList<ModelTransformer>,
+
     // @OneToMany because @SQLRestriction does not work with @OneToOne
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("score_type = 'TRAIN'")
