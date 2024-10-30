@@ -3,7 +3,7 @@ package org.jaqpot.api.service.prediction.runtime.runtimes
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
-import org.jaqpot.api.service.model.dto.PredictionRequestDto
+import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.springframework.http.HttpEntity
 import org.springframework.stereotype.Component

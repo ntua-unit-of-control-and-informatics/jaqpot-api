@@ -5,8 +5,8 @@ import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
+import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
-import org.jaqpot.api.service.model.dto.PredictionResponseDto
 import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotPyV6Runtime
 import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotRV6Runtime
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase

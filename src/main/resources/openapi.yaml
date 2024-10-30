@@ -2038,6 +2038,34 @@ components:
           type: string
           nullable: true
           description: "Legacy prediction service information, if available"
+    PredictionRequest:
+      type: object
+      required:
+        - model
+        - dataset
+      properties:
+        model:
+          $ref: '#/components/schemas/PredictionModel'
+          description: "The prediction model to use."
+        dataset:
+          $ref: '#/components/schemas/Dataset'
+          description: "The dataset to be used for the prediction."
+        extraConfig:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+          description: "Optional configuration for additional settings."
+    PredictionResponse:
+      type: object
+      required:
+        - predictions
+      properties:
+        predictions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnyValue'
+          description: "List of predictions"
+
     User:
       title: User
       x-stoplight:

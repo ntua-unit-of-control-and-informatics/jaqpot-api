@@ -3,7 +3,7 @@ package org.jaqpot.api.service.prediction.runtime.runtimes
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
-import org.jaqpot.api.service.model.dto.PredictionResponseDto
+import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyDataEntryDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyDatasetDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyPredictionRequestDto
