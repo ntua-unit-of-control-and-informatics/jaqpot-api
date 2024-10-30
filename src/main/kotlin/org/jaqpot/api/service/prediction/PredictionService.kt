@@ -1,13 +1,13 @@
 package org.jaqpot.api.service.prediction
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.jaqpot.api.dto.prediction.PredictionModelDto
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.PredictionModelDto
+import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.repository.DatasetRepository
-import org.jaqpot.api.service.model.dto.PredictionResponseDto
 import org.jaqpot.api.service.prediction.runtime.PredictionChain
 import org.jaqpot.api.storage.StorageService
 import org.springframework.scheduling.annotation.Async
