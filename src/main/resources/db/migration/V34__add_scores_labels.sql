@@ -1,0 +1,2 @@
+ALTER TABLE scores
+    ADD COLUMN labels VARCHAR(255)[];
