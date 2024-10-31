@@ -24,6 +24,7 @@ fun Scores.toDto(): ScoresDto {
         ),
         binaryClassification = BinaryClassificationScoresDto(
             yName = this.yName,
+            labels = this.labels?.toList(),
             accuracy = this.accuracy,
             balancedAccuracy = this.balancedAccuracy,
             precision = this.precision?.toList(),
@@ -35,6 +36,7 @@ fun Scores.toDto(): ScoresDto {
         ),
         multiclassClassification = MulticlassClassificationScoresDto(
             yName = this.yName,
+            labels = this.labels?.toList(),
             accuracy = this.multiClassAccuracy,
             balancedAccuracy = this.multiClassBalancedAccuracy,
             precision = this.multiClassPrecision?.toList(),
@@ -53,6 +55,8 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
         scoreType = scoreType,
         yName = this.regression?.yName ?: this.binaryClassification?.yName
         ?: this.multiclassClassification?.yName ?: "",
+        labels = this.binaryClassification?.labels?.toTypedArray()
+            ?: this.multiclassClassification?.labels?.toTypedArray(),
         r2 = this.regression?.r2,
         mae = this.regression?.mae,
         rmse = this.regression?.rmse,

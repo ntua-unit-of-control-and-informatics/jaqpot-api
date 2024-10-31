@@ -1370,6 +1370,10 @@ components:
       required:
         - yName
       properties:
+        labels:
+          type: array
+          items:
+            type: string
         yName:
           type: string
         accuracy:
@@ -1419,6 +1423,10 @@ components:
       required:
         - yName
       properties:
+        labels:
+          type: array
+          items:
+            type: string
         yName:
           type: string
         accuracy:

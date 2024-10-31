@@ -22,6 +22,9 @@ class Scores(
     @Column(nullable = false)
     val yName: String,
 
+    @Column
+    val labels: Array<String>?,
+
     // Regression Scores
     val r2: Float?,
     val mae: Float?,
