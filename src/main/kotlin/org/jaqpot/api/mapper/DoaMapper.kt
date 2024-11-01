@@ -5,12 +5,21 @@ import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.DoaDataDto
 import org.jaqpot.api.model.DoaDto
+import org.jaqpot.api.model.PredictionDoaDto
 
-fun Doa.toDto(doaData: Any): DoaDto {
+fun Doa.toDto(doaData: DoaDataDto): DoaDto {
     return DoaDto(
         id = this.id,
         method = this.method.toDto(),
-        data = doaData as DoaDataDto,
+        data = doaData,
+    )
+}
+
+fun Doa.toPredictionDto(doaData: Map<String, Any>): PredictionDoaDto {
+    return PredictionDoaDto(
+        id = this.id,
+        method = this.method.toDto(),
+        data = doaData,
     )
 }
 

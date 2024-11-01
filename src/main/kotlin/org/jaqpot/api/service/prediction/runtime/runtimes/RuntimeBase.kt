@@ -1,7 +1,5 @@
 package org.jaqpot.api.service.prediction.runtime.runtimes
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
@@ -37,10 +35,10 @@ abstract class RuntimeBase {
         try {
 
             // uncomment to test request json
-            val objectMapper = ObjectMapper()
-            objectMapper.registerModule(JavaTimeModule())
-            val json = objectMapper.writeValueAsString(request)
-            logger.info { json }
+//            val objectMapper = ObjectMapper()
+//            objectMapper.registerModule(JavaTimeModule())
+//            val json = objectMapper.writeValueAsString(request)
+//            logger.info { json }
 
             val response: ResponseEntity<PredictionResponseDto> =
                 restTemplate.postForEntity(inferenceUrl, request, PredictionResponseDto::class.java)

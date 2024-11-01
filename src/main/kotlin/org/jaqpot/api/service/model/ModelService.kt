@@ -7,10 +7,7 @@ import jakarta.transaction.Transactional
 import org.jaqpot.api.ModelApiDelegate
 import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.*
-import org.jaqpot.api.mapper.toDto
-import org.jaqpot.api.mapper.toEntity
-import org.jaqpot.api.mapper.toGetModels200ResponseDto
-import org.jaqpot.api.mapper.toPredictionModelDto
+import org.jaqpot.api.mapper.*
 import org.jaqpot.api.model.*
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
@@ -248,9 +245,9 @@ class ModelService(
 
         val doaDtos = model.doas.map {
             val rawDoaData = storageService.readRawDoa(it)
-            val type = object : TypeToken<DoaDataDto>() {}.type
-            val doaData: Any = Gson().fromJson(rawDoaData.decodeToString(), type)
-            it.toDto(doaData)
+            val type = object : TypeToken<Map<String, Any>>() {}.type
+            val doaData: Map<String, Any> = Gson().fromJson(rawDoaData.decodeToString(), type)
+            it.toPredictionDto(doaData)
         }
 
         this.predictionService.executePredictionAndSaveResults(

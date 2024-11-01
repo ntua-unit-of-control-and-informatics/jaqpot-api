@@ -1,27 +1,27 @@
 package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.DoaMethod
-import org.jaqpot.api.model.DoaDto
+import org.jaqpot.api.model.DoaMethodDto
 
-fun DoaDto.Method.toEntity(): DoaMethod {
+fun DoaMethodDto.toEntity(): DoaMethod {
     return when (this) {
-        DoaDto.Method.LEVERAGE -> DoaMethod.LEVERAGE
-        DoaDto.Method.BOUNDING_BOX -> DoaMethod.BOUNDING_BOX
-        DoaDto.Method.KERNEL_BASED -> DoaMethod.KERNEL_BASED
-        DoaDto.Method.MEAN_VAR -> DoaMethod.MEAN_VAR
-        DoaDto.Method.MAHALANOBIS -> DoaMethod.MAHALANOBIS
-        DoaDto.Method.CITY_BLOCK -> DoaMethod.CITY_BLOCK
+        DoaMethodDto.LEVERAGE -> DoaMethod.LEVERAGE
+        DoaMethodDto.BOUNDING_BOX -> DoaMethod.BOUNDING_BOX
+        DoaMethodDto.KERNEL_BASED -> DoaMethod.KERNEL_BASED
+        DoaMethodDto.MEAN_VAR -> DoaMethod.MEAN_VAR
+        DoaMethodDto.MAHALANOBIS -> DoaMethod.MAHALANOBIS
+        DoaMethodDto.CITY_BLOCK -> DoaMethod.CITY_BLOCK
     }
 }
 
-fun DoaMethod.toDto(): DoaDto.Method {
+fun DoaMethod.toDto(): DoaMethodDto {
     return when (this) {
-        DoaMethod.LEVERAGE -> DoaDto.Method.LEVERAGE
-        DoaMethod.BOUNDING_BOX -> DoaDto.Method.BOUNDING_BOX
-        DoaMethod.KERNEL_BASED -> DoaDto.Method.KERNEL_BASED
-        DoaMethod.MEAN_VAR -> DoaDto.Method.MEAN_VAR
-        DoaMethod.MAHALANOBIS -> DoaDto.Method.MAHALANOBIS
-        DoaMethod.CITY_BLOCK -> DoaDto.Method.CITY_BLOCK
+        DoaMethod.LEVERAGE -> DoaMethodDto.LEVERAGE
+        DoaMethod.BOUNDING_BOX -> DoaMethodDto.BOUNDING_BOX
+        DoaMethod.KERNEL_BASED -> DoaMethodDto.KERNEL_BASED
+        DoaMethod.MEAN_VAR -> DoaMethodDto.MEAN_VAR
+        DoaMethod.MAHALANOBIS -> DoaMethodDto.MAHALANOBIS
+        DoaMethod.CITY_BLOCK -> DoaMethodDto.CITY_BLOCK
     }
 }
 

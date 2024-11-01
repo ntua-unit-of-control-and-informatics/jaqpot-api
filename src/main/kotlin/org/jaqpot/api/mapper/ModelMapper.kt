@@ -106,7 +106,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
 
 fun Model.toPredictionModelDto(
     rawModel: ByteArray,
-    doas: List<DoaDto>,
+    doas: List<PredictionDoaDto>,
     rawPreprocessor: ByteArray?
 ): PredictionModelDto {
     return PredictionModelDto(
