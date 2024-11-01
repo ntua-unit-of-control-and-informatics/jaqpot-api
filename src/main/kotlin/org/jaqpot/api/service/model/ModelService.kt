@@ -55,6 +55,25 @@ class ModelService(
     private val modelConfiguration: ModelConfiguration
 ) : ModelApiDelegate {
 
+    companion object {
+        val FORBIDDEN_MODEL_TYPES_FOR_CREATION = setOf(
+            ModelTypeDto.QSAR_TOOLBOX_CALCULATOR,
+            ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL,
+            ModelTypeDto.QSAR_TOOLBOX_PROFILER,
+            ModelTypeDto.TORCHSCRIPT, // https://github.com/ntua-unit-of-control-and-informatics/jaqpotpy-inference/security/code-scanning/1
+            ModelTypeDto.R_BNLEARN_DISCRETE,
+            ModelTypeDto.R_CARET,
+            ModelTypeDto.R_GBM,
+            ModelTypeDto.R_NAIVE_BAYES,
+            ModelTypeDto.R_PBPK,
+            ModelTypeDto.R_RF,
+            ModelTypeDto.R_RPART,
+            ModelTypeDto.R_SVM,
+            ModelTypeDto.R_TREE_CLASS,
+            ModelTypeDto.R_TREE_REGR
+        )
+    }
+
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
@@ -88,6 +107,11 @@ class ModelService(
         if (modelDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
         }
+
+        if (FORBIDDEN_MODEL_TYPES_FOR_CREATION.contains(modelDto.type)) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "${modelDto.type} is not supported for creation.")
+        }
+
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
         val savedModel = modelRepository.save(toEntity)
