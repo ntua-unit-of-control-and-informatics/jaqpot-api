@@ -1582,6 +1582,33 @@ components:
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
 
+    PredictionDoa:
+      type: object
+      required:
+        - method
+        - data
+      properties:
+        id:
+          type: integer
+          format: int64
+        method:
+          $ref: '#/components/schemas/DoaMethod'
+        data:
+          type: object
+          description: The doa calculated data
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
+
     Doa:
       type: object
       required:
@@ -1592,15 +1619,7 @@ components:
           type: integer
           format: int64
         method:
-          type: string
-          enum:
-            - LEVERAGE
-            - BOUNDING_BOX
-            - KERNEL_BASED
-            - MEAN_VAR
-            - MAHALANOBIS
-            - CITY_BLOCK
-          example: LEVERAGE
+          $ref: '#/components/schemas/DoaMethod'
         data:
           type: object
           description: The doa calculated data
@@ -1621,6 +1640,16 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    DoaMethod:
+      type: string
+      enum:
+        - LEVERAGE
+        - BOUNDING_BOX
+        - KERNEL_BASED
+        - MEAN_VAR
+        - MAHALANOBIS
+        - CITY_BLOCK
+      example: LEVERAGE
 
     LeverageDoa:
       type: object
@@ -2019,7 +2048,6 @@ components:
           description: "List of independent features for the model"
         type:
           $ref: '#/components/schemas/ModelType'
-          description: "Type of the model"
         rawModel:
           type: string
           description: "Raw model data in serialized format"
@@ -2029,7 +2057,7 @@ components:
         doas:
           type: array
           items:
-            $ref: '#/components/schemas/Doa'
+            $ref: '#/components/schemas/PredictionDoa'
           description: "List of Domain of Applicability (DoA) configurations"
         selectedFeatures:
           type: array
@@ -2038,7 +2066,6 @@ components:
           description: "List of feature names selected for the model"
         task:
           $ref: '#/components/schemas/ModelTask'
-          description: "Task configuration for the model"
         featurizers:
           type: array
           items:
@@ -2079,10 +2106,8 @@ components:
       properties:
         model:
           $ref: '#/components/schemas/PredictionModel'
-          description: "The prediction model to use."
         dataset:
           $ref: '#/components/schemas/Dataset'
-          description: "The dataset to be used for the prediction."
         extraConfig:
           type: object
           additionalProperties:
@@ -2097,7 +2122,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnyValue'
-          description: "List of predictions"
 
     User:
       title: User
