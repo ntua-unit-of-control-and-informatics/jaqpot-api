@@ -1,0 +1,3 @@
+ALTER TABLE scores
+    ADD y_name VARCHAR(500) NOT NULL DEFAULT 'y';
+

@@ -4,13 +4,14 @@ import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl
 import org.jaqpot.api.model.DoaDto
+import org.jaqpot.api.model.DoaMethodDto
 
 class DoaValidator : ConstraintValidator<ValidDoa, List<DoaDto>?> {
     override fun isValid(value: List<DoaDto>?, context: ConstraintValidatorContext?): Boolean {
         if (value.isNullOrEmpty()) return true
 
         value.forEach {
-            if (it.method == DoaDto.Method.LEVERAGE) {
+            if (it.method == DoaMethodDto.LEVERAGE) {
                 if (it.data.hStar == null) {
                     context?.let { constraintValidatorContext ->
                         (constraintValidatorContext as ConstraintValidatorContextImpl).addMessageParameter(

@@ -1221,6 +1221,10 @@ components:
           items:
             $ref: '#/components/schemas/Transformer'
           maxItems: 50
+        rawPreprocessor:
+          type: string
+          format: byte
+          description: A base64 representation of the raw preprocessor.
         rawModel:
           type: string
           format: byte
@@ -1246,11 +1250,17 @@ components:
           type: object
           properties:
             train:
-              $ref: '#/components/schemas/Scores'
+              type: array
+              items:
+                $ref: '#/components/schemas/Scores'
             test:
-              $ref: '#/components/schemas/Scores'
+              type: array
+              items:
+                $ref: '#/components/schemas/Scores'
             crossValidation:
-              $ref: '#/components/schemas/Scores'
+              type: array
+              items:
+                $ref: '#/components/schemas/Scores'
         extraConfig:
           $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
@@ -1326,7 +1336,11 @@ components:
           $ref: '#/components/schemas/MulticlassClassificationScores'
     RegressionScores:
       type: object
+      required:
+        - yName
       properties:
+        yName:
+          type: string
         r2:
           type: number
           format: float
@@ -1353,7 +1367,15 @@ components:
           format: float
     BinaryClassificationScores:
       type: object
+      required:
+        - yName
       properties:
+        labels:
+          type: array
+          items:
+            type: string
+        yName:
+          type: string
         accuracy:
           type: number
           format: float
@@ -1398,7 +1420,15 @@ components:
           maxItems: 1000
     MulticlassClassificationScores:
       type: object
+      required:
+        - yName
       properties:
+        labels:
+          type: array
+          items:
+            type: string
+        yName:
+          type: string
         accuracy:
           type: number
           format: float
@@ -1437,10 +1467,13 @@ components:
           items:
             type: array
             items:
-              type: number
-              format: float
-            maxItems: 1000
-          maxItems: 1000
+              type: array
+              items:
+                type: number
+                format: float
+              maxItems: 2
+            maxItems: 2
+          maxItems: 100
 
     OrganizationSummary:
       type: object
@@ -1549,6 +1582,33 @@ components:
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
 
+    PredictionDoa:
+      type: object
+      required:
+        - method
+        - data
+      properties:
+        id:
+          type: integer
+          format: int64
+        method:
+          $ref: '#/components/schemas/DoaMethod'
+        data:
+          type: object
+          description: The doa calculated data
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was created.
+          example: '2023-01-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the feature was last updated.
+          example: '2023-01-01T12:00:00Z'
+
     Doa:
       type: object
       required:
@@ -1559,15 +1619,7 @@ components:
           type: integer
           format: int64
         method:
-          type: string
-          enum:
-            - LEVERAGE
-            - BOUNDING_BOX
-            - KERNEL_BASED
-            - MEAN_VAR
-            - MAHALANOBIS
-            - CITY_BLOCK
-          example: LEVERAGE
+          $ref: '#/components/schemas/DoaMethod'
         data:
           type: object
           description: The doa calculated data
@@ -1588,6 +1640,16 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
+    DoaMethod:
+      type: string
+      enum:
+        - LEVERAGE
+        - BOUNDING_BOX
+        - KERNEL_BASED
+        - MEAN_VAR
+        - MAHALANOBIS
+        - CITY_BLOCK
+      example: LEVERAGE
 
     LeverageDoa:
       type: object
@@ -1602,9 +1664,6 @@ components:
             items:
               type: number
               format: float
-            maxItems: 1000
-          maxItems: 1000
-
 
     BoundingBoxDoa:
       type: object
@@ -1989,14 +2048,16 @@ components:
           description: "List of independent features for the model"
         type:
           $ref: '#/components/schemas/ModelType'
-          description: "Type of the model"
         rawModel:
           type: string
           description: "Raw model data in serialized format"
+        rawPreprocessor:
+          type: string
+          description: "Raw preprocessor data in serialized format"
         doas:
           type: array
           items:
-            $ref: '#/components/schemas/Doa'
+            $ref: '#/components/schemas/PredictionDoa'
           description: "List of Domain of Applicability (DoA) configurations"
         selectedFeatures:
           type: array
@@ -2005,7 +2066,6 @@ components:
           description: "List of feature names selected for the model"
         task:
           $ref: '#/components/schemas/ModelTask'
-          description: "Task configuration for the model"
         featurizers:
           type: array
           items:
@@ -2046,16 +2106,13 @@ components:
       properties:
         model:
           $ref: '#/components/schemas/PredictionModel'
-          description: "The prediction model to use."
         dataset:
           $ref: '#/components/schemas/Dataset'
-          description: "The dataset to be used for the prediction."
         extraConfig:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/AnyValue'
           description: "Optional configuration for additional settings."
-      additionalProperties: false
     PredictionResponse:
       type: object
       required:
@@ -2065,8 +2122,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnyValue'
-          description: "List of predictions"
-      additionalProperties: false
 
     User:
       title: User

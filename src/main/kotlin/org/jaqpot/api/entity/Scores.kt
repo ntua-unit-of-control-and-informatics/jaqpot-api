@@ -11,13 +11,19 @@ class Scores(
     @SequenceGenerator(name = "scores_id_seq", sequenceName = "scores_id_seq", allocationSize = 1)
     val id: Long? = null,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "model_id", nullable = false)
     val model: Model,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val scoreType: ScoreType,
+
+    @Column(nullable = false)
+    val yName: String,
+
+    @Column
+    val labels: Array<String>?,
 
     // Regression Scores
     val r2: Float?,
@@ -51,6 +57,6 @@ class Scores(
     val multiClassMatthewsCorrCoef: Float?,
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    val multiClassConfusionMatrix: Array<FloatArray>?
+    val multiClassConfusionMatrix: Array<Array<FloatArray>>?
 ) : BaseEntity()
 

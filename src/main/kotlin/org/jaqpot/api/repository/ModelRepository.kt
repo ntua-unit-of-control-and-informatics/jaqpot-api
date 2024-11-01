@@ -60,9 +60,14 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
     )
     fun searchModelsBy(query: String, pageable: Pageable): Page<Model>
 
-
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Model m SET m.rawModel = NULL WHERE m.id = :id")
     fun setRawModelToNull(@Param("id") id: Long?)
+
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Model m SET m.rawPreprocessor = NULL WHERE m.id = :id")
+    fun setRawPreprocessorToNull(@Param("id") id: Long?)
 }
