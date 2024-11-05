@@ -577,7 +577,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Organization'
-
     post:
       summary: Create a new organization
       operationId: createOrganization
@@ -851,7 +850,6 @@ paths:
           schema:
             type: string
             format: uuid
-
       requestBody:
         description: "Invitation status update payload"
         required: true
@@ -888,7 +886,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Lead'
-
     post:
       summary: Create a Lead
       description: Create a new lead
@@ -929,7 +926,6 @@ paths:
                 $ref: '#/components/schemas/Lead'
         '404':
           description: Lead not found
-
     put:
       summary: Update a Lead by ID
       description: Update the details of an existing lead
@@ -960,7 +956,6 @@ paths:
           description: Invalid request data
         '404':
           description: Lead not found
-
     delete:
       summary: Delete a Lead by ID
       description: Delete a single lead by its ID
@@ -1057,7 +1052,6 @@ paths:
                       description: Whether the API key is active or disabled
         '401':
           description: Unauthorized request, the user must be authenticated
-
   /v1/user/api-keys/{key}:
     delete:
       summary: Delete an API Key
@@ -1082,7 +1076,6 @@ paths:
           description: Unauthorized request, the user must be authenticated
         '404':
           description: API key not found
-
     patch:
       summary: Update API Key
       description: Update an API key's metadata, such as its note or status (enable/disable).
@@ -1136,8 +1129,6 @@ paths:
           description: Unauthorized request, the user must be authenticated
         '404':
           description: API key not found
-
-
 components:
   securitySchemes:
     bearerAuth:
@@ -1273,9 +1264,6 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-
-
-
     ModelSummary:
       type: object
       required:
@@ -1324,7 +1312,6 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-
     Scores:
       type: object
       properties:
@@ -1474,7 +1461,6 @@ components:
               maxItems: 2
             maxItems: 2
           maxItems: 100
-
     OrganizationSummary:
       type: object
       required:
@@ -1488,7 +1474,6 @@ components:
         name:
           type: string
           example: My Organization
-
     ModelType:
       type: string
       enum:
@@ -1581,7 +1566,6 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-
     PredictionDoa:
       type: object
       required:
@@ -1608,7 +1592,6 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-
     Doa:
       type: object
       required:
@@ -1622,14 +1605,9 @@ components:
           $ref: '#/components/schemas/DoaMethod'
         data:
           type: object
-          description: The doa calculated data
-          oneOf:
-            - '$ref': '#/components/schemas/LeverageDoa'
-            - '$ref': '#/components/schemas/BoundingBoxDoa'
-            - '$ref': '#/components/schemas/KernelBasedDoa'
-            - '$ref': '#/components/schemas/MeanVarDoa'
-            - '$ref': '#/components/schemas/MahalanobisDoa'
-            - '$ref': '#/components/schemas/CityBlockDoa'
+          maxProperties: 20
+          additionalProperties:
+            '$ref': '#/components/schemas/AnyValue'
         createdAt:
           type: string
           format: date-time
@@ -1650,7 +1628,6 @@ components:
         - MAHALANOBIS
         - CITY_BLOCK
       example: LEVERAGE
-
     LeverageDoa:
       type: object
       properties:
@@ -1664,7 +1641,6 @@ components:
             items:
               type: number
               format: float
-
     BoundingBoxDoa:
       type: object
       properties:
@@ -1704,7 +1680,6 @@ components:
       properties:
         data:
           type: object
-
     Feature:
       type: object
       required:
@@ -1718,7 +1693,6 @@ components:
           example: 1
         key:
           type: string
-          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*$"
           description: A key that must start with a letter, followed by any combination of letters, digits, hyphens, or underscores. For example, 'abc123', 'abc-test', or 'Abc_test'. It cannot start with a digit.
           example: feature-key
         name:
@@ -1765,7 +1739,6 @@ components:
           format: date-time
           description: The date and time when the feature was last updated.
           example: '2023-01-01T12:00:00Z'
-
     FeaturePossibleValue:
       type: object
       required:
@@ -1893,8 +1866,6 @@ components:
         updatedAt:
           type: string
           format: date-time
-
-
     Organization:
       type: object
       required:
@@ -1948,7 +1919,6 @@ components:
         updated_at:
           type: string
           format: date-time
-
     OrganizationUser:
       type: object
       required:
@@ -1969,7 +1939,6 @@ components:
           format: email
         associationType:
           $ref: '#/components/schemas/OrganizationUserAssociationType'
-
     OrganizationUserAssociationType:
       type: string
       enum:
@@ -2122,7 +2091,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnyValue'
-
     User:
       title: User
       x-stoplight:
@@ -2188,7 +2156,6 @@ components:
         enabled:
           type: boolean
           description: Whether the API key is active or disabled
-
     ErrorResponse:
       type: "object"
       properties:

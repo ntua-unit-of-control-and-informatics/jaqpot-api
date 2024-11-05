@@ -12,7 +12,7 @@ class DoaValidator : ConstraintValidator<ValidDoa, List<DoaDto>?> {
 
         value.forEach {
             if (it.method == DoaMethodDto.LEVERAGE) {
-                if (it.data.hStar == null) {
+                if (it.data["hStar"] == null) {
                     context?.let { constraintValidatorContext ->
                         (constraintValidatorContext as ConstraintValidatorContextImpl).addMessageParameter(
                             "message",
@@ -22,7 +22,7 @@ class DoaValidator : ConstraintValidator<ValidDoa, List<DoaDto>?> {
                     return false
                 }
 
-                if (it.data.doaMatrix == null) {
+                if (it.data["doaMatrix"] == null) {
                     context?.let { constraintValidatorContext ->
                         (constraintValidatorContext as ConstraintValidatorContextImpl).addMessageParameter(
                             "message",
