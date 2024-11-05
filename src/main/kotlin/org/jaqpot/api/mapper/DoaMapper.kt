@@ -3,11 +3,10 @@ package org.jaqpot.api.mapper
 import com.google.gson.Gson
 import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
-import org.jaqpot.api.model.DoaDataDto
 import org.jaqpot.api.model.DoaDto
 import org.jaqpot.api.model.PredictionDoaDto
 
-fun Doa.toDto(doaData: DoaDataDto): DoaDto {
+fun Doa.toDto(doaData: Map<String, Any>): DoaDto {
     return DoaDto(
         id = this.id,
         method = this.method.toDto(),
