@@ -28,6 +28,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
         tags = this.tags,
         selectedFeatures = this.selectedFeatures,
         legacyPredictionService = this.legacyPredictionService,
+        torchConfig = this.torchConfig,
         scores = ModelScoresDto(
             train = this.trainScores?.map { it.toDto() },
             test = this.testScores?.map { it.toDto() },
