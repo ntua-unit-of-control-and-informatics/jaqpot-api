@@ -1252,8 +1252,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Scores'
-        extraConfig:
-          $ref: '#/components/schemas/ModelExtraConfig'
         createdAt:
           type: string
           format: date-time
@@ -1493,24 +1491,6 @@ components:
         - QSAR_TOOLBOX_CALCULATOR
         - QSAR_TOOLBOX_QSAR_MODEL
         - QSAR_TOOLBOX_PROFILER
-    ModelExtraConfig:
-      type: object
-      description: A JSON object containing extra configuration for the model
-      properties:
-        torchConfig:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/AnyValue'
-        preprocessors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Transformer'
-          maxItems: 20
-        featurizers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Transformer'
-          maxItems: 20
     Transformer:
       type: object
       description: A preprocessor for the model
@@ -2051,12 +2031,6 @@ components:
             $ref: '#/components/schemas/AnyValue'
           description: "Torch configuration settings, optional"
           nullable: true
-        extraConfig:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/AnyValue'
-          description: "Additional configuration settings, optional"
-          nullable: true
         legacyAdditionalInfo:
           type: object
           additionalProperties:
@@ -2077,11 +2051,6 @@ components:
           $ref: '#/components/schemas/PredictionModel'
         dataset:
           $ref: '#/components/schemas/Dataset'
-        extraConfig:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/AnyValue'
-          description: "Optional configuration for additional settings."
     PredictionResponse:
       type: object
       required:
