@@ -16,7 +16,6 @@ class JaqpotPyV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) 
         val predictionRequestDto = PredictionRequestDto(
             predictionModelDto,
             datasetDto,
-            predictionModelDto.extraConfig
         )
         return HttpEntity(
             predictionRequestDto

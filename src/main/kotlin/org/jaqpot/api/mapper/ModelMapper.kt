@@ -63,14 +63,6 @@ fun ModelDto.toEntity(creatorId: String): Model {
         trainScores = mutableListOf(),
         testScores = mutableListOf(),
         crossValidationScores = mutableListOf(),
-        extraConfig = this.extraConfig?.let {
-            mapOf(
-                // TODO force specific type for torch config
-                "torchConfig" to (this.extraConfig?.torchConfig ?: {}),
-                "preprocessors" to (this.extraConfig?.preprocessors ?: arrayOf<Any>()),
-                "featurizers" to (this.extraConfig?.featurizers ?: arrayOf<Any>()),
-            )
-        },
         rawPreprocessor = this.rawPreprocessor,
         rawModel = this.rawModel,
     )
@@ -122,7 +114,6 @@ fun Model.toPredictionModelDto(
         featurizers = this.featurizers.map { it.toDto() },
         preprocessors = this.preprocessors.map { it.toDto() },
         torchConfig = this.torchConfig,
-        extraConfig = this.extraConfig,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )
