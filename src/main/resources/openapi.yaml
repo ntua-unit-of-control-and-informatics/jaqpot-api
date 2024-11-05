@@ -1631,8 +1631,6 @@ components:
             items:
               type: number
               format: float
-            maxItems: 1000
-          maxItems: 1000
     KernelBasedDoa:
       type: object
       properties:
