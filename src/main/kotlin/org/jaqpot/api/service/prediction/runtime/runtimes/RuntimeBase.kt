@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit
 abstract class RuntimeBase {
     companion object {
         private val logger = KotlinLogging.logger {}
+        private const val SIXTEEN_MEGABYTES_IN_BYTES = 16 * 1024 * 1024
     }
 
     abstract fun getRuntimePath(predictionModelDto: PredictionModelDto): String
@@ -39,6 +40,7 @@ abstract class RuntimeBase {
     ): Optional<PredictionResponseDto> = runBlocking {
         val client = WebClient.builder()
             .clientConnector(ReactorClientHttpConnector(getHttpClient()))
+            .codecs { it.defaultCodecs().maxInMemorySize(SIXTEEN_MEGABYTES_IN_BYTES) }
             .build()
         val inferenceUrl = "${getRuntimeUrl()}${getRuntimePath(predictionModelDto)}"
 
