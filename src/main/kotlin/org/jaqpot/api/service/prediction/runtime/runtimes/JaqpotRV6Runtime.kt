@@ -5,7 +5,6 @@ import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
-import org.springframework.http.HttpEntity
 import org.springframework.stereotype.Component
 
 @Component
@@ -36,13 +35,10 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
     override fun createRequestBody(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
-    ): HttpEntity<Any> {
-        val predictionRequestDto = PredictionRequestDto(
+    ): Any {
+        return PredictionRequestDto(
             predictionModelDto,
             datasetDto,
-        )
-        return HttpEntity(
-            predictionRequestDto
         )
     }
 }

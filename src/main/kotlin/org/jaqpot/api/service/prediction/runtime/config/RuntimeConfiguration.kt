@@ -3,6 +3,7 @@ package org.jaqpot.api.service.prediction.runtime.config
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 
+
 @Configuration
 class RuntimeConfiguration(
     @Value("\${jaqpot.runtime.jaqpotpy-inference-v6}")
