@@ -72,13 +72,13 @@ abstract class RuntimeBase {
         return legacyPredictionUrl.path
     }
 
-    fun getHttpClient(): HttpClient {
+    open fun getHttpClient(): HttpClient {
         return HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .responseTimeout(Duration.ofMillis(5000))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1)
+            .responseTimeout(Duration.ofSeconds(60))
             .doOnConnected { conn ->
-                conn.addHandlerLast(ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-                    .addHandlerLast(WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS))
+                conn.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
+                    .addHandlerLast(WriteTimeoutHandler(60, TimeUnit.SECONDS))
             }
     }
 

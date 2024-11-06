@@ -1,11 +1,17 @@
 package org.jaqpot.api.service.prediction.runtime.runtimes
 
+import io.netty.channel.ChannelOption
+import io.netty.handler.timeout.ReadTimeoutHandler
+import io.netty.handler.timeout.WriteTimeoutHandler
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.springframework.stereotype.Component
+import reactor.netty.http.client.HttpClient
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 @Component
 class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) : RuntimeBase() {
@@ -41,4 +47,12 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
             datasetDto,
         )
     }
+
+    override fun getHttpClient(): HttpClient = HttpClient.create()
+        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+        .responseTimeout(Duration.ofMinutes(2))
+        .doOnConnected { conn ->
+            conn.addHandlerLast(ReadTimeoutHandler(2, TimeUnit.MINUTES))
+                .addHandlerLast(WriteTimeoutHandler(2, TimeUnit.MINUTES))
+        }
 }
