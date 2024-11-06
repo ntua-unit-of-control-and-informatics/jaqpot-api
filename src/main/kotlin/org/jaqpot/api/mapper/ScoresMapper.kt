@@ -16,11 +16,7 @@ fun Scores.toDto(): ScoresDto {
             r2 = this.r2,
             mae = this.mae,
             rmse = this.rmse,
-            rSquaredDiffRZero = this.rSquaredDiffRZero,
-            rSquaredDiffRZeroHat = this.rSquaredDiffRZeroHat,
-            absDiffRZeroHat = this.absDiffRZeroHat,
-            k = this.k,
-            kHat = this.kHat
+            folds = this.folds
         ),
         binaryClassification = BinaryClassificationScoresDto(
             yName = this.yName,
@@ -32,7 +28,8 @@ fun Scores.toDto(): ScoresDto {
             f1Score = this.f1Score?.toList(),
             jaccard = this.jaccard?.toList(),
             matthewsCorrCoef = this.matthewsCorrCoef,
-            confusionMatrix = this.confusionMatrix?.toList()?.map { it.toList() }
+            confusionMatrix = this.confusionMatrix?.toList()?.map { it.toList() },
+            folds = this.folds
         ),
         multiclassClassification = MulticlassClassificationScoresDto(
             yName = this.yName,
@@ -45,6 +42,7 @@ fun Scores.toDto(): ScoresDto {
             jaccard = this.multiClassJaccard?.toList(),
             matthewsCorrCoef = this.multiClassMatthewsCorrCoef,
             confusionMatrix = this.multiClassConfusionMatrix?.toList()?.map { it.toList().map { it1 -> it1.toList() } },
+            folds = this.folds
         )
     )
 }
@@ -57,14 +55,10 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
         ?: this.multiclassClassification?.yName ?: "",
         labels = this.binaryClassification?.labels?.toTypedArray()
             ?: this.multiclassClassification?.labels?.toTypedArray(),
+        folds = this.regression?.folds ?: this.binaryClassification?.folds ?: this.multiclassClassification?.folds,
         r2 = this.regression?.r2,
         mae = this.regression?.mae,
         rmse = this.regression?.rmse,
-        rSquaredDiffRZero = this.regression?.rSquaredDiffRZero,
-        rSquaredDiffRZeroHat = this.regression?.rSquaredDiffRZeroHat,
-        absDiffRZeroHat = this.regression?.absDiffRZeroHat,
-        k = this.regression?.k,
-        kHat = this.regression?.kHat,
         accuracy = this.binaryClassification?.accuracy,
         balancedAccuracy = this.binaryClassification?.balancedAccuracy,
         precision = this.binaryClassification?.precision?.toFloatArray(),
