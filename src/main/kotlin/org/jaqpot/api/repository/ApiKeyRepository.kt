@@ -13,7 +13,7 @@ interface ApiKeyRepository : CrudRepository<ApiKey, UUID> {
     fun findAllByUserId(userId: String): List<ApiKey>
     fun findByClientKey(clientKey: String): ApiKey?
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
     @Query("UPDATE ApiKey ak SET ak.lastUsed = :date, ak.lastUsedIp = :ip WHERE ak.id = :id")
     fun updateLastUsed(@Param("id") id: UUID?, @Param("date") date: OffsetDateTime, @Param("ip") ip: String)
