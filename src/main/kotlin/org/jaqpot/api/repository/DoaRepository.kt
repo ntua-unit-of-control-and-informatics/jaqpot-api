@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param
 
 interface DoaRepository : CrudRepository<Doa, Long> {
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
     @Query("UPDATE Doa d SET d.rawDoa = NULL WHERE d.id = :id")
     fun setRawDoaToNull(@Param("id") id: Long?)

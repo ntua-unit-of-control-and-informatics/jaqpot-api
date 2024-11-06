@@ -16,7 +16,7 @@ interface DatasetRepository : CrudRepository<Dataset, Long> {
 
     fun findAllByCreatedAtBefore(date: OffsetDateTime): List<Dataset>
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
     @Query("UPDATE Dataset d SET d.input = NULL, d.result = NULL WHERE d.id = :id")
     fun setDatasetInputAndResultToNull(@Param("id") id: Long?)
