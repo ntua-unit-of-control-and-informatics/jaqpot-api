@@ -116,6 +116,7 @@ class ModelService(
         val toEntity = modelDto.toEntity(creatorId)
         val savedModel = modelRepository.save(toEntity)
         storeRawModelToStorage(savedModel)
+        storeRawPreprocessorToStorage(savedModel)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
 
         val location: URI = ServletUriComponentsBuilder
@@ -189,6 +190,8 @@ class ModelService(
             }
             // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model)
+            // TODO once there are no models with rawPreprocessor in the database, remove this
+            storeRawPreprocessorToStorage(model)
 
             val userId = authenticationFacade.userId
             val toEntity = datasetDto.toEntity(
@@ -230,6 +233,8 @@ class ModelService(
             val userId = authenticationFacade.userId
             // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model)
+            // TODO once there are no models with rawPreprocessor in the database, remove this
+            storeRawPreprocessorToStorage(model)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
 
