@@ -13,12 +13,14 @@ class AuthenticationFacade {
         const val ADMIN_ROLE = "admin"
         const val ENTERPRISE_ROLE = "enterprise"
         const val PRO_ROLE = "pro"
+        const val UPCI_ROLE = "upci"
     }
 
     val isLoggedIn: Boolean get() = authentication !is AnonymousAuthenticationToken
     val isAdmin: Boolean get() = authentication.authorities.any { it.authority == ADMIN_ROLE }
     val isEnterpriseUser: Boolean get() = authentication.authorities.any { it.authority == ENTERPRISE_ROLE }
     val isProUser: Boolean get() = authentication.authorities.any { it.authority == PRO_ROLE }
+    val isUpciUser: Boolean get() = authentication.authorities.any { it.authority == UPCI_ROLE }
     val authentication: Authentication
         get() = SecurityContextHolder.getContext().authentication
 

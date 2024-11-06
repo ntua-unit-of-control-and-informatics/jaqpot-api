@@ -108,7 +108,7 @@ class ModelService(
             throw IllegalStateException("ID should not be provided for resource creation.")
         }
 
-        if (FORBIDDEN_MODEL_TYPES_FOR_CREATION.contains(modelDto.type)) {
+        if (FORBIDDEN_MODEL_TYPES_FOR_CREATION.contains(modelDto.type) && !authenticationFacade.isAdmin && !authenticationFacade.isUpciUser) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "${modelDto.type} is not supported for creation.")
         }
 
