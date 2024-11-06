@@ -190,7 +190,7 @@ class StorageService(
         }
 
         return if (rawDatasetsFromStorage.isNotEmpty()) {
-            rawDatasetsFromStorage.mapValues { (key, value) ->
+            rawDatasetsFromStorage.mapValues { (_, value) ->
                 val type = object : TypeToken<List<Any>>() {}.type
                 val input: List<Any> = Gson().fromJson(value.decodeToString(), type)
                 input
@@ -212,7 +212,7 @@ class StorageService(
         }
 
         return if (rawDatasetsFromStorage.isNotEmpty()) {
-            rawDatasetsFromStorage.mapValues { (key, value) ->
+            rawDatasetsFromStorage.mapValues { (_, value) ->
                 val type = object : TypeToken<List<Any>>() {}.type
                 val result: List<Any> = Gson().fromJson(value.decodeToString(), type)
                 result
