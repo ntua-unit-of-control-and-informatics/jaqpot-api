@@ -25,16 +25,13 @@ class Scores(
     @Column
     val labels: Array<String>?,
 
+    val folds: Int?,
+
     // Regression Scores
     val r2: Float?,
     val mae: Float?,
     val rmse: Float?,
-    val rSquaredDiffRZero: Float?,
-    val rSquaredDiffRZeroHat: Float?,
-    val absDiffRZeroHat: Float?,
-    val k: Float?,
-    val kHat: Float?,
-//
+
     // Binary Classification Metrics
     val accuracy: Float?,
     val balancedAccuracy: Float?,

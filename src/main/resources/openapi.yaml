@@ -1326,6 +1326,8 @@ components:
       properties:
         yName:
           type: string
+        folds:
+          type: integer
         r2:
           type: number
           format: float
@@ -1361,6 +1363,8 @@ components:
             type: string
         yName:
           type: string
+        folds:
+          type: integer
         accuracy:
           type: number
           format: float
@@ -1414,6 +1418,8 @@ components:
             type: string
         yName:
           type: string
+        folds:
+          type: integer
         accuracy:
           type: number
           format: float
