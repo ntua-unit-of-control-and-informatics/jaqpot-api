@@ -10,6 +10,7 @@ import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.springframework.stereotype.Component
 import reactor.netty.http.client.HttpClient
+import reactor.netty.resources.ConnectionProvider
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -48,11 +49,23 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
         )
     }
 
-    override fun getHttpClient(): HttpClient = HttpClient.create()
-        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-        .responseTimeout(Duration.ofMinutes(2))
-        .doOnConnected { conn ->
-            conn.addHandlerLast(ReadTimeoutHandler(2, TimeUnit.MINUTES))
-                .addHandlerLast(WriteTimeoutHandler(2, TimeUnit.MINUTES))
-        }
+    override fun getHttpClient(): HttpClient {
+        val connectionProvider =
+            ConnectionProvider.builder("custom")
+                .maxConnections(50)
+                .maxIdleTime(Duration.ofMinutes(10))
+                .maxLifeTime(Duration.ofMinutes(10))
+                .build()
+
+        return HttpClient.create(connectionProvider)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+            .option(ChannelOption.SO_KEEPALIVE, true)
+            .responseTimeout(Duration.ofMinutes(10))
+            .doOnConnected { conn ->
+                conn.addHandlerLast(ReadTimeoutHandler(10, TimeUnit.MINUTES))
+                    .addHandlerLast(WriteTimeoutHandler(10, TimeUnit.MINUTES))
+
+
+            }
+    }
 }

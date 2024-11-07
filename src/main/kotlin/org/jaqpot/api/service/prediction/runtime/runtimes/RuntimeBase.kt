@@ -76,7 +76,8 @@ abstract class RuntimeBase {
 
     open fun getHttpClient(): HttpClient {
         return HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+            .option(ChannelOption.SO_KEEPALIVE, true)
             .responseTimeout(Duration.ofSeconds(60))
             .doOnConnected { conn ->
                 conn.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
