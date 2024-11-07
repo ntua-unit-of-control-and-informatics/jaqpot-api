@@ -59,6 +59,7 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
 
         return HttpClient.create(connectionProvider)
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+            .option(ChannelOption.SO_KEEPALIVE, true)
             .responseTimeout(Duration.ofMinutes(10))
             .doOnConnected { conn ->
                 conn.addHandlerLast(ReadTimeoutHandler(10, TimeUnit.MINUTES))
