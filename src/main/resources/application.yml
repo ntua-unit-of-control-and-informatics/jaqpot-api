@@ -86,7 +86,7 @@ jaqpot:
     url: http://localhost.jaqpot.org:3000
   runtime:
     jaqpotpy-inference-v6: http://localhost.jaqpot.org:8002
-    jaqpotr: http://localhost:8004
+    jaqpotr: http://localhost.jaqpot.org:8004
 
     legacy:
       jaqpot-inference: http://localhost.jaqpot.org:8880

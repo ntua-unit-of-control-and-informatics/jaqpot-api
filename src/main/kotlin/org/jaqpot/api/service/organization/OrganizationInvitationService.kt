@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 import java.util.*
 
-private val logger = KotlinLogging.logger {}
 
 @Service
 class OrganizationInvitationService(
@@ -41,6 +40,7 @@ class OrganizationInvitationService(
 ) : OrganizationInvitationApiDelegate {
     companion object {
         const val ORGANIZATION_INVITATION_EMAIL_SUBJECT = "Jaqpot organization invitation"
+        val logger = KotlinLogging.logger {}
     }
 
     @PreAuthorize("@organizationInviteAuthorizationLogic.decide(#root, #orgName)")

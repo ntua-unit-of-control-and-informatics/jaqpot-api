@@ -1907,8 +1907,6 @@ components:
       type: object
       required:
         - userId
-        - email
-        - username
         - associationType
       properties:
         id:

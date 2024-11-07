@@ -29,6 +29,23 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
             ModelTypeDto.R_TREE_CLASS to "predict_tree_class",
             ModelTypeDto.R_TREE_REGR to "predict_tree_regr",
         )
+
+        val connectionProvider =
+            ConnectionProvider.builder("custom")
+                .maxIdleTime(Duration.ofMinutes(10))
+                .maxLifeTime(Duration.ofMinutes(10))
+                .build()
+
+        val httpClient = HttpClient.create(connectionProvider)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+            .option(ChannelOption.SO_KEEPALIVE, true)
+            .responseTimeout(Duration.ofMinutes(10))
+            .doOnConnected { conn ->
+                conn.addHandlerLast(ReadTimeoutHandler(10, TimeUnit.MINUTES))
+                    .addHandlerLast(WriteTimeoutHandler(10, TimeUnit.MINUTES))
+
+
+            }
     }
 
     override fun getRuntimeUrl(): String {
@@ -50,22 +67,6 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
     }
 
     override fun getHttpClient(): HttpClient {
-        val connectionProvider =
-            ConnectionProvider.builder("custom")
-                .maxConnections(50)
-                .maxIdleTime(Duration.ofMinutes(10))
-                .maxLifeTime(Duration.ofMinutes(10))
-                .build()
-
-        return HttpClient.create(connectionProvider)
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .option(ChannelOption.SO_KEEPALIVE, true)
-            .responseTimeout(Duration.ofMinutes(10))
-            .doOnConnected { conn ->
-                conn.addHandlerLast(ReadTimeoutHandler(10, TimeUnit.MINUTES))
-                    .addHandlerLast(WriteTimeoutHandler(10, TimeUnit.MINUTES))
-
-
-            }
+        return httpClient
     }
 }

@@ -15,17 +15,17 @@ class UserCacheService(
     private val keycloakUserService: KeycloakUserService,
 ) : UserService {
 
-    private val usersCache: Cache<UserId, Optional<UserDto>> = Caffeine.newBuilder()
+    private val usersCache: Cache<UserId, UserDto> = Caffeine.newBuilder()
         .expireAfterWrite(1, TimeUnit.HOURS)
         .maximumSize(10_000)
         .build()
 
     override fun getUserById(id: UserId): Optional<UserDto> {
-        return usersCache.get(id) { id -> keycloakUserService.getUserById(id) }
+        return Optional.ofNullable(usersCache.get(id) { userId -> keycloakUserService.getUserById(userId) })
     }
 
     override fun getUserByEmail(email: String): Optional<UserDto> {
-        return keycloakUserService.getUserByEmail(email)
+        return Optional.ofNullable(keycloakUserService.getUserByEmail(email))
     }
 
 }
