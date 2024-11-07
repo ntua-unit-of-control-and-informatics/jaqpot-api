@@ -50,9 +50,9 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
 
     override fun getHttpClient(): HttpClient = HttpClient.create()
         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-        .responseTimeout(Duration.ofMinutes(2))
+        .responseTimeout(Duration.ofMinutes(10))
         .doOnConnected { conn ->
-            conn.addHandlerLast(ReadTimeoutHandler(2, TimeUnit.MINUTES))
-                .addHandlerLast(WriteTimeoutHandler(2, TimeUnit.MINUTES))
+            conn.addHandlerLast(ReadTimeoutHandler(10, TimeUnit.MINUTES))
+                .addHandlerLast(WriteTimeoutHandler(10, TimeUnit.MINUTES))
         }
 }
