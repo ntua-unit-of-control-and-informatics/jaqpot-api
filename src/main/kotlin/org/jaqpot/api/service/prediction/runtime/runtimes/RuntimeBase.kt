@@ -26,6 +26,14 @@ abstract class RuntimeBase {
     companion object {
         private val logger = KotlinLogging.logger {}
         private const val SIXTEEN_MEGABYTES_IN_BYTES = 16 * 1024 * 1024
+        private val httpClient = HttpClient.create()
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+            .option(ChannelOption.SO_KEEPALIVE, true)
+            .responseTimeout(Duration.ofSeconds(60))
+            .doOnConnected { conn ->
+                conn.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
+                    .addHandlerLast(WriteTimeoutHandler(60, TimeUnit.SECONDS))
+            }
     }
 
     abstract fun getRuntimePath(predictionModelDto: PredictionModelDto): String
@@ -77,14 +85,7 @@ abstract class RuntimeBase {
     }
 
     open fun getHttpClient(): HttpClient {
-        return HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .option(ChannelOption.SO_KEEPALIVE, true)
-            .responseTimeout(Duration.ofSeconds(60))
-            .doOnConnected { conn ->
-                conn.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
-                    .addHandlerLast(WriteTimeoutHandler(60, TimeUnit.SECONDS))
-            }
+        return httpClient
     }
 
     fun generateLegacyPredictionRequest(

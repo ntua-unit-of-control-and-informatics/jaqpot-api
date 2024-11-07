@@ -1,5 +1,6 @@
 package org.jaqpot.api.service.organization
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.NotFoundException
 import org.jaqpot.api.OrganizationApiDelegate
@@ -12,6 +13,7 @@ import org.jaqpot.api.mapper.toOrganizationUserDto
 import org.jaqpot.api.model.OrganizationDto
 import org.jaqpot.api.model.OrganizationUserDto
 import org.jaqpot.api.model.PartialUpdateOrganizationRequestDto
+import org.jaqpot.api.model.UserDto
 import org.jaqpot.api.repository.OrganizationRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
@@ -33,6 +35,10 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
     private val userService: UserService,
 ) : OrganizationApiDelegate {
+
+    companion object {
+        val logger = KotlinLogging.logger {}
+    }
 
     override fun getAllOrganizationsForUser(): ResponseEntity<List<OrganizationDto>> {
         val userId = authenticationFacade.userId
@@ -98,9 +104,12 @@ class OrganizationService(
 
     private fun getOrganizationUserDtos(organization: Organization): List<OrganizationUserDto> {
         val organizationMembers = organization.organizationMembers.map {
-            val userDto = userService.getUserById(it.userId).orElseThrow()
+            val userDto = userService.getUserById(it.userId).orElseGet {
+                logger.error { "User with id ${it.userId} not found but should exist for organization." }
+                UserDto(it.userId, null, null)
+            }
 
-            it.toOrganizationUserDto(userDto.username!!, userDto.email!!)
+            it.toOrganizationUserDto(userDto.username, userDto.email)
         }
         return organizationMembers
     }
