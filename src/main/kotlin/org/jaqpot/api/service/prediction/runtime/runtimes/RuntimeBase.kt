@@ -60,9 +60,11 @@ abstract class RuntimeBase {
                     .awaitBody<PredictionResponseDto>()
             }
 
+            val predictionResponseDto = body.await()
+
             logger.info { "Prediction successful using ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
 
-            return@runBlocking Optional.of(body.await())
+            return@runBlocking Optional.of(predictionResponseDto)
         } catch (e: Exception) {
             logger.warn(e) { "Prediction failed for ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
             return@runBlocking Optional.empty()
