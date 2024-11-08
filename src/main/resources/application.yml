@@ -38,7 +38,7 @@ spring:
 #    type: none
 
 springdoc:
-  paths-to-match: /v1/models/**, /v1/organizations/**
+  paths-to-match: /v1/models/**, /v1/organizations/**, /v1/user/**
   paths-to-exclude: /v1/organizations/*/invitations/**
 
 management:
