@@ -1337,21 +1337,6 @@ components:
         rmse:
           type: number
           format: float
-        rSquaredDiffRZero:
-          type: number
-          format: float
-        rSquaredDiffRZeroHat:
-          type: number
-          format: float
-        absDiffRZeroHat:
-          type: number
-          format: float
-        k:
-          type: number
-          format: float
-        kHat:
-          type: number
-          format: float
     BinaryClassificationScores:
       type: object
       required:
