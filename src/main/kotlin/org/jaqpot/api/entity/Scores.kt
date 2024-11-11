@@ -42,7 +42,7 @@ class Scores(
     val matthewsCorrCoef: Float?,
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    val confusionMatrix: Array<Array<FloatArray>>?,
+    val confusionMatrix: Array<FloatArray>?,
 
     // Multiclass Classification Metrics
     val multiClassAccuracy: Float?,
@@ -54,6 +54,6 @@ class Scores(
     val multiClassMatthewsCorrCoef: Float?,
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    val multiClassConfusionMatrix: Array<Array<FloatArray>>?
+    val multiClassConfusionMatrix: Array<FloatArray>?
 ) : BaseEntity()
 
