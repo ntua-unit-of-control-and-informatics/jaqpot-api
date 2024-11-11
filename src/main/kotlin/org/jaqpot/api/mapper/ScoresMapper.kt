@@ -28,7 +28,7 @@ fun Scores.toDto(): ScoresDto {
             f1Score = this.f1Score?.toList(),
             jaccard = this.jaccard?.toList(),
             matthewsCorrCoef = this.matthewsCorrCoef,
-            confusionMatrix = this.confusionMatrix?.toList()?.map { it.toList() },
+            confusionMatrix = this.confusionMatrix?.toList()?.map { it.toList().map { it1 -> it1.toList() } },
             folds = this.folds
         ),
         multiclassClassification = MulticlassClassificationScoresDto(
@@ -66,7 +66,9 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
         f1Score = this.binaryClassification?.f1Score?.toFloatArray(),
         jaccard = this.binaryClassification?.jaccard?.toFloatArray(),
         matthewsCorrCoef = this.binaryClassification?.matthewsCorrCoef,
-        confusionMatrix = this.binaryClassification?.confusionMatrix?.map { it.toFloatArray() }
+        confusionMatrix = this.binaryClassification?.confusionMatrix?.map {
+            it.map { it1 -> it1.toFloatArray() }.toTypedArray()
+        }
             ?.toTypedArray(),
         multiClassAccuracy = this.multiclassClassification?.accuracy,
         multiClassBalancedAccuracy = this.multiclassClassification?.balancedAccuracy,
