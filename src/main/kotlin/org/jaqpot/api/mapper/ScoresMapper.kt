@@ -41,7 +41,7 @@ fun Scores.toDto(): ScoresDto {
             f1Score = this.multiClassF1Score?.toList(),
             jaccard = this.multiClassJaccard?.toList(),
             matthewsCorrCoef = this.multiClassMatthewsCorrCoef,
-            confusionMatrix = this.confusionMatrix?.toList()?.map { it.toList().map { it1 -> it1.toList() } },
+            confusionMatrix = this.multiClassConfusionMatrix?.toList()?.map { it.toList().map { it1 -> it1.toList() } },
             folds = this.folds
         )
     )
@@ -66,8 +66,7 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
         f1Score = this.binaryClassification?.f1Score?.toFloatArray(),
         jaccard = this.binaryClassification?.jaccard?.toFloatArray(),
         matthewsCorrCoef = this.binaryClassification?.matthewsCorrCoef,
-        confusionMatrix = (this.binaryClassification?.confusionMatrix
-            ?: this.multiclassClassification?.confusionMatrix)?.map {
+        confusionMatrix = this.binaryClassification?.confusionMatrix?.map {
             it.map { it1 -> it1.toFloatArray() }.toTypedArray()
         }
             ?.toTypedArray(),
@@ -78,5 +77,9 @@ fun ScoresDto.toEntity(model: Model, scoreType: ScoreType): Scores {
         multiClassF1Score = this.multiclassClassification?.f1Score?.toFloatArray(),
         multiClassJaccard = this.multiclassClassification?.jaccard?.toFloatArray(),
         multiClassMatthewsCorrCoef = this.multiclassClassification?.matthewsCorrCoef,
+        multiClassConfusionMatrix = this.multiclassClassification?.confusionMatrix?.map {
+            it.map { it1 -> it1.toFloatArray() }.toTypedArray()
+        }
+            ?.toTypedArray()
     )
 }

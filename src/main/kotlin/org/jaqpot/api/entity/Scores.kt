@@ -32,10 +32,6 @@ class Scores(
     val mae: Float?,
     val rmse: Float?,
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    val confusionMatrix: Array<Array<FloatArray>>?,
-
     // Binary Classification Metrics
     val accuracy: Float?,
     val balancedAccuracy: Float?,
@@ -44,7 +40,9 @@ class Scores(
     val f1Score: FloatArray?,
     val jaccard: FloatArray?,
     val matthewsCorrCoef: Float?,
-
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    val confusionMatrix: Array<Array<FloatArray>>?,
 
     // Multiclass Classification Metrics
     val multiClassAccuracy: Float?,
@@ -54,5 +52,8 @@ class Scores(
     val multiClassF1Score: FloatArray?,
     val multiClassJaccard: FloatArray?,
     val multiClassMatthewsCorrCoef: Float?,
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    val multiClassConfusionMatrix: Array<Array<FloatArray>>?
 ) : BaseEntity()
 
