@@ -1172,7 +1172,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Doa'
-          x-field-extra-annotation: "@get:org.jaqpot.api.service.model.constraints.ValidDoa"
           maxItems: 50
         libraries:
           type: array
