@@ -1388,12 +1388,9 @@ components:
           items:
             type: array
             items:
-              type: array
-              items:
-                type: number
-                format: float
-              maxItems: 2
-            maxItems: 2
+              type: number
+              format: float
+            maxItems: 100
           maxItems: 100
     MulticlassClassificationScores:
       type: object
@@ -1446,12 +1443,9 @@ components:
           items:
             type: array
             items:
-              type: array
-              items:
-                type: number
-                format: float
-              maxItems: 2
-            maxItems: 2
+              type: number
+              format: float
+            maxItems: 100
           maxItems: 100
     OrganizationSummary:
       type: object
