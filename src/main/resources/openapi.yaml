@@ -1215,10 +1215,12 @@ components:
           type: string
           format: byte
           description: A base64 representation of the raw preprocessor.
+          maxLength: 10000000 # ~10MB
         rawModel:
           type: string
           format: byte
           description: A base64 representation of the raw model.
+          maxLength: 10000000 # ~10MB
         creator:
           $ref: '#/components/schemas/User'
         canEdit:
@@ -1802,6 +1804,7 @@ components:
           type: string
           format: byte
           description: A base64 representation in CSV format of the input values.
+          maxLength: 10000000 # ~10MB
         values:
           type: array
           items: { }
