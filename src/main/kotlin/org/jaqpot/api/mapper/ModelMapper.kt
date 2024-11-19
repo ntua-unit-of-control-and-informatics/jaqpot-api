@@ -64,6 +64,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
         trainScores = mutableListOf(),
         testScores = mutableListOf(),
         crossValidationScores = mutableListOf(),
+        rPbpkOdeSolver = this.rPbpkConfig?.odeSolver,
         rawPreprocessor = this.rawPreprocessor,
         rawModel = this.rawModel,
     )
@@ -115,6 +116,7 @@ fun Model.toPredictionModelDto(
         featurizers = this.featurizers.map { it.toDto() },
         preprocessors = this.preprocessors.map { it.toDto() },
         torchConfig = this.torchConfig,
+        rPbpkOdeSolver = this.rPbpkOdeSolver,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
         legacyPredictionService = this.legacyPredictionService
     )

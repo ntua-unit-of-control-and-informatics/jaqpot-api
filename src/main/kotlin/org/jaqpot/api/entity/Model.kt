@@ -101,6 +101,8 @@ class Model(
     @SQLRestriction("score_type = 'TRAIN'")
     var trainScores: List<Scores>? = null,
 
+    val rPbpkOdeSolver: String? = null,
+
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("score_type = 'TEST'")
     var testScores: List<Scores>? = null,

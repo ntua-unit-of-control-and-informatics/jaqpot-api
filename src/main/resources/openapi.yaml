@@ -1253,6 +1253,8 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Scores'
+        rPbpkConfig:
+          $ref: '#/components/schemas/RPbpkConfig'
         createdAt:
           type: string
           format: date-time
@@ -1448,6 +1450,12 @@ components:
               format: float
             maxItems: 100
           maxItems: 100
+    RPbpkConfig:
+      type: object
+      description: Configuration for the R PBPK models
+      properties:
+        odeSolver:
+          type: string
     OrganizationSummary:
       type: object
       required:
@@ -2017,6 +2025,8 @@ components:
             $ref: '#/components/schemas/AnyValue'
           description: "Torch configuration settings, optional"
           nullable: true
+        rPbpkOdeSolver:
+          type: string
         legacyAdditionalInfo:
           type: object
           additionalProperties:
