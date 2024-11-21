@@ -1129,6 +1129,46 @@ paths:
           description: Unauthorized request, the user must be authenticated
         '404':
           description: API key not found
+  /v1/user/settings:
+    get:
+      summary: Get user settings
+      operationId: getUserSettings
+      tags:
+        - User Settings
+      responses:
+        '200':
+          description: User settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Settings not found
+
+    post:
+      summary: Create or update user settings
+      operationId: saveUserSettings
+      tags:
+        - User Settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSettings'
+      responses:
+        '200':
+          description: Settings saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettings'
+        '401':
+          description: Unauthorized
+        '400':
+          description: Invalid request
 components:
   securitySchemes:
     bearerAuth:
@@ -2080,6 +2120,24 @@ components:
           type: string
         emailVerified:
           type: boolean
+    UserSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        darkMode:
+          type: boolean
+          default: false
+        collapseSidebar:
+          type: boolean
+          default: false
+        isAdmin:
+          type: boolean
+          readOnly: true
+        isUpci:
+          type: boolean
+          readOnly: true
     ApiKey:
       type: object
       required:
