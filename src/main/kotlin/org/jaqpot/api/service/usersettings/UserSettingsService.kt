@@ -23,6 +23,7 @@ class UserSettingsService(
             .orElseGet { ResponseEntity.notFound().build() }
     }
 
+    
     override fun saveUserSettings(userSettingsDto: UserSettingsDto): ResponseEntity<UserSettingsDto> {
         val isAdmin = authenticationFacade.isAdmin
         val isUpciUser = authenticationFacade.isUpciUser
