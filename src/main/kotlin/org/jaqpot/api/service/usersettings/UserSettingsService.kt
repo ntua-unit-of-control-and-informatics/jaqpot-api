@@ -1,19 +1,24 @@
 package org.jaqpot.api.service.usersettings
 
 import org.jaqpot.api.UserSettingsApiDelegate
+import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.UserSettingsDto
 import org.jaqpot.api.repository.UserSettingsRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
 class UserSettingsService(
-    private val authenticationFacade: AuthenticationFacade,
+    val authenticationFacade: AuthenticationFacade,
     private val userSettingsRepository: UserSettingsRepository
 ) : UserSettingsApiDelegate {
+
+    @Cacheable(value = [CacheKeys.USER_SETTINGS], key = "#root.target.authenticationFacade.userId")
     override fun getUserSettings(): ResponseEntity<UserSettingsDto> {
         val isAdmin = authenticationFacade.isAdmin
         val isUpciUser = authenticationFacade.isUpciUser
@@ -23,7 +28,7 @@ class UserSettingsService(
             .orElseGet { ResponseEntity.notFound().build() }
     }
 
-    
+    @CacheEvict(value = [CacheKeys.USER_SETTINGS], key = "#root.target.authenticationFacade.userId")
     override fun saveUserSettings(userSettingsDto: UserSettingsDto): ResponseEntity<UserSettingsDto> {
         val isAdmin = authenticationFacade.isAdmin
         val isUpciUser = authenticationFacade.isUpciUser
