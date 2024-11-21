@@ -29,8 +29,8 @@ class UserSettingsService(
 
         return userSettingsRepository.findByUserId(authenticationFacade.userId)
             .map {
-                it.darkMode?.let { it1 -> it.darkMode = it1 }
-                it.collapseSidebar?.let { it1 -> it.collapseSidebar = it1 }
+                userSettingsDto.darkMode?.let { darkMode -> it.darkMode = darkMode }
+                userSettingsDto.collapseSidebar?.let { collapseSidebar -> it.collapseSidebar = collapseSidebar }
                 userSettingsRepository.save(it)
                 ResponseEntity.ok(it.toDto(isUpciUser = isUpciUser, isAdmin = isAdmin))
             }
