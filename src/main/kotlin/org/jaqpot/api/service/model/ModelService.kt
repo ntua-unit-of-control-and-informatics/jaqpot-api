@@ -78,17 +78,24 @@ class ModelService(
     override fun getAllModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val modelsPage = modelRepository.findAll(pageable)
+        val modelIdToUserMap = modelsPage.content.associateBy(
+            { it.id!! },
+            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
+        )
 
-        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(null))
+        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val modelsPage = modelRepository.findAllByCreatorId(creatorId, pageable)
-        val creator = userService.getUserById(creatorId).orElse(UserDto(creatorId))
+        val modelIdToUserMap = modelsPage.content.associateBy(
+            { it.id!! },
+            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
+        )
 
-        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(creator))
+        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
     override fun getSharedModels(
@@ -106,7 +113,12 @@ class ModelService(
             modelRepository.findAllSharedWithUserByOrganizationId(userId, pageable, organizationId)
         }
 
-        return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(null))
+        val modelIdToUserMap = sharedModelsPage.content.associateBy(
+            { it.id!! },
+            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
+        )
+
+        return ResponseEntity.ok().body(sharedModelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
     @CacheEvict("searchModels", allEntries = true)
@@ -360,7 +372,12 @@ class ModelService(
         val transformedQuery = FullTextUtil.transformSearchQuery(query)
         val pageable = PageRequest.of(page, size)
         val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
-        return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(null))
+        val modelIdToUserMap = modelsPage.content.associateBy(
+            { it.id!! },
+            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
+        )
+
+        return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
     @CacheEvict("searchModels", allEntries = true)

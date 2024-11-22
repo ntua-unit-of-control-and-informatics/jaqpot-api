@@ -16,7 +16,7 @@ class UserCacheService(
 ) : UserService {
 
     private val usersCache: Cache<UserId, UserDto> = Caffeine.newBuilder()
-        .expireAfterWrite(1, TimeUnit.HOURS)
+        .expireAfterWrite(4, TimeUnit.HOURS)
         .maximumSize(10_000)
         .build()
 
