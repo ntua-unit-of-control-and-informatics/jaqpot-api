@@ -131,15 +131,11 @@ private fun Model.encodeRawPreprocessor(rawPreprocessor: ByteArray?): String? {
 }
 
 fun Model.encodeRawModel(rawModel: ByteArray): String {
-    return if (isRModel()) {
+    return if (isRModel() && isLegacyModel()) {
         // https://upci-ntua.atlassian.net/browse/JAQPOT-199
         // R models require special deserialization and base64 messes up the model
         rawModel.decodeToString()
-    }
-//    else if (isLegacyModel()) {
-//        String(rawModel)
-//    }
-    else {
+    } else {
         Base64.getEncoder().encodeToString(rawModel)
     }
 }

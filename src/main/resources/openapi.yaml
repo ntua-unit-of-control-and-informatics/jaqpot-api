@@ -1809,15 +1809,15 @@ components:
     FeaturePossibleValue:
       type: object
       required:
-        - key
         - value
+        - description
       properties:
-        key:
-          type: string
-          example: "value"
         value:
           type: string
           example: "value"
+        description:
+          type: string
+          example: "my description"
     FeatureType:
       type: string
       enum:
