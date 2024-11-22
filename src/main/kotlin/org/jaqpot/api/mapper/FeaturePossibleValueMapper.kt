@@ -6,15 +6,15 @@ import org.jaqpot.api.model.FeaturePossibleValueDto
 
 fun FeaturePossibleValue.toDto(): FeaturePossibleValueDto {
     return FeaturePossibleValueDto(
-        key = this.key,
-        value = this.value
+        value = this.value,
+        description = this.description
     )
 }
 
 fun FeaturePossibleValueDto.toEntity(): FeaturePossibleValue {
     return FeaturePossibleValue(
-        key = this.key,
-        value = this.value
+        value = this.value,
+        description = this.description
     )
 }
 
