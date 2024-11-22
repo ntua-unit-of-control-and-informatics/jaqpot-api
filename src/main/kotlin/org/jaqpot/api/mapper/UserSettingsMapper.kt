@@ -9,7 +9,7 @@ fun UserSettings.toDto(isUpciUser: Boolean, isAdmin: Boolean): UserSettingsDto {
         darkMode = this.darkMode,
         collapseSidebar = this.collapseSidebar,
         isAdmin = isAdmin,
-        isUpci = isUpciUser
+        isUpciUser = isUpciUser
     )
 }
 

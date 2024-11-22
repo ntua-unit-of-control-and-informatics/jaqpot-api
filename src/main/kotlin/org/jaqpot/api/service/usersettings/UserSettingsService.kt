@@ -25,7 +25,7 @@ class UserSettingsService(
 
         return userSettingsRepository.findByUserId(authenticationFacade.userId)
             .map { ResponseEntity.ok(it.toDto(isUpciUser = isUpciUser, isAdmin = isAdmin)) }
-            .orElseGet { ResponseEntity.notFound().build() }
+            .orElseGet { ResponseEntity.ok(UserSettingsDto(isUpciUser = isUpciUser, isAdmin = isAdmin)) }
     }
 
     @CacheEvict(value = [CacheKeys.USER_SETTINGS], key = "#root.target.authenticationFacade.userId")

@@ -35,27 +35,6 @@ paths:
           description: JWT is valid
         '401':
           description: Unauthorized
-  /v1/models:
-    post:
-      summary: Create a new model
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - model
-      operationId: createModel
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Model'
-      responses:
-        '201':
-          description: Model created successfully
-        '400':
-          description: Invalid input
-      x-stoplight:
-        id: 9ffjy7o77jc41
   /v1/user/models:
     get:
       x-spring-paginated: true
@@ -108,6 +87,78 @@ paths:
                     type: integer
         '400':
           description: Invalid input
+  /v1/models:
+    get:
+      x-spring-paginated: true
+      summary: Get paginated models
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: getAllModels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "field1|asc", "field2|desc" ]
+      responses:
+        '200':
+          description: Paginated list of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelSummary'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '400':
+          description: Invalid input
+    post:
+      summary: Create a new model
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: createModel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Model'
+      responses:
+        '201':
+          description: Model created successfully
+        '400':
+          description: Invalid input
+      x-stoplight:
+        id: 9ffjy7o77jc41
   /v1/models/search:
     get:
       x-spring-paginated: true
@@ -1146,7 +1197,6 @@ paths:
           description: Unauthorized
         '404':
           description: Settings not found
-
     post:
       summary: Create or update user settings
       operationId: saveUserSettings
@@ -2135,7 +2185,7 @@ components:
         isAdmin:
           type: boolean
           readOnly: true
-        isUpci:
+        isUpciUser:
           type: boolean
           readOnly: true
     ApiKey:
