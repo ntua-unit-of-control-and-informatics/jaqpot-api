@@ -77,4 +77,13 @@ class S3Storage(
         s3Client.putObject(request, RequestBody.fromBytes(obj))
     }
 
+    override fun deleteObject(bucketName: String, keyName: String) {
+        logger.info { "Deleting object from S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
+
+        s3Client.deleteObject {
+            it.bucket(bucketName)
+            it.key(keyName)
+        }
+    }
+
 }

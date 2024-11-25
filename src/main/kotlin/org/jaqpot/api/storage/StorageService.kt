@@ -24,7 +24,8 @@ class StorageService(
         private const val METADATA_VERSION = "1"
     }
 
-    fun storeDataset(dataset: Dataset): Boolean {
+    // Dataset
+    fun storeRawDataset(dataset: Dataset): Boolean {
         try {
             val metadata = mapOf(
                 "version" to METADATA_VERSION,
@@ -56,127 +57,6 @@ class StorageService(
             logger.error(e) { "Failed to store dataset with id ${dataset.id}" }
             return false
         }
-    }
-
-    fun storeDoa(doa: Doa): Boolean {
-        try {
-            val metadata = mapOf(
-                "version" to METADATA_VERSION,
-                "encoding" to Encoding.RAW.name,
-                "modelId" to doa.model.id.toString(),
-                "method" to doa.method.name
-            )
-
-            this.storage.putObject(
-                awsS3Config.doasBucketName,
-                getDoaStorageKey(doa),
-                doa.rawDoa!!,
-                metadata
-            )
-            return true
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to store doa with id ${doa.id}" }
-            return false
-        }
-    }
-
-    private fun getDoaStorageKey(doa: Doa) = "${doa.model.id}/${doa.method.name}"
-
-    fun storeRawModel(model: Model): Boolean {
-        try {
-            val metadata = mapOf(
-                "version" to METADATA_VERSION,
-                "encoding" to fileEncodingProcessor.determineEncoding(model.rawModel!!).name
-            )
-
-            this.storage.putObject(
-                awsS3Config.modelsBucketName,
-                getModelStorageKey(model),
-                model.rawModel!!,
-                metadata
-            )
-            return true
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to store model with id ${model.id}" }
-            return false
-        }
-    }
-
-    fun readRawModel(model: Model): ByteArray {
-        var rawModelFromStorage = Optional.empty<ByteArray>()
-        try {
-            rawModelFromStorage = this.storage.getObject(awsS3Config.modelsBucketName, getModelStorageKey(model))
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to read model with id ${model.id}" }
-        }
-
-        if (rawModelFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id)
-        } else if (model.rawModel != null) {
-            logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to raw model from database" }
-            return fileEncodingProcessor.readFile(model.rawModel!!, model.id)
-        }
-
-        throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
-    }
-
-    private fun getModelStorageKey(model: Model) = model.id.toString()
-
-    fun storeRawPreprocessor(model: Model): Boolean {
-        try {
-            val metadata = mapOf(
-                "version" to METADATA_VERSION,
-                "encoding" to Encoding.RAW.name
-            )
-
-            this.storage.putObject(
-                awsS3Config.preprocessorsBucketName,
-                getModelStorageKey(model),
-                model.rawPreprocessor!!,
-                metadata
-            )
-            return true
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to store preprocessor for model with id ${model.id}" }
-            return false
-        }
-    }
-
-    fun readRawPreprocessor(model: Model): ByteArray? {
-        var rawPreprocessorFromStorage = Optional.empty<ByteArray>()
-        try {
-            rawPreprocessorFromStorage =
-                this.storage.getObject(awsS3Config.preprocessorsBucketName, getModelStorageKey(model))
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to read preprocessor for model with id ${model.id}" }
-        }
-
-        if (rawPreprocessorFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id)
-        } else if (model.rawPreprocessor != null) {
-            logger.warn { "Failed to find raw preprocessor for model with id ${model.id} in storage, falling back to raw preprocessor from database" }
-            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id)
-        }
-
-        return null
-    }
-
-    fun readRawDoa(doa: Doa): ByteArray {
-        var rawDoaFromStorage = Optional.empty<ByteArray>()
-        try {
-            rawDoaFromStorage = this.storage.getObject(awsS3Config.doasBucketName, getDoaStorageKey(doa))
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to read doa with id ${doa.id}" }
-        }
-
-        if (rawDoaFromStorage.isPresent) {
-            return rawDoaFromStorage.get()
-        } else if (doa.rawDoa != null) {
-            logger.warn { "Failed to find raw doa with id ${doa.id} in storage, falling back to raw doa from database" }
-            return doa.rawDoa!!
-        }
-
-        throw JaqpotRuntimeException("Failed to find raw doa with id ${doa.id}")
     }
 
     fun readRawDatasetInputs(datasets: List<Dataset>): Map<String, List<Any>> {
@@ -265,4 +145,160 @@ class StorageService(
 
         return null
     }
+
+    // Doa
+    fun storeRawDoa(doa: Doa): Boolean {
+        try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to Encoding.RAW.name,
+                "modelId" to doa.model.id.toString(),
+                "method" to doa.method.name
+            )
+
+            this.storage.putObject(
+                awsS3Config.doasBucketName,
+                getDoaStorageKey(doa),
+                doa.rawDoa!!,
+                metadata
+            )
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store doa with id ${doa.id}" }
+            return false
+        }
+    }
+
+    fun deleteRawDoa(doa: Doa): Boolean {
+        try {
+            this.storage.deleteObject(awsS3Config.doasBucketName, getDoaStorageKey(doa))
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to delete doa with id ${doa.id}" }
+            return false
+        }
+    }
+
+    fun readRawDoa(doa: Doa): ByteArray {
+        var rawDoaFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawDoaFromStorage = this.storage.getObject(awsS3Config.doasBucketName, getDoaStorageKey(doa))
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read doa with id ${doa.id}" }
+        }
+
+        if (rawDoaFromStorage.isPresent) {
+            return rawDoaFromStorage.get()
+        } else if (doa.rawDoa != null) {
+            logger.warn { "Failed to find raw doa with id ${doa.id} in storage, falling back to raw doa from database" }
+            return doa.rawDoa!!
+        }
+
+        throw JaqpotRuntimeException("Failed to find raw doa with id ${doa.id}")
+    }
+
+    private fun getDoaStorageKey(doa: Doa) = "${doa.model.id}/${doa.method.name}"
+
+    // Model
+    fun deleteRawModel(model: Model): Boolean {
+        try {
+            this.storage.deleteObject(awsS3Config.modelsBucketName, getModelStorageKey(model))
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to delete model with id ${model.id}" }
+            return false
+        }
+    }
+
+    fun storeRawModel(model: Model): Boolean {
+        try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to fileEncodingProcessor.determineEncoding(model.rawModel!!).name
+            )
+
+            this.storage.putObject(
+                awsS3Config.modelsBucketName,
+                getModelStorageKey(model),
+                model.rawModel!!,
+                metadata
+            )
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store model with id ${model.id}" }
+            return false
+        }
+    }
+
+    fun readRawModel(model: Model): ByteArray {
+        var rawModelFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawModelFromStorage = this.storage.getObject(awsS3Config.modelsBucketName, getModelStorageKey(model))
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read model with id ${model.id}" }
+        }
+
+        if (rawModelFromStorage.isPresent) {
+            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id)
+        } else if (model.rawModel != null) {
+            logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to raw model from database" }
+            return fileEncodingProcessor.readFile(model.rawModel!!, model.id)
+        }
+
+        throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
+    }
+
+    private fun getModelStorageKey(model: Model) = model.id.toString()
+
+    // Preprocessor
+    fun storeRawPreprocessor(model: Model): Boolean {
+        try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to Encoding.RAW.name
+            )
+
+            this.storage.putObject(
+                awsS3Config.preprocessorsBucketName,
+                getModelStorageKey(model),
+                model.rawPreprocessor!!,
+                metadata
+            )
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store preprocessor for model with id ${model.id}" }
+            return false
+        }
+    }
+
+    fun deleteRawPreprocessor(model: Model): Boolean {
+        try {
+            this.storage.deleteObject(awsS3Config.preprocessorsBucketName, getModelStorageKey(model))
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to delete preprocessor for model with id ${model.id}" }
+            return false
+        }
+    }
+
+    fun readRawPreprocessor(model: Model): ByteArray? {
+        var rawPreprocessorFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawPreprocessorFromStorage =
+                this.storage.getObject(awsS3Config.preprocessorsBucketName, getModelStorageKey(model))
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to read preprocessor for model with id ${model.id}" }
+        }
+
+        if (rawPreprocessorFromStorage.isPresent) {
+            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id)
+        } else if (model.rawPreprocessor != null) {
+            logger.warn { "Failed to find raw preprocessor for model with id ${model.id} in storage, falling back to raw preprocessor from database" }
+            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id)
+        }
+
+        return null
+    }
+
+
 }

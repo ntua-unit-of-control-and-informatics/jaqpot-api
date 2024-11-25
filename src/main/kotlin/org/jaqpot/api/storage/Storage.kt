@@ -16,4 +16,9 @@ interface Storage {
         obj: ByteArray,
         metadata: Map<String, String> = mapOf(),
     )
+
+    fun deleteObject(
+        bucketName: String,
+        keyName: String
+    )
 }

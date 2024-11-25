@@ -7,8 +7,8 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 
-@Component("partialFeatureUpdateAuthorizationLogic")
-class PartialFeatureUpdateAuthorizationLogic(
+@Component("modelUpdateAuthorizationLogic")
+class ModelUpdateAuthorizationLogic(
     private val modelRepository: ModelRepository,
     private val authenticationFacade: AuthenticationFacade
 ) {

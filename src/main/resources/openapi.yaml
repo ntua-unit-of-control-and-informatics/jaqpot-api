@@ -208,6 +208,82 @@ paths:
                     type: integer
         '400':
           description: Invalid input
+  /v1/models/{modelId}/archive:
+    post:
+      summary: Archive a model
+      description: Archives a model. Models that remain archived for more than 30 days will be permanently deleted.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: archiveModel
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
+          description: The ID of the model to archive
+      responses:
+        '200':
+          description: Model successfully archived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 0
+                  archivedAt:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the model was archived
+        '404':
+          description: Model not found
+        '409':
+          description: Model is already archived
+        '403':
+          description: Insufficient permissions to archive the model
+  /v1/models/{modelId}/unarchive:
+    post:
+      summary: Unarchive a model
+      description: Unarchives a previously archived model. This will cancel any scheduled deletion.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: unarchiveModel
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
+          description: The ID of the model to unarchive
+      responses:
+        '200':
+          description: Model successfully unarchived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 0
+        '404':
+          description: Model not found
+        '409':
+          description: Model is not currently archived
+        '403':
+          description: Insufficient permissions to unarchive the model
   /v1/user/shared-models:
     get:
       x-spring-paginated: true
@@ -1286,6 +1362,13 @@ components:
           $ref: '#/components/schemas/ModelVisibility'
         task:
           $ref: '#/components/schemas/ModelTask'
+        archived:
+          type: boolean
+        archivedAt:
+          type: string
+          format: date-time
+          description: The date and time when the model was last archived.
+          example: '2023-01-01T12:00:00Z'
         torchConfig:
           type: object
           maxProperties: 20
@@ -1353,7 +1436,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-          description: The date and time when the feature was last updated.
+          description: The date and time when the model was last updated.
           example: '2023-01-01T12:00:00Z'
     ModelSummary:
       type: object
