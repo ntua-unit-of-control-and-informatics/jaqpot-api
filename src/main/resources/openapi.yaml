@@ -342,6 +342,61 @@ paths:
                     type: integer
         '400':
           description: Invalid input
+  /v1/user/archived-models:
+    get:
+      x-spring-paginated: true
+      summary: Get paginated archived models
+      description: Retrieve a paginated list of models that have been archived by the user
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: getArchivedModels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "archivedAt|desc", "name|asc" ]
+      responses:
+        '200':
+          description: Paginated list of archived models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelSummary'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '400':
+          description: Invalid input
+        '403':
+          description: Insufficient permissions to access archived models
   '/v1/models/{id}':
     get:
       summary: Get a Model

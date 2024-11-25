@@ -68,7 +68,8 @@ class Model(
 
     val selectedFeatures: List<String>?,
 
-    var archived: Boolean? = null,
+    @Column(nullable = false)
+    var archived: Boolean = false,
 
     var archivedAt: OffsetDateTime? = null,
 

@@ -90,7 +90,7 @@ class ModelService(
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val modelsPage = modelRepository.findAllByCreatorId(creatorId, pageable)
+        val modelsPage = modelRepository.findAllByCreatorIdAndArchivedIsFalse(creatorId, pageable)
         val modelIdToUserMap = modelsPage.content.associateBy(
             { it.id!! },
             { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
@@ -185,7 +185,7 @@ class ModelService(
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     override fun getLegacyModelById(id: String): ResponseEntity<ModelDto> {
-        val model = modelRepository.findOneByLegacyId(id)
+        val model = modelRepository.findOneByLegacyIdAndArchivedIsFalse(id)
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
@@ -421,6 +421,24 @@ class ModelService(
         )
 
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
+    }
+
+    override fun getArchivedModels(
+        page: Int,
+        size: Int,
+        sort: List<String>?
+    ): ResponseEntity<GetModels200ResponseDto> {
+        val userId = authenticationFacade.userId
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
+
+        val archivedModelsPage = modelRepository.findAllByCreatorIdAndArchivedIsTrue(userId, pageable)
+
+        val modelIdToUserMap = archivedModelsPage.content.associateBy(
+            { it.id!! },
+            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
+        )
+
+        return ResponseEntity.ok().body(archivedModelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
     @CacheEvict("searchModels", allEntries = true)
