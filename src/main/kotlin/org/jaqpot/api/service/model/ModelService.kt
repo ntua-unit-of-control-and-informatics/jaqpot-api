@@ -466,10 +466,12 @@ class ModelService(
     private fun deleteModel(model: Model) {
         logger.info { "Deleting model with id ${model.id}" }
 
-        model.doas.forEach {
-            logger.info { "Deleting DOA with id ${it.id} for model with id ${model.id}" }
-            val deletedRawDoa = storageService.deleteRawDoa(it)
-            logger.info { "Deleted raw DOA for model with id ${model.id}: $deletedRawDoa" }
+        if (model.doas.isNotEmpty()) {
+            model.doas.forEach {
+                logger.info { "Deleting DOA with id ${it.id} for model with id ${model.id}" }
+                val deletedRawDoa = storageService.deleteRawDoa(it)
+                logger.info { "Deleted raw DOA for model with id ${model.id}: $deletedRawDoa" }
+            }
         }
 
         logger.info { "Deleting raw preprocessor for model with id ${model.id}" }
@@ -485,6 +487,7 @@ class ModelService(
         logger.info { "Deleted model with id ${model.id}" }
     }
 
+    @Transactional
     @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
     fun purgeExpiredArchivedModels() {
         logger.info { "Purging expired archived models" }
@@ -493,15 +496,18 @@ class ModelService(
             OffsetDateTime.now().minusDays(ARCHIVED_MODEL_EXPIRATION_DAYS)
         )
 
+        var deletionCount = 0
+
         expiredArchivedModels.forEach {
             try {
                 this.deleteModel(it)
+                deletionCount++
             } catch (e: Exception) {
                 logger.error(e) { "Failed to delete model with id ${it.id}" }
             }
         }
 
-        logger.info { "Purged ${expiredArchivedModels.size} expired archived models" }
+        logger.info { "Purged $deletionCount expired archived models" }
     }
 }
 
