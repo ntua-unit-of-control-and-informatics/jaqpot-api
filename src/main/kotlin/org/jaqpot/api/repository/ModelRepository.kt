@@ -18,7 +18,7 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
     fun findAllByCreatorIdAndArchivedIsFalse(creatorId: String, pageable: Pageable): Page<Model>
     fun findAllByCreatorIdAndArchivedIsTrue(creatorId: String, pageable: Pageable): Page<Model>
 
-    fun findOneByLegacyIdAndArchivedIsFalse(legacyId: String): Optional<Model>
+    fun findOneByLegacyId(legacyId: String): Optional<Model>
 
     @Query(
         """
