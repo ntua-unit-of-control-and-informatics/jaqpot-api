@@ -1,6 +1,7 @@
 package org.jaqpot.api.service.dataset
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.transaction.Transactional
 import org.jaqpot.api.DatasetApiDelegate
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toGetDatasets200ResponseDto
@@ -52,6 +53,7 @@ class DatasetService(
         return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(inputsMap, resultsMap))
     }
 
+    @Transactional
     @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
     fun purgeExpiredDatasets() {
         logger.info { "Purging expired datasets" }

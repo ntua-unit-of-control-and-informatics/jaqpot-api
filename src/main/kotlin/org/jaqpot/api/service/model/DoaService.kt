@@ -19,7 +19,7 @@ class DoaService(private val doaRepository: DoaRepository, private val storageSe
             return
         }
         logger.info { "Storing raw doa to storage for doa with id ${doa.id} and model ${doa.model.id}" }
-        if (storageService.storeDoa(doa)) {
+        if (storageService.storeRawDoa(doa)) {
             logger.info { "Successfully moved raw doa to storage for doa ${doa.id} and model ${doa.model.id}" }
             doaRepository.setRawDoaToNull(doa.id)
         }

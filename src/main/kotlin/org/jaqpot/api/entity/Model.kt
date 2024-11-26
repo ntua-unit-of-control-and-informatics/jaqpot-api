@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
+import java.time.OffsetDateTime
 
 @Entity
 class Model(
@@ -66,6 +67,11 @@ class Model(
     var task: ModelTask,
 
     val selectedFeatures: List<String>?,
+
+    @Column(nullable = false)
+    var archived: Boolean = false,
+
+    var archivedAt: OffsetDateTime? = null,
 
     @Size(min = 3, max = 1000)
     @Column(columnDefinition = "TEXT")

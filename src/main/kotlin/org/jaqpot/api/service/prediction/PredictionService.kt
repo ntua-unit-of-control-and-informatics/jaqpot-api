@@ -60,7 +60,7 @@ class PredictionService(
         dataset.result = results
         dataset.executionFinishedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
-        if (storageService.storeDataset(dataset)) {
+        if (storageService.storeRawDataset(dataset)) {
             datasetRepository.setDatasetInputAndResultToNull(dataset.id)
         }
     }
@@ -70,7 +70,7 @@ class PredictionService(
         dataset.failureReason = err.toString()
 
         datasetRepository.save(dataset)
-        if (storageService.storeDataset(dataset)) {
+        if (storageService.storeRawDataset(dataset)) {
             datasetRepository.setDatasetInputAndResultToNull(dataset.id)
         }
     }

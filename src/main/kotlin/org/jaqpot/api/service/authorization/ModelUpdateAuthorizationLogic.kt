@@ -7,8 +7,8 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 
-@Component("partialFeatureUpdateAuthorizationLogic")
-class PartialFeatureUpdateAuthorizationLogic(
+@Component("modelUpdateAuthorizationLogic")
+class ModelUpdateAuthorizationLogic(
     private val modelRepository: ModelRepository,
     private val authenticationFacade: AuthenticationFacade
 ) {
@@ -20,8 +20,6 @@ class PartialFeatureUpdateAuthorizationLogic(
         val model = modelRepository.findById(modelId).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
-
-
 
         return authenticationFacade.userId == model.creatorId
     }

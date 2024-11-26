@@ -28,14 +28,16 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
+import java.time.OffsetDateTime
 
-private val logger = KotlinLogging.logger {}
+
 const val JAQPOT_METADATA_KEY = "jaqpotMetadata"
 const val JAQPOT_ROW_ID_KEY = "jaqpotRowId"
 const val JAQPOT_ROW_LABEL_KEY = "jaqpotRowLabel"
@@ -72,6 +74,8 @@ class ModelService(
             ModelTypeDto.R_TREE_CLASS,
             ModelTypeDto.R_TREE_REGR
         )
+        const val ARCHIVED_MODEL_EXPIRATION_DAYS = 30L
+        private val logger = KotlinLogging.logger {}
     }
 
     @PreAuthorize("hasAnyAuthority('admin', 'upci')")
@@ -89,7 +93,7 @@ class ModelService(
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val modelsPage = modelRepository.findAllByCreatorId(creatorId, pageable)
+        val modelsPage = modelRepository.findAllByCreatorIdAndArchivedIsFalse(creatorId, pageable)
         val modelIdToUserMap = modelsPage.content.associateBy(
             { it.id!! },
             { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
@@ -212,6 +216,10 @@ class ModelService(
             storeRawModelToStorage(model)
             // TODO once there are no models with rawPreprocessor in the database, remove this
             storeRawPreprocessorToStorage(model)
+
+            if (model.archived) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
+            }
 
             val userId = authenticationFacade.userId
             val toEntity = datasetDto.toEntity(
@@ -363,6 +371,50 @@ class ModelService(
         return ResponseEntity.ok(model.toDto(modelCreator, userCanEdit, isAdmin))
     }
 
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
+    @PreAuthorize("@modelUpdateAuthorizationLogic.decide(#root, #modelId)")
+    override fun archiveModel(modelId: Long): ResponseEntity<ArchiveModel200ResponseDto> {
+        val existingModel = modelRepository.findById(modelId).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+        }
+
+        if (existingModel.archived) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is already archived")
+        }
+
+        existingModel.archived = true
+        existingModel.archivedAt = OffsetDateTime.now()
+
+        modelRepository.save(existingModel)
+
+        return ResponseEntity(
+            ArchiveModel200ResponseDto(id = modelId, archivedAt = existingModel.archivedAt),
+            HttpStatus.OK
+        )
+    }
+
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
+    @PreAuthorize("@modelUpdateAuthorizationLogic.decide(#root, #modelId)")
+    override fun unarchiveModel(modelId: Long): ResponseEntity<UnarchiveModel200ResponseDto> {
+        val existingModel = modelRepository.findById(modelId).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+        }
+
+        if (!existingModel.archived) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is not archived")
+        }
+
+        existingModel.archived = false
+        existingModel.archivedAt = null
+
+        modelRepository.save(existingModel)
+
+        return ResponseEntity(
+            UnarchiveModel200ResponseDto(id = modelId),
+            HttpStatus.OK
+        )
+    }
+
     @Cacheable(CacheKeys.SEARCH_MODELS)
     override fun searchModels(
         query: String,
@@ -380,13 +432,82 @@ class ModelService(
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
+    override fun getArchivedModels(
+        page: Int,
+        size: Int,
+        sort: List<String>?
+    ): ResponseEntity<GetModels200ResponseDto> {
+        val userId = authenticationFacade.userId
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
+
+        val archivedModelsPage = modelRepository.findAllByCreatorIdAndArchivedIsTrue(userId, pageable)
+
+        val modelIdToUserMap = archivedModelsPage.content.associateBy(
+            { it.id!! },
+            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
+        )
+
+        return ResponseEntity.ok().body(archivedModelsPage.toGetModels200ResponseDto(modelIdToUserMap))
+    }
+
     @CacheEvict("searchModels", allEntries = true)
     @PreAuthorize("hasAuthority('admin')")
     override fun deleteModelById(id: Long): ResponseEntity<Unit> {
-        modelRepository.delete(modelRepository.findById(id).orElseThrow {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
-        })
-        return ResponseEntity.noContent().build()
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "This endpoint is not supported")
+//        val model = modelRepository.findById(id).orElseThrow {
+//            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
+//        }
+//
+//        deleteModel(model)
+//
+//        return ResponseEntity.noContent().build()
+    }
+
+    private fun deleteModel(model: Model) {
+        logger.info { "Deleting model with id ${model.id}" }
+
+        if (model.doas.isNotEmpty()) {
+            model.doas.forEach {
+                logger.info { "Deleting DOA with id ${it.id} for model with id ${model.id}" }
+                val deletedRawDoa = storageService.deleteRawDoa(it)
+                logger.info { "Deleted raw DOA for model with id ${model.id}: $deletedRawDoa" }
+            }
+        }
+
+        logger.info { "Deleting raw preprocessor for model with id ${model.id}" }
+        val deletedRawPreprocessor = storageService.deleteRawPreprocessor(model)
+        logger.info { "Deleted raw preprocessor for model with id ${model.id}: $deletedRawPreprocessor" }
+
+        logger.info { "Deleting raw model for model with id ${model.id}" }
+        val deletedRawModel = storageService.deleteRawModel(model)
+        logger.info { "Deleted raw model for model with id ${model.id}: $deletedRawModel" }
+
+        modelRepository.delete(model)
+
+        logger.info { "Deleted model with id ${model.id}" }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
+    fun purgeExpiredArchivedModels() {
+        logger.info { "Purging expired archived models" }
+
+        val expiredArchivedModels = modelRepository.findAllByArchivedIsTrueAndArchivedAtBefore(
+            OffsetDateTime.now().minusDays(ARCHIVED_MODEL_EXPIRATION_DAYS)
+        )
+
+        var deletionCount = 0
+
+        expiredArchivedModels.forEach {
+            try {
+                this.deleteModel(it)
+                deletionCount++
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to delete model with id ${it.id}" }
+            }
+        }
+
+        logger.info { "Purged $deletionCount expired archived models" }
     }
 }
 
