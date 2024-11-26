@@ -188,7 +188,7 @@ class ModelService(
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     override fun getLegacyModelById(id: String): ResponseEntity<ModelDto> {
-        val model = modelRepository.findOneByLegacyIdAndArchivedIsFalse(id)
+        val model = modelRepository.findOneByLegacyId(id)
 
         return model.map {
             val userCanEdit = authenticationFacade.isAdmin || isCreator(authenticationFacade, it)
@@ -453,13 +453,14 @@ class ModelService(
     @CacheEvict("searchModels", allEntries = true)
     @PreAuthorize("hasAuthority('admin')")
     override fun deleteModelById(id: Long): ResponseEntity<Unit> {
-        val model = modelRepository.findById(id).orElseThrow {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
-        }
-
-        deleteModel(model)
-
-        return ResponseEntity.noContent().build()
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "This endpoint is not supported")
+//        val model = modelRepository.findById(id).orElseThrow {
+//            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
+//        }
+//
+//        deleteModel(model)
+//
+//        return ResponseEntity.noContent().build()
     }
 
     private fun deleteModel(model: Model) {
