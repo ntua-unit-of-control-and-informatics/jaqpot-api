@@ -214,6 +214,10 @@ class ModelService(
             // TODO once there are no models with rawPreprocessor in the database, remove this
             storeRawPreprocessorToStorage(model)
 
+            if (model.archived) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
+            }
+
             val userId = authenticationFacade.userId
             val toEntity = datasetDto.toEntity(
                 model,
@@ -370,7 +374,7 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-        if (existingModel.archived == true) {
+        if (existingModel.archived) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is already archived")
         }
 
@@ -391,7 +395,7 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-        if (existingModel.archived != true) {
+        if (!existingModel.archived) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is not archived")
         }
 
