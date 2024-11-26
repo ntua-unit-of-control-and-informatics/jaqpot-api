@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.query.Param
+import java.time.OffsetDateTime
 import java.util.*
 
 
@@ -74,4 +75,6 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
     @Transactional
     @Query("UPDATE Model m SET m.rawPreprocessor = NULL WHERE m.id = :id")
     fun setRawPreprocessorToNull(@Param("id") id: Long?)
+
+    fun findAllByArchivedIsTrueAndArchivedAtBefore(date: OffsetDateTime): List<Model>
 }

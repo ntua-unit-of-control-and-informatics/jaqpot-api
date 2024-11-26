@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -36,7 +37,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 import java.time.OffsetDateTime
 
-private val logger = KotlinLogging.logger {}
+
 const val JAQPOT_METADATA_KEY = "jaqpotMetadata"
 const val JAQPOT_ROW_ID_KEY = "jaqpotRowId"
 const val JAQPOT_ROW_LABEL_KEY = "jaqpotRowLabel"
@@ -73,6 +74,8 @@ class ModelService(
             ModelTypeDto.R_TREE_CLASS,
             ModelTypeDto.R_TREE_REGR
         )
+        const val ARCHIVED_MODEL_EXPIRATION_DAYS = 30L
+        private val logger = KotlinLogging.logger {}
     }
 
     @PreAuthorize("hasAnyAuthority('admin', 'upci')")
@@ -368,6 +371,7 @@ class ModelService(
         return ResponseEntity.ok(model.toDto(modelCreator, userCanEdit, isAdmin))
     }
 
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
     @PreAuthorize("@modelUpdateAuthorizationLogic.decide(#root, #modelId)")
     override fun archiveModel(modelId: Long): ResponseEntity<ArchiveModel200ResponseDto> {
         val existingModel = modelRepository.findById(modelId).orElseThrow {
@@ -389,6 +393,7 @@ class ModelService(
         )
     }
 
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60)
     @PreAuthorize("@modelUpdateAuthorizationLogic.decide(#root, #modelId)")
     override fun unarchiveModel(modelId: Long): ResponseEntity<UnarchiveModel200ResponseDto> {
         val existingModel = modelRepository.findById(modelId).orElseThrow {
@@ -452,25 +457,50 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $id not found")
         }
 
-        model.doas.forEach {
-            logger.info { "Deleting DOA with id ${it.id} for model with id $id" }
-            val deletedRawDoa = storageService.deleteRawDoa(it)
-            logger.info { "Deleted raw DOA for model with id $id: $deletedRawDoa" }
-        }
-
-        logger.info { "Deleting raw preprocessor for model with id $id" }
-        val deletedRawPreprocessor = storageService.deleteRawPreprocessor(model)
-        logger.info { "Deleted raw preprocessor for model with id $id: $deletedRawPreprocessor" }
-
-        logger.info { "Deleting raw model for model with id $id" }
-        val deletedRawModel = storageService.deleteRawModel(model)
-        logger.info { "Deleted raw model for model with id $id: $deletedRawModel" }
-
-        logger.info { "Deleting model with id $id" }
-        modelRepository.delete(model)
-        logger.info { "Deleted model with id $id" }
+        deleteModel(model)
 
         return ResponseEntity.noContent().build()
+    }
+
+    private fun deleteModel(model: Model) {
+        logger.info { "Deleting model with id ${model.id}" }
+
+        model.doas.forEach {
+            logger.info { "Deleting DOA with id ${it.id} for model with id ${model.id}" }
+            val deletedRawDoa = storageService.deleteRawDoa(it)
+            logger.info { "Deleted raw DOA for model with id ${model.id}: $deletedRawDoa" }
+        }
+
+        logger.info { "Deleting raw preprocessor for model with id ${model.id}" }
+        val deletedRawPreprocessor = storageService.deleteRawPreprocessor(model)
+        logger.info { "Deleted raw preprocessor for model with id ${model.id}: $deletedRawPreprocessor" }
+
+        logger.info { "Deleting raw model for model with id ${model.id}" }
+        val deletedRawModel = storageService.deleteRawModel(model)
+        logger.info { "Deleted raw model for model with id ${model.id}: $deletedRawModel" }
+
+        modelRepository.delete(model)
+
+        logger.info { "Deleted model with id ${model.id}" }
+    }
+
+    @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
+    fun purgeExpiredArchivedModels() {
+        logger.info { "Purging expired archived models" }
+
+        val expiredArchivedModels = modelRepository.findAllByArchivedIsTrueAndArchivedAtBefore(
+            OffsetDateTime.now().minusDays(ARCHIVED_MODEL_EXPIRATION_DAYS)
+        )
+
+        expiredArchivedModels.forEach {
+            try {
+                this.deleteModel(it)
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to delete model with id ${it.id}" }
+            }
+        }
+
+        logger.info { "Purged ${expiredArchivedModels.size} expired archived models" }
     }
 }
 

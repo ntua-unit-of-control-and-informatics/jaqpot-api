@@ -21,8 +21,6 @@ class ModelUpdateAuthorizationLogic(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-
-
         return authenticationFacade.userId == model.creatorId
     }
 
