@@ -34,6 +34,8 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
             test = this.testScores?.map { it.toDto() },
             crossValidation = this.crossValidationScores?.map { it.toDto() },
         ),
+        archived = this.archived,
+        archivedAt = this.archivedAt,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
     )
