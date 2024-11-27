@@ -24,7 +24,7 @@ class S3Storage(
     }
 
     override fun getObject(bucketName: String, keyName: String): Optional<ByteArray> {
-        logger.info { "Downloading object from S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
+        logger.trace { "Downloading object from S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
         val request = GetObjectRequest.builder()
             .bucket(bucketName)
             .key(keyName)
@@ -44,7 +44,7 @@ class S3Storage(
 
             val jobs = keyNames.map { keyName ->
                 async {
-                    logger.info { "Downloading object from S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
+                    logger.trace { "Downloading object from S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
                     val request = GetObjectRequest.builder()
                         .bucket(bucketName)
                         .key(keyName)
