@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import org.jaqpot.api.model.UserDto
 import org.jaqpot.api.service.authentication.keycloak.KeycloakUserService
 import org.jaqpot.api.storage.StorageService
+import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,40 +18,37 @@ class UserCacheService(
     private val storageService: StorageService
 ) : UserService {
 
-    private val usersCache: Cache<UserId, UserDto> = Caffeine.newBuilder()
+    private val usersCache: Cache<UserId, UserRepresentation> = Caffeine.newBuilder()
         .expireAfterWrite(4, TimeUnit.HOURS)
         .maximumSize(10_000)
         .build()
 
     override fun getUserById(id: UserId): Optional<UserDto> {
-        val userFromCache = Optional.ofNullable(usersCache.getIfPresent(id))
-        if (userFromCache.isPresent) {
-            return userFromCache
-        }
+        val userRepresentation = usersCache.get(id) { keycloakUserService.getUserById(id) }
 
-        val userRepresentation = keycloakUserService.getUserById(id) ?: return Optional.empty()
-        val userAvatar = storageService.readRawUserAvatarFromUserId(id)
-        val userDto = UserDto(
-            id = userRepresentation.id,
-            username = userRepresentation.username,
-            firstName = userRepresentation.firstName,
-            lastName = userRepresentation.lastName,
-            email = userRepresentation.email,
-            emailVerified = userRepresentation.isEmailVerified,
-            avatar = userAvatar
-        )
+        val userDto = generateUserDto(userRepresentation)
 
-        return Optional.of(userDto).also { usersCache.put(id, userDto) }
+        return Optional.of(userDto)
     }
 
     override fun getUserByEmail(email: String): Optional<UserDto> {
-        val userFromCache = usersCache.getIfPresent(email)
-        if (userFromCache != null) {
-            return Optional.of(userFromCache)
-        }
+        val userRepresentation = usersCache.get(email) { keycloakUserService.getUserByEmail(email) }
 
-        val userRepresentation = keycloakUserService.getUserByEmail(email) ?: return Optional.empty()
-        val userAvatar = storageService.readRawUserAvatarFromUserId(userRepresentation.id)
+        val userDto = generateUserDto(userRepresentation)
+
+        return Optional.of(userDto)
+    }
+
+    override fun getUserByUsername(username: String): Optional<UserDto> {
+        val userRepresentation = usersCache.get(username) { keycloakUserService.getUserByUsername(username) }
+        val userDto = generateUserDto(userRepresentation)
+
+        return Optional.of(userDto)
+    }
+
+    private fun generateUserDto(userRepresentation: UserRepresentation): UserDto {
+        val userAvatar =
+            storageService.readRawUserAvatarFromUserId(userRepresentation.id)
         val userDto = UserDto(
             id = userRepresentation.id,
             username = userRepresentation.username,
@@ -60,8 +58,7 @@ class UserCacheService(
             emailVerified = userRepresentation.isEmailVerified,
             avatar = userAvatar
         )
-
-        return Optional.of(userDto).also { usersCache.put(userRepresentation.email, userDto) }
+        return userDto
     }
 
 }

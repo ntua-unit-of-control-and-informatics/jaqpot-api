@@ -6,6 +6,7 @@ class CacheKeys {
         const val USER_ORGANIZATIONS = "userOrganizations"
         const val SEARCH_MODELS = "searchModels"
         const val USER_SETTINGS = "userSettings"
+        const val USER_AVATARS = "userAvatars"
     }
 }
 

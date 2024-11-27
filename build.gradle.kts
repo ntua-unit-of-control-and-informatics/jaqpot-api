@@ -144,7 +144,6 @@ tasks.withType<Test> {
 openApiGenerate {
     generatorName.set("kotlin-spring")
     inputSpec.set("$projectDir/src/main/resources/openapi.yaml")
-    invokerPackage.set("org.jaqpot.api")
     apiPackage.set("org.jaqpot.api")
     modelPackage.set("org.jaqpot.api.model")
     outputDir.set("${buildDir}/openapi")

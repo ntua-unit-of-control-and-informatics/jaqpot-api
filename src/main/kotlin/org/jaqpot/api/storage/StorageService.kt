@@ -3,6 +3,7 @@ package org.jaqpot.api.storage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
@@ -11,6 +12,8 @@ import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.storage.encoding.Encoding
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -288,7 +291,7 @@ class StorageService(
             rawPreprocessorFromStorage =
                 this.storage.getObject(awsS3Config.preprocessorsBucketName, getModelStorageKey(model))
         } catch (e: Exception) {
-            logger.warn(e) { "Failed to read preprocessor for model with id ${model.id}" }
+            logger.info(e) { "Failed to find preprocessor for model with id ${model.id}" }
         }
 
         if (rawPreprocessorFromStorage.isPresent) {
@@ -303,6 +306,7 @@ class StorageService(
 
 
     // user-avatars
+    @CacheEvict(value = [CacheKeys.USER_AVATARS], key = "#userSettings.userId")
     fun storeRawUserAvatar(userSettings: UserSettings): Boolean {
         try {
             val metadata = mapOf(
@@ -323,13 +327,14 @@ class StorageService(
         }
     }
 
+    @Cacheable(value = [CacheKeys.USER_AVATARS], key = "#userId")
     fun readRawUserAvatarFromUserId(userId: String): ByteArray? {
         var rawUserAvatarFromStorage = Optional.empty<ByteArray>()
         try {
             rawUserAvatarFromStorage =
                 this.storage.getObject(awsS3Config.userAvatarsBucketName, userId)
         } catch (e: Exception) {
-            logger.warn { "Failed to read user avatar for user with id ${userId}" }
+            logger.info { "Failed to find user avatar for user with id ${userId}" }
         }
 
         if (rawUserAvatarFromStorage.isPresent) {
@@ -339,6 +344,7 @@ class StorageService(
         return null
     }
 
+    @Cacheable(value = [CacheKeys.USER_AVATARS], key = "#userSettings.userId")
     fun readRawUserAvatarFromUserSettings(userSettings: UserSettings): ByteArray? {
         var rawUserAvatarFromStorage = Optional.empty<ByteArray>()
         try {

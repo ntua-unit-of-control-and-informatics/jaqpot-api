@@ -7,6 +7,7 @@ import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.UserSettingsDto
 import org.jaqpot.api.repository.UserSettingsRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
+import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.storage.StorageService
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -17,7 +18,8 @@ import org.springframework.stereotype.Service
 class UserSettingsService(
     val authenticationFacade: AuthenticationFacade, // do not make private, cache is using this field
     private val userSettingsRepository: UserSettingsRepository,
-    private val storageService: StorageService
+    private val storageService: StorageService,
+    private val userService: UserService
 ) : UserSettingsApiDelegate {
 
     @Cacheable(value = [CacheKeys.USER_SETTINGS], key = "#root.target.authenticationFacade.userId")

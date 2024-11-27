@@ -1350,14 +1350,14 @@ paths:
           description: Unauthorized
         '400':
           description: Invalid request
-  /v1/users/{userId}:
+  /v1/users/{username}:
     get:
       summary: Get user data
       operationId: getUser
       tags:
         - user
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           description: The ID of the user to retrieve
@@ -1895,8 +1895,8 @@ components:
             items:
               type: number
               format: float
-              maxItems: 1000
             maxItems: 1000
+          maxItems: 1000
     MahalanobisDoa:
       type: object
       properties:
@@ -2335,6 +2335,8 @@ components:
         avatar:
           type: string
           format: byte
+        canEdit:
+          type: boolean
     UserSettings:
       type: object
       properties:
