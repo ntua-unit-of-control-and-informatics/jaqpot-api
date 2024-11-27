@@ -66,7 +66,7 @@ class S3Storage(
         }
 
     override fun putObject(bucketName: String, keyName: String, obj: ByteArray, metadata: Map<String, String>) {
-        logger.info { "Uploading object to S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
+        logger.trace { "Uploading object to S3 bucket $bucketName with key $keyName on region ${awsConfig.region}" }
 
         val request = PutObjectRequest.builder()
             .bucket(bucketName)
