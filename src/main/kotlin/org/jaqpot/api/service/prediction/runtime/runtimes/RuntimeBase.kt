@@ -70,7 +70,7 @@ abstract class RuntimeBase {
 
             val predictionResponseDto = body.await()
 
-            logger.info { "Prediction successful using ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
+            logger.trace { "Prediction successful using ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
 
             return@runBlocking Optional.of(predictionResponseDto)
         } catch (e: Exception) {
