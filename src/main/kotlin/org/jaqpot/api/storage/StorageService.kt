@@ -6,6 +6,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.entity.UserSettings
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.storage.encoding.Encoding
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
@@ -239,10 +240,10 @@ class StorageService(
         }
 
         if (rawModelFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id)
+            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id.toString())
         } else if (model.rawModel != null) {
             logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to raw model from database" }
-            return fileEncodingProcessor.readFile(model.rawModel!!, model.id)
+            return fileEncodingProcessor.readFile(model.rawModel!!, model.id.toString())
         }
 
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
@@ -291,14 +292,74 @@ class StorageService(
         }
 
         if (rawPreprocessorFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id)
+            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id.toString())
         } else if (model.rawPreprocessor != null) {
             logger.warn { "Failed to find raw preprocessor for model with id ${model.id} in storage, falling back to raw preprocessor from database" }
-            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id)
+            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id.toString())
         }
 
         return null
     }
 
+
+    // user-avatars
+    fun storeRawUserAvatar(userSettings: UserSettings): Boolean {
+        try {
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to Encoding.RAW.name
+            )
+
+            this.storage.putObject(
+                awsS3Config.userAvatarsBucketName,
+                getUserAvatarStorageKey(userSettings),
+                userSettings.rawAvatar!!,
+                metadata
+            )
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store user avatar for user with id ${userSettings.userId}" }
+            return false
+        }
+    }
+
+    fun readRawUserAvatarFromUserId(userId: String): ByteArray? {
+        var rawUserAvatarFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawUserAvatarFromStorage =
+                this.storage.getObject(awsS3Config.userAvatarsBucketName, userId)
+        } catch (e: Exception) {
+            logger.warn { "Failed to read user avatar for user with id ${userId}" }
+        }
+
+        if (rawUserAvatarFromStorage.isPresent) {
+            return fileEncodingProcessor.readFile(rawUserAvatarFromStorage.get(), userId)
+        }
+
+        return null
+    }
+
+    fun readRawUserAvatarFromUserSettings(userSettings: UserSettings): ByteArray? {
+        var rawUserAvatarFromStorage = Optional.empty<ByteArray>()
+        try {
+            rawUserAvatarFromStorage =
+                this.storage.getObject(awsS3Config.userAvatarsBucketName, getUserAvatarStorageKey(userSettings))
+        } catch (e: Exception) {
+            logger.warn { "Failed to read user avatar for user with id ${userSettings.userId}" }
+        }
+
+        if (rawUserAvatarFromStorage.isPresent) {
+            return fileEncodingProcessor.readFile(rawUserAvatarFromStorage.get(), userSettings.userId)
+        } else if (userSettings.rawAvatar != null) {
+            logger.warn { "Failed to find raw user avatar for user with id ${userSettings.userId} in storage, falling back to raw user avatar from database" }
+            return fileEncodingProcessor.readFile(userSettings.rawAvatar!!, userSettings.userId)
+        }
+
+        return null
+    }
+
+    private fun getUserAvatarStorageKey(userSettings: UserSettings): String {
+        return userSettings.userId
+    }
 
 }

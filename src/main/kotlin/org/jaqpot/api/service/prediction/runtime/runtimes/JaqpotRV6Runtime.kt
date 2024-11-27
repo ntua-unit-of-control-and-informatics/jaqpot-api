@@ -36,7 +36,7 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
                 .maxLifeTime(Duration.ofMinutes(10))
                 .build()
 
-        val httpClient = HttpClient.create(connectionProvider)
+        val RHttpClient = HttpClient.create(connectionProvider)
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
             .option(ChannelOption.SO_KEEPALIVE, true)
             .responseTimeout(Duration.ofMinutes(10))
@@ -67,6 +67,6 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
     }
 
     override fun getHttpClient(): HttpClient {
-        return httpClient
+        return RHttpClient
     }
 }

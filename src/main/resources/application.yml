@@ -64,6 +64,7 @@ aws:
     datasets-bucket:
     doas-bucket:
     preprocessors-bucket:
+    user-avatars-bucket:
 
 server:
   error:

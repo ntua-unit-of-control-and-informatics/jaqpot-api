@@ -18,6 +18,8 @@ class AWSS3Config(
     val doasBucketName: String,
     @Value("\${aws.s3.preprocessors-bucket}")
     val preprocessorsBucketName: String,
+    @Value("\${aws.s3.user-avatars-bucket}")
+    val userAvatarsBucketName: String,
 ) {
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {

@@ -2308,6 +2308,9 @@ components:
           type: string
         emailVerified:
           type: boolean
+        avatar:
+          type: string
+          format: byte
     UserSettings:
       type: object
       properties:
@@ -2320,6 +2323,11 @@ components:
         collapseSidebar:
           type: boolean
           default: false
+        rawAvatar:
+          type: string
+          format: byte
+          description: A base64 representation of the user's avatar
+          maxLength: 1000000 # ~1MB
         isAdmin:
           type: boolean
           readOnly: true
