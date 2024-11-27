@@ -23,9 +23,9 @@ class UserCacheService(
         .build()
 
     override fun getUserById(id: UserId): Optional<UserDto> {
-        val userFromCache = usersCache.getIfPresent(id)
-        if (userFromCache != null) {
-            return Optional.of(userFromCache)
+        val userFromCache = Optional.ofNullable(usersCache.getIfPresent(id))
+        if (userFromCache.isPresent) {
+            return userFromCache
         }
 
         val userRepresentation = keycloakUserService.getUserById(id) ?: return Optional.empty()
@@ -39,7 +39,6 @@ class UserCacheService(
             emailVerified = userRepresentation.isEmailVerified,
             avatar = userAvatar
         )
-
 
         return Optional.of(userDto).also { usersCache.put(id, userDto) }
     }
