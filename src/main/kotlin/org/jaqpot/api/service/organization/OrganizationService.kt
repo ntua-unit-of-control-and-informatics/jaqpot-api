@@ -109,7 +109,7 @@ class OrganizationService(
                 UserDto(it.userId, null, null)
             }
 
-            it.toOrganizationUserDto(userDto.username, userDto.email)
+            it.toOrganizationUserDto(userDto.username, userDto.email, userDto.avatarUrl)
         }
         return organizationMembers
     }

@@ -2229,6 +2229,8 @@ components:
         email:
           type: string
           format: email
+        avatarUrl:
+          type: string
         associationType:
           $ref: '#/components/schemas/OrganizationUserAssociationType'
     OrganizationUserAssociationType:

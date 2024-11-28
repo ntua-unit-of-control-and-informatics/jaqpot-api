@@ -14,11 +14,16 @@ fun OrganizationUserDto.toUserOrganizationAssociationEntity(org: Organization): 
     )
 }
 
-fun OrganizationUserAssociation.toOrganizationUserDto(username: String?, userEmail: String?): OrganizationUserDto {
+fun OrganizationUserAssociation.toOrganizationUserDto(
+    username: String?,
+    userEmail: String?,
+    avatarUrl: String?
+): OrganizationUserDto {
     return OrganizationUserDto(
         userId = this.userId,
         username = username,
         email = userEmail,
-        associationType = this.associationType.toDto()
+        associationType = this.associationType.toDto(),
+        avatarUrl = avatarUrl
     )
 }
