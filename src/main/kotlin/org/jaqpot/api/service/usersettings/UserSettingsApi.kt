@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.ws.rs.BadRequestException
-import org.jaqpot.api.model.UploadUserAvatar200ResponseDto
-import org.jaqpot.api.model.UploadUserAvatar400ResponseDto
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.RequestMapping

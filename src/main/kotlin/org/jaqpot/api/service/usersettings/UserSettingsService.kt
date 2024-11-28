@@ -7,7 +7,6 @@ import org.jaqpot.api.entity.UserSettings
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
-import org.jaqpot.api.model.UploadUserAvatar200ResponseDto
 import org.jaqpot.api.model.UserSettingsDto
 import org.jaqpot.api.repository.UserSettingsRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
