@@ -1,10 +1,11 @@
 package org.jaqpot.api.entity
 
 enum class ModelType {
-    SKLEARN,
+    SKLEARN_ONNX,
 
     // torch
-    TORCH_ONNX,
+    TORCH_GEOMETRIC_ONNX,
+    TORCH_SEQUENCE_ONNX,
     TORCHSCRIPT,
 
     // R models
