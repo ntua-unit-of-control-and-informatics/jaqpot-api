@@ -47,7 +47,11 @@ class UserSettingsService(
     }
 
     fun getUserAvatar(userId: UserId): String? {
-        return usersSettingsCache.getIfPresent(userId)?.avatarUrl
+        val userSettings = usersSettingsCache.get(userId) {
+            userSettingsRepository.findByUserId(userId)
+                .orElseGet { UserSettings(userId = userId) }
+        }
+        return userSettings?.avatarUrl
     }
 
     override fun saveUserSettings(userSettingsDto: UserSettingsDto): ResponseEntity<UserSettingsDto> {

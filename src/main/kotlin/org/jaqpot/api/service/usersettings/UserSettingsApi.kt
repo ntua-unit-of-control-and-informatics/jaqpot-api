@@ -6,15 +6,14 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import jakarta.validation.Valid
-import jakarta.validation.constraints.Size
+import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.model.UploadUserAvatar200ResponseDto
 import org.jaqpot.api.model.UploadUserAvatar400ResponseDto
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
@@ -29,7 +28,6 @@ class UserSettingsAvatarApi(private val userSettingsService: UserSettingsService
         tags = ["user-settings"],
         summary = "Upload user avatar",
         operationId = "uploadUserAvatar",
-        description = """""",
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -50,14 +48,15 @@ class UserSettingsAvatarApi(private val userSettingsService: UserSettingsService
         method = [RequestMethod.POST],
         value = ["/v1/user/avatar"],
         produces = ["application/json"],
-        consumes = ["image/jpeg", "image/png", "image/webp"]
+        consumes = ["multipart/form-data"]
     )
     fun uploadUserAvatar(
-        @Parameter(
-            description = "",
-            required = true
-        ) @Valid @Size(max = 1048576) @RequestBody body: MultipartFile
+        @Parameter(description = "Avatar file to upload", required = true)
+        @RequestParam("file") file: MultipartFile
     ): ResponseEntity<UploadUserAvatar200ResponseDto> {
-        return userSettingsService.uploadUserAvatar(body)
+        if (file.size > 1_048_576) { // 1MB in bytes
+            throw BadRequestException("File size exceeds maximum limit of 1MB")
+        }
+        return userSettingsService.uploadUserAvatar(file)
     }
 }
