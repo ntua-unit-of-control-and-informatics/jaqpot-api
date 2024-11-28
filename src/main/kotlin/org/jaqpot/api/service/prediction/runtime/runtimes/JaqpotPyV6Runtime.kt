@@ -23,7 +23,7 @@ class JaqpotPyV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) 
     }
 
     override fun getRuntimePath(predictionModelDto: PredictionModelDto): String {
-        return "/predict/"
+        return "/predict"
     }
 
 }
