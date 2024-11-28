@@ -10,9 +10,19 @@ interface Storage {
 
     fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray>
 
+    fun listObjects(bucketName: String, prefix: String): List<String>
+
     fun putObject(
         bucketName: String,
         keyName: String,
+        obj: ByteArray,
+        metadata: Map<String, String> = mapOf(),
+    )
+
+    fun putObject(
+        bucketName: String,
+        keyName: String,
+        contentType: String,
         obj: ByteArray,
         metadata: Map<String, String> = mapOf(),
     )

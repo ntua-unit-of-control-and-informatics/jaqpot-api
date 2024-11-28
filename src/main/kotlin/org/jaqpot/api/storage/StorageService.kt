@@ -11,6 +11,7 @@ import org.jaqpot.api.storage.encoding.Encoding
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @Service
@@ -301,28 +302,55 @@ class StorageService(
     }
 
     // user-avatars
-    fun storeRawUserAvatar(userId: String, rawAvatar: ByteArray, extension: String): Boolean {
+    fun storeRawUserAvatar(userId: String, file: MultipartFile): String? {
         try {
+            val (extension, contentType) = when (file.contentType) {
+                "image/jpeg" -> "jpg" to "image/jpeg"
+                "image/png" -> "png" to "image/png"
+                "image/webp" -> "webp" to "image/webp"
+                else -> throw JaqpotRuntimeException("Unsupported image type: ${file.contentType}")
+            }
+
             val metadata = mapOf(
                 "version" to METADATA_VERSION,
-                "encoding" to Encoding.RAW.name
+                "encoding" to Encoding.RAW.name,
+                "Content-Type" to contentType
             )
 
+            val userAvatarStorageKey = getUserAvatarStorageKey(userId, extension)
             this.storage.putObject(
                 awsS3Config.imagesBucketName,
-                getUserAvatarStorageKey(userId, extension),
-                rawAvatar,
+                userAvatarStorageKey,
+                contentType,
+                file.bytes,
                 metadata
             )
-            return true
+            return userAvatarStorageKey
         } catch (e: Exception) {
             logger.error(e) { "Failed to store user avatar for user with id $userId" }
+            return null
+        }
+    }
+
+    fun deleteRawUserAvatar(userId: String): Boolean {
+        try {
+            val prefix = "avatars/$userId."
+            val objects = this.storage.listObjects(awsS3Config.imagesBucketName, prefix)
+
+            objects.firstOrNull()?.let { key ->
+                this.storage.deleteObject(awsS3Config.imagesBucketName, key)
+                return true
+            }
+
+            return false // No avatar found
+        } catch (e: Exception) {
+            logger.error { "Failed to delete user avatar for user with id $userId" }
             return false
         }
     }
 
     private fun getUserAvatarStorageKey(userId: String, extension: String): String {
-        return "avatars/${userId}.${extension}"
+        return "avatars/${userId}.$extension"
     }
 
 }

@@ -1350,8 +1350,20 @@ paths:
           description: Unauthorized
         '400':
           description: Invalid request
+  /v1/user/avatar:
+    delete:
+      summary: Delete user avatar
+      operationId: deleteUserAvatar
+      tags:
+        - user-settings
+      responses:
+        '204':
+          description: Avatar successfully deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Avatar not found
   #  Commented out until https://github.com/OpenAPITools/openapi-generator/issues/8333 is fixed
-  #  /v1/user/avatar:
   #    post:
   #      summary: Upload user avatar
   #      operationId: uploadUserAvatar

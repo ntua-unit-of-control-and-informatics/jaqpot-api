@@ -2,7 +2,6 @@ package org.jaqpot.api.service.usersettings
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.UserSettingsApiDelegate
 import org.jaqpot.api.entity.UserSettings
 import org.jaqpot.api.error.JaqpotRuntimeException
@@ -15,7 +14,6 @@ import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserId
 import org.jaqpot.api.storage.StorageService
 import org.jaqpot.api.storage.s3.AWSS3Config
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -75,15 +73,9 @@ class UserSettingsService(
     }
 
     fun uploadUserAvatar(body: MultipartFile): ResponseEntity<UploadUserAvatar200ResponseDto> {
-        val extension = when (body.contentType?.toString()) {
-            MediaType.IMAGE_JPEG_VALUE -> "jpg"
-            MediaType.IMAGE_PNG_VALUE -> "png"
-            "image/webp" -> "webp"
-            else -> throw BadRequestException("Unsupported image type: ${body.contentType}. Only JPEG, PNG and WebP are supported.")
-        }
-
-        if (storageService.storeRawUserAvatar(authenticationFacade.userId, body.bytes, extension)) {
-            val avatarUrl = generateUserAvatarUrl(authenticationFacade.userId, extension)
+        val userAvatarPath = storageService.storeRawUserAvatar(authenticationFacade.userId, body)
+        if (userAvatarPath != null) {
+            val avatarUrl = "${awsS3Config.cloudfrontImagesDistributionUrl}/$userAvatarPath"
             val userSettings = userSettingsRepository.findByUserId(authenticationFacade.userId)
                 .map {
                     it.avatarUrl = avatarUrl
@@ -103,7 +95,21 @@ class UserSettingsService(
         }
     }
 
-    private fun generateUserAvatarUrl(userId: String, extension: String): String {
-        return "${awsS3Config.cloudfrontImagesDistributionUrl}/avatars/${userId}.$extension"
+    override fun deleteUserAvatar(): ResponseEntity<Unit> {
+        storageService.deleteRawUserAvatar(authenticationFacade.userId)
+        val userSettings = userSettingsRepository.findByUserId(authenticationFacade.userId)
+            .map {
+                it.avatarUrl = null
+                it
+            }
+            .orElseGet {
+                UserSettings(userId = authenticationFacade.userId, avatarUrl = null)
+            }
+
+        userSettingsRepository.save(userSettings)
+
+        usersSettingsCache.put(authenticationFacade.userId, userSettings)
+
+        return ResponseEntity.noContent().build()
     }
 }
