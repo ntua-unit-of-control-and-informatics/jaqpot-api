@@ -39,7 +39,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "test": "hello"
                     },
                     "task": "REGRESSION",
-                    "type": "SKLEARN",
+                    "type": "SKLEARN_ONNX",
                     "visibility": "PRIVATE",
                     "reliability": 5,
                     "pretrained": false,
@@ -108,7 +108,7 @@ class ModelApiTest : AbstractIntegrationTest() {
                         "test": "hello"
                     },
                     "task": "REGRESSION",
-                    "type": "TORCH_ONNX",
+                    "type": "TORCH_GEOMETRIC_ONNX",
                     "visibility": "PRIVATE",
                     "reliability": 5,
                     "pretrained": false,

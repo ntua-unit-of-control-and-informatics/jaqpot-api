@@ -1790,8 +1790,9 @@ components:
     ModelType:
       type: string
       enum:
-        - SKLEARN
-        - TORCH_ONNX
+        - SKLEARN_ONNX
+        - TORCH_SEQUENCE_ONNX
+        - TORCH_GEOMETRIC_ONNX
         - TORCHSCRIPT
         - R_BNLEARN_DISCRETE
         - R_CARET
