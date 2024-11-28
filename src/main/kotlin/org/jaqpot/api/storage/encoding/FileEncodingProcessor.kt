@@ -32,9 +32,9 @@ class FileEncodingProcessor {
         }
     }
 
-    fun readFile(data: ByteArray, modelId: Long?): ByteArray {
+    fun readFile(data: ByteArray, objectId: String?): ByteArray {
         if (determineEncoding(data) == Encoding.BASE64) {
-            logger.warn { "Deprecated base64 encoding detected on model $modelId" }
+            logger.warn { "Deprecated base64 encoding detected on object $objectId" }
             // no metadata exist on legacy base64 encoded files
             return Base64.getDecoder().decode(data)
         }

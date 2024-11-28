@@ -64,6 +64,9 @@ aws:
     datasets-bucket:
     doas-bucket:
     preprocessors-bucket:
+    images-bucket:
+  cloudfront:
+    images-distribution-url:
 
 server:
   error:

@@ -11,6 +11,7 @@ import org.jaqpot.api.storage.encoding.Encoding
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @Service
@@ -239,10 +240,10 @@ class StorageService(
         }
 
         if (rawModelFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id)
+            return fileEncodingProcessor.readFile(rawModelFromStorage.get(), model.id.toString())
         } else if (model.rawModel != null) {
             logger.warn { "Failed to find raw model with id ${model.id} in storage, falling back to raw model from database" }
-            return fileEncodingProcessor.readFile(model.rawModel!!, model.id)
+            return fileEncodingProcessor.readFile(model.rawModel!!, model.id.toString())
         }
 
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
@@ -287,18 +288,69 @@ class StorageService(
             rawPreprocessorFromStorage =
                 this.storage.getObject(awsS3Config.preprocessorsBucketName, getModelStorageKey(model))
         } catch (e: Exception) {
-            logger.warn(e) { "Failed to read preprocessor for model with id ${model.id}" }
+            logger.info(e) { "Failed to find preprocessor for model with id ${model.id}" }
         }
 
         if (rawPreprocessorFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id)
+            return fileEncodingProcessor.readFile(rawPreprocessorFromStorage.get(), model.id.toString())
         } else if (model.rawPreprocessor != null) {
             logger.warn { "Failed to find raw preprocessor for model with id ${model.id} in storage, falling back to raw preprocessor from database" }
-            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id)
+            return fileEncodingProcessor.readFile(model.rawPreprocessor!!, model.id.toString())
         }
 
         return null
     }
 
+    // user-avatars
+    fun storeRawUserAvatar(userId: String, file: MultipartFile): String? {
+        try {
+            val (extension, contentType) = when (file.contentType) {
+                "image/jpeg" -> "jpg" to "image/jpeg"
+                "image/png" -> "png" to "image/png"
+                "image/webp" -> "webp" to "image/webp"
+                else -> throw JaqpotRuntimeException("Unsupported image type: ${file.contentType}")
+            }
+
+            val metadata = mapOf(
+                "version" to METADATA_VERSION,
+                "encoding" to Encoding.RAW.name,
+                "Content-Type" to contentType
+            )
+
+            val userAvatarStorageKey = getUserAvatarStorageKey(userId, extension)
+            this.storage.putObject(
+                awsS3Config.imagesBucketName,
+                userAvatarStorageKey,
+                contentType,
+                file.bytes,
+                metadata
+            )
+            return userAvatarStorageKey
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to store user avatar for user with id $userId" }
+            return null
+        }
+    }
+
+    fun deleteRawUserAvatar(userId: String): Boolean {
+        try {
+            val prefix = "avatars/$userId."
+            val objects = this.storage.listObjects(awsS3Config.imagesBucketName, prefix)
+
+            objects.firstOrNull()?.let { key ->
+                this.storage.deleteObject(awsS3Config.imagesBucketName, key)
+                return true
+            }
+
+            return false // No avatar found
+        } catch (e: Exception) {
+            logger.error { "Failed to delete user avatar for user with id $userId" }
+            return false
+        }
+    }
+
+    private fun getUserAvatarStorageKey(userId: String, extension: String): String {
+        return "avatars/${userId}.$extension"
+    }
 
 }

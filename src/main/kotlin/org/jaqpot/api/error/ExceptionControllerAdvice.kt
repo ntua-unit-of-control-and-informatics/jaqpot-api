@@ -32,6 +32,15 @@ class ExceptionControllerAdvice {
     }
 
     @ExceptionHandler
+    fun handleRuntimeException(ex: JaqpotRuntimeException): ResponseEntity<ApiErrorResponse> {
+        val errorMessage = ApiErrorResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            ex.message
+        )
+        return ResponseEntity(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+
+    @ExceptionHandler
     fun handleBadRequestException(ex: BadRequestException): ResponseEntity<ApiErrorResponse> {
         val errorMessage = ApiErrorResponse(
             HttpStatus.BAD_REQUEST.value(),

@@ -1316,7 +1316,7 @@ paths:
       summary: Get user settings
       operationId: getUserSettings
       tags:
-        - User Settings
+        - user-settings
       responses:
         '200':
           description: User settings retrieved successfully
@@ -1350,6 +1350,96 @@ paths:
           description: Unauthorized
         '400':
           description: Invalid request
+  /v1/user/avatar:
+    delete:
+      summary: Delete user avatar
+      operationId: deleteUserAvatar
+      tags:
+        - user-settings
+      responses:
+        '204':
+          description: Avatar successfully deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Avatar not found
+  #  Commented out until https://github.com/OpenAPITools/openapi-generator/issues/8333 is fixed
+  #    post:
+  #      summary: Upload user avatar
+  #      operationId: uploadUserAvatar
+  #      tags:
+  #        - user-settings
+  #      requestBody:
+  #        required: true
+  #        content:
+  #          image/jpeg:
+  #            schema:
+  #              type: string
+  #              format: binary
+  #              maxLength: 1048576  # 1MB in bytes
+  #              description: JPEG/JPG image (max 1MB)
+  #          image/png:
+  #            schema:
+  #              type: string
+  #              format: binary
+  #              maxLength: 1048576  # 1MB in bytes
+  #              description: PNG image (max 1MB)
+  #          image/webp:
+  #            schema:
+  #              type: string
+  #              format: binary
+  #              maxLength: 1048576  # 1MB in bytes
+  #              description: WebP image (max 1MB)
+  #      responses:
+  #        '200':
+  #          description: Avatar uploaded successfully
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  avatarUrl:
+  #                    type: string
+  #                    description: The CDN URL of the uploaded avatar
+  #                    example: "https://d2zoqz4gyxc03g.cloudfront.net/avatars/123e4567-e89b-12d3-a456-426614174000.jpg"
+  #        '400':
+  #          description: Invalid request
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: "Invalid file type. Allowed types are: jpg, png, webp"
+  #        '401':
+  #          description: Unauthorized
+  #        '413':
+  #          description: File exceeds maximum size of 1MB
+  /v1/users/{username}:
+    get:
+      summary: Get user data
+      operationId: getUser
+      tags:
+        - user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
 components:
   securitySchemes:
     bearerAuth:
@@ -1871,8 +1961,8 @@ components:
             items:
               type: number
               format: float
-              maxItems: 1000
             maxItems: 1000
+          maxItems: 1000
     MahalanobisDoa:
       type: object
       properties:
@@ -2308,6 +2398,10 @@ components:
           type: string
         emailVerified:
           type: boolean
+        avatarUrl:
+          type: string
+        canEdit:
+          type: boolean
     UserSettings:
       type: object
       properties:
@@ -2320,6 +2414,8 @@ components:
         collapseSidebar:
           type: boolean
           default: false
+        avatarUrl:
+          type: string
         isAdmin:
           type: boolean
           readOnly: true

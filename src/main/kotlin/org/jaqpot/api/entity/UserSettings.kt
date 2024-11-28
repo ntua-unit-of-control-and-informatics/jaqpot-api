@@ -15,4 +15,6 @@ class UserSettings(
     var darkMode: Boolean? = false,
 
     var collapseSidebar: Boolean? = false,
+
+    var avatarUrl: String? = null,
 ) : BaseEntity()
