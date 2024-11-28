@@ -2416,11 +2416,6 @@ components:
           default: false
         avatarUrl:
           type: string
-        rawAvatar:
-          type: string
-          format: byte
-          description: A base64 representation of the user's avatar
-          maxLength: 1000000 # ~1MB
         isAdmin:
           type: boolean
           readOnly: true
