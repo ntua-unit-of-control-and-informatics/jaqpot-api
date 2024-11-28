@@ -1,82 +1,105 @@
 package org.jaqpot.api.service.usersettings
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import jakarta.ws.rs.BadRequestException
 import org.jaqpot.api.UserSettingsApiDelegate
-import org.jaqpot.api.cache.CacheKeys
+import org.jaqpot.api.entity.UserSettings
+import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
+import org.jaqpot.api.model.UploadUserAvatar200ResponseDto
 import org.jaqpot.api.model.UserSettingsDto
 import org.jaqpot.api.repository.UserSettingsRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
-import org.jaqpot.api.service.authentication.UserService
+import org.jaqpot.api.service.authentication.UserId
 import org.jaqpot.api.storage.StorageService
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.Cacheable
+import org.jaqpot.api.storage.s3.AWSS3Config
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
+import java.util.concurrent.TimeUnit
 
 @Service
 class UserSettingsService(
-    val authenticationFacade: AuthenticationFacade, // do not make private, cache is using this field
+    private val authenticationFacade: AuthenticationFacade,
     private val userSettingsRepository: UserSettingsRepository,
     private val storageService: StorageService,
-    private val userService: UserService
+    private val awsS3Config: AWSS3Config,
 ) : UserSettingsApiDelegate {
 
-    @Cacheable(value = [CacheKeys.USER_SETTINGS], key = "#root.target.authenticationFacade.userId")
+    private val usersSettingsCache: Cache<UserId, UserSettings> = Caffeine.newBuilder()
+        .expireAfterWrite(4, TimeUnit.HOURS)
+        .maximumSize(10_000)
+        .build()
+
     override fun getUserSettings(): ResponseEntity<UserSettingsDto> {
         val isAdmin = authenticationFacade.isAdmin
         val isUpciUser = authenticationFacade.isUpciUser
 
-        return userSettingsRepository.findByUserId(authenticationFacade.userId)
-            .map {
-                val userAvatar = storageService.readRawUserAvatarFromUserSettings(it)
-                ResponseEntity.ok(it.toDto(isUpciUser = isUpciUser, isAdmin = isAdmin, rawAvatar = userAvatar))
-            }
-            .orElseGet { ResponseEntity.ok(UserSettingsDto(isUpciUser = isUpciUser, isAdmin = isAdmin)) }
+        val userSettings = usersSettingsCache.get(authenticationFacade.userId) {
+            userSettingsRepository.findByUserId(authenticationFacade.userId)
+                .orElseGet { UserSettings(userId = authenticationFacade.userId) }
+        }
+
+        return ResponseEntity.ok(userSettings.toDto(isUpciUser = isUpciUser, isAdmin = isAdmin))
     }
 
-    @CacheEvict(value = [CacheKeys.USER_SETTINGS], key = "#root.target.authenticationFacade.userId")
+    fun getUserAvatar(userId: UserId): String? {
+        return usersSettingsCache.getIfPresent(userId)?.avatarUrl
+    }
+
     override fun saveUserSettings(userSettingsDto: UserSettingsDto): ResponseEntity<UserSettingsDto> {
         val isAdmin = authenticationFacade.isAdmin
         val isUpciUser = authenticationFacade.isUpciUser
 
-        return userSettingsRepository.findByUserId(authenticationFacade.userId)
+        val updatedUserSettings = userSettingsRepository.findByUserId(authenticationFacade.userId)
             .map {
                 userSettingsDto.darkMode?.let { darkMode -> it.darkMode = darkMode }
                 userSettingsDto.collapseSidebar?.let { collapseSidebar -> it.collapseSidebar = collapseSidebar }
-                val userAvatar = if (userSettingsDto.rawAvatar != null) {
-                    it.rawAvatar = userSettingsDto.rawAvatar
-                    if (storageService.storeRawUserAvatar(it)) {
-                        it.rawAvatar = null
-                    }
-                    userSettingsDto.rawAvatar
-                } else {
-                    it.rawAvatar
-                }
                 userSettingsRepository.save(it)
-                ResponseEntity.ok(it.toDto(isUpciUser = isUpciUser, isAdmin = isAdmin, rawAvatar = userAvatar))
+                it
             }
             .orElseGet {
                 val userSettings = userSettingsDto.toEntity(userId = authenticationFacade.userId)
-                val userAvatar = if (userSettingsDto.rawAvatar != null) {
-                    userSettings.rawAvatar = userSettingsDto.rawAvatar
-                    if (storageService.storeRawUserAvatar(userSettings)) {
-                        userSettings.rawAvatar = null
-                    }
-                    userSettingsDto.rawAvatar
-                } else {
-                    null
-                }
                 userSettingsRepository.save(userSettings)
-                ResponseEntity.ok(
-                    userSettings.toDto(
-                        isUpciUser = isUpciUser,
-                        isAdmin = isAdmin,
-                        rawAvatar = userAvatar
-                    )
-                )
             }
+
+        return ResponseEntity.ok(updatedUserSettings.toDto(isUpciUser = isUpciUser, isAdmin = isAdmin))
+            .also { usersSettingsCache.put(authenticationFacade.userId, updatedUserSettings) }
     }
 
+    fun uploadUserAvatar(body: MultipartFile): ResponseEntity<UploadUserAvatar200ResponseDto> {
+        val extension = when (body.contentType?.toString()) {
+            MediaType.IMAGE_JPEG_VALUE -> "jpg"
+            MediaType.IMAGE_PNG_VALUE -> "png"
+            "image/webp" -> "webp"
+            else -> throw BadRequestException("Unsupported image type: ${body.contentType}. Only JPEG, PNG and WebP are supported.")
+        }
 
+        if (storageService.storeRawUserAvatar(authenticationFacade.userId, body.bytes, extension)) {
+            val avatarUrl = generateUserAvatarUrl(authenticationFacade.userId, extension)
+            val userSettings = userSettingsRepository.findByUserId(authenticationFacade.userId)
+                .map {
+                    it.avatarUrl = avatarUrl
+                    it
+                }
+                .orElseGet {
+                    UserSettings(userId = authenticationFacade.userId, avatarUrl = avatarUrl)
+                }
+
+            userSettingsRepository.save(userSettings)
+
+            return ResponseEntity.ok(
+                UploadUserAvatar200ResponseDto(avatarUrl = avatarUrl)
+            ).also { usersSettingsCache.invalidate(authenticationFacade.userId) }
+        } else {
+            throw JaqpotRuntimeException("Could not upload user avatar")
+        }
+    }
+
+    private fun generateUserAvatarUrl(userId: String, extension: String): String {
+        return "${awsS3Config.cloudfrontImagesDistributionUrl}/avatars/${userId}.$extension"
+    }
 }

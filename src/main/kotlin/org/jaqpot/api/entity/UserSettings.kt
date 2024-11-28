@@ -16,5 +16,5 @@ class UserSettings(
 
     var collapseSidebar: Boolean? = false,
 
-    var rawAvatar: ByteArray? = null,
+    var avatarUrl: String? = null,
 ) : BaseEntity()

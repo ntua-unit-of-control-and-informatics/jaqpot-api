@@ -3,17 +3,13 @@ package org.jaqpot.api.storage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.jaqpot.api.cache.CacheKeys
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Doa
 import org.jaqpot.api.entity.Model
-import org.jaqpot.api.entity.UserSettings
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.storage.encoding.Encoding
 import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -304,10 +300,8 @@ class StorageService(
         return null
     }
 
-
     // user-avatars
-    @CacheEvict(value = [CacheKeys.USER_AVATARS], key = "#userSettings.userId")
-    fun storeRawUserAvatar(userSettings: UserSettings): Boolean {
+    fun storeRawUserAvatar(userId: String, rawAvatar: ByteArray, extension: String): Boolean {
         try {
             val metadata = mapOf(
                 "version" to METADATA_VERSION,
@@ -315,57 +309,20 @@ class StorageService(
             )
 
             this.storage.putObject(
-                awsS3Config.userAvatarsBucketName,
-                getUserAvatarStorageKey(userSettings),
-                userSettings.rawAvatar!!,
+                awsS3Config.imagesBucketName,
+                getUserAvatarStorageKey(userId, extension),
+                rawAvatar,
                 metadata
             )
             return true
         } catch (e: Exception) {
-            logger.error(e) { "Failed to store user avatar for user with id ${userSettings.userId}" }
+            logger.error(e) { "Failed to store user avatar for user with id $userId" }
             return false
         }
     }
 
-    @Cacheable(value = [CacheKeys.USER_AVATARS], key = "#userId")
-    fun readRawUserAvatarFromUserId(userId: String): ByteArray? {
-        var rawUserAvatarFromStorage = Optional.empty<ByteArray>()
-        try {
-            rawUserAvatarFromStorage =
-                this.storage.getObject(awsS3Config.userAvatarsBucketName, userId)
-        } catch (e: Exception) {
-            logger.info { "Failed to find user avatar for user with id ${userId}" }
-        }
-
-        if (rawUserAvatarFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawUserAvatarFromStorage.get(), userId)
-        }
-
-        return null
-    }
-
-    @Cacheable(value = [CacheKeys.USER_AVATARS], key = "#userSettings.userId")
-    fun readRawUserAvatarFromUserSettings(userSettings: UserSettings): ByteArray? {
-        var rawUserAvatarFromStorage = Optional.empty<ByteArray>()
-        try {
-            rawUserAvatarFromStorage =
-                this.storage.getObject(awsS3Config.userAvatarsBucketName, getUserAvatarStorageKey(userSettings))
-        } catch (e: Exception) {
-            logger.warn { "Failed to read user avatar for user with id ${userSettings.userId}" }
-        }
-
-        if (rawUserAvatarFromStorage.isPresent) {
-            return fileEncodingProcessor.readFile(rawUserAvatarFromStorage.get(), userSettings.userId)
-        } else if (userSettings.rawAvatar != null) {
-            logger.warn { "Failed to find raw user avatar for user with id ${userSettings.userId} in storage, falling back to raw user avatar from database" }
-            return fileEncodingProcessor.readFile(userSettings.rawAvatar!!, userSettings.userId)
-        }
-
-        return null
-    }
-
-    private fun getUserAvatarStorageKey(userSettings: UserSettings): String {
-        return userSettings.userId
+    private fun getUserAvatarStorageKey(userId: String, extension: String): String {
+        return "avatars/${userId}.${extension}"
     }
 
 }

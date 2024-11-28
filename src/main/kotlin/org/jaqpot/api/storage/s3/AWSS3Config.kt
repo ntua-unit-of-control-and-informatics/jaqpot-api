@@ -18,8 +18,10 @@ class AWSS3Config(
     val doasBucketName: String,
     @Value("\${aws.s3.preprocessors-bucket}")
     val preprocessorsBucketName: String,
-    @Value("\${aws.s3.user-avatars-bucket}")
-    val userAvatarsBucketName: String,
+    @Value("\${aws.s3.images-bucket}")
+    val imagesBucketName: String,
+    @Value("\${aws.cloudfront.images-distribution-url}")
+    val cloudfrontImagesDistributionUrl: String
 ) {
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {

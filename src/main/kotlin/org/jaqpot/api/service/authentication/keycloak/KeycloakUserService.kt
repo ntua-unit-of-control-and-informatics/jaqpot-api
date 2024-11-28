@@ -33,13 +33,19 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig, private va
     fun getUserByEmail(email: String): UserRepresentation? {
         try {
             val users = keycloakAdminClient.realm(keycloakConfig.realm).users().searchByEmail(email, true)
-            if (users.size == 0) {
-                return null
-            } else if (users.size == 1) {
-                return users.first()
-            } else {
-                logger.error { "Found more than 1 users with the same email" }
-                return null
+            when (users.size) {
+                0 -> {
+                    return null
+                }
+
+                1 -> {
+                    return users.first()
+                }
+
+                else -> {
+                    logger.error { "Found more than 1 users with the same email" }
+                    return null
+                }
             }
         } catch (e: Exception) {
             logger.error(e) { "Could not retrieve user by email: $email" }
