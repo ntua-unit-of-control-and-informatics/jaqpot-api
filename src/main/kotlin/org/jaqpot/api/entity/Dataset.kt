@@ -47,4 +47,10 @@ class Dataset(
     var executedAt: OffsetDateTime? = null,
 
     var executionFinishedAt: OffsetDateTime? = null
-) : BaseEntity()
+) : BaseEntity() {
+    fun shouldHaveResult(): Boolean {
+        return this.type == DatasetType.PREDICTION && this.status == DatasetStatus.SUCCESS
+    }
+}
+
+
