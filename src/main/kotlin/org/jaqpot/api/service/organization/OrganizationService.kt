@@ -64,7 +64,7 @@ class OrganizationService(
     }
 
     @CacheEvict(cacheNames = [CacheKeys.ALL_PUBLIC_ORGANIZATIONS, CacheKeys.USER_ORGANIZATIONS], allEntries = true)
-    @WithRateLimitProtectionByUser(limit = 2, intervalInSeconds = 60)
+    @WithRateLimitProtectionByUser(limit = 10, intervalInSeconds = 60 * 10)
     override fun createOrganization(organizationDto: OrganizationDto): ResponseEntity<Unit> {
         if (organizationDto.id != null) {
             throw IllegalStateException("ID should not be provided for resource creation.")
