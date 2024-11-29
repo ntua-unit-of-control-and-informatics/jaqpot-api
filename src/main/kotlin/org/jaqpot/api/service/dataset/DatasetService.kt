@@ -36,7 +36,11 @@ class DatasetService(
 
         return dataset.map {
             val input = storageService.readRawDatasetInput(it)
-            val result = storageService.readRawDatasetResult(it)
+            val result = if (it.shouldHaveResult()) {
+                storageService.readRawDatasetResult(it)
+            } else {
+                null
+            }
             ResponseEntity.ok(it.toDto(input, result))
         }
             .orElse(ResponseEntity.notFound().build())
@@ -48,7 +52,13 @@ class DatasetService(
         val datasets = datasetRepository.findAllByUserId(userId, pageable)
 
         val inputsMap = storageService.readRawDatasetInputs(datasets.content)
-        val resultsMap = storageService.readRawDatasetResults(datasets.content)
+        val resultsMap: MutableMap<String, List<Any>?> =
+            datasets.content.associateBy { it.id.toString() }.mapValues { null }.toMutableMap()
+
+        val datasetsWithResults = datasets.content.filter { it.shouldHaveResult() }
+        storageService.readRawDatasetResults(datasetsWithResults).forEach {
+            resultsMap[it.key] = it.value
+        }
 
         return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(inputsMap, resultsMap))
     }
