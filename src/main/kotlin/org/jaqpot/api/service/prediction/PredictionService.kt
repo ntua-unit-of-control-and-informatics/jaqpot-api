@@ -68,6 +68,7 @@ class PredictionService(
     private fun storeDatasetFailure(dataset: Dataset, err: Exception) {
         dataset.status = DatasetStatus.FAILURE
         dataset.failureReason = err.toString()
+        dataset.executionFinishedAt = OffsetDateTime.now()
 
         datasetRepository.save(dataset)
         if (storageService.storeRawDataset(dataset)) {
