@@ -1968,6 +1968,18 @@ components:
             - PERCENTILE
             - MEAN_STD
           example: GAUSSIAN
+        thresholdMethod:
+          type: string
+        thresholdPercentile:
+          type: number
+          format: int64
+        dataPoints:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
     MeanVarDoa:
       type: object
       properties:
