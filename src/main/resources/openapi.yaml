@@ -1950,8 +1950,24 @@ components:
     KernelBasedDoa:
       type: object
       properties:
-        data:
-          type: object
+        sigma:
+          type: number
+          format: float
+        gamma:
+          type: number
+          format: float
+        threshold:
+          type: number
+          format: float
+        kernelType:
+          type: string
+          enum:
+            - GAUSSIAN
+            - RBF
+            - LAPLACIAN
+            - PERCENTILE
+            - MEAN_STD
+          example: GAUSSIAN
     MeanVarDoa:
       type: object
       properties:
@@ -1967,13 +1983,33 @@ components:
     MahalanobisDoa:
       type: object
       properties:
-        data:
-          type: object
+        meanVector:
+          type: array
+          items:
+            type: number
+            format: float
+        covMatrix:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: float
+        threshold:
+          type: number
+          format: float
     CityBlockDoa:
       type: object
       properties:
-        data:
-          type: object
+        meanVector:
+          type: array
+          items:
+            type: number
+            format: float
+          maxItems: 5000
+        threshold:
+          type: number
+          format: float
     Feature:
       type: object
       required:
