@@ -18,7 +18,7 @@ learning workflows.
 To get started with Jaqpot API, clone this repository and navigate to the project directory:
 
 ```bash
-git clone https://github.com/your-org/jaqpot-api.git
+git clone https://github.com/ntua-unit-of-control-and-informatics/jaqpot-api
 cd jaqpot-api
 ```
 
