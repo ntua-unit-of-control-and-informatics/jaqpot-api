@@ -1968,11 +1968,6 @@ components:
             - PERCENTILE
             - MEAN_STD
           example: GAUSSIAN
-        thresholdMethod:
-          type: string
-        thresholdPercentile:
-          type: number
-          format: int64
         dataPoints:
           type: array
           items:
@@ -2000,7 +1995,7 @@ components:
           items:
             type: number
             format: float
-        covMatrix:
+        invCovMatrix:
           type: array
           items:
             type: array
