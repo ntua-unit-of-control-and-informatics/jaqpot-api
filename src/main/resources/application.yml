@@ -39,7 +39,7 @@ spring:
 
 springdoc:
   paths-to-match: /v1/models/**, /v1/organizations/**, /v1/user/**
-  paths-to-exclude: /v1/organizations/*/invitations/**, /v1/user/settings
+  paths-to-exclude: /v1/organizations/*/invitations/**, /v1/user/settings, /v1/user/avatar
 
 management:
   health:
