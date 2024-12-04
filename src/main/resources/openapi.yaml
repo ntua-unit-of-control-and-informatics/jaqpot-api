@@ -2097,6 +2097,7 @@ components:
         - SMILES
         - STRING
         - TEXT
+        - BOOLEAN
         - FLOAT_ARRAY
         - STRING_ARRAY
       example: FLOAT

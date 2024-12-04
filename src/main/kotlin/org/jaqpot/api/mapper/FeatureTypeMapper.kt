@@ -13,6 +13,7 @@ fun FeatureTypeDto.toEntity(): FeatureType {
         FeatureTypeDto.SMILES -> FeatureType.SMILES
         FeatureTypeDto.FLOAT_ARRAY -> FeatureType.FLOAT_ARRAY
         FeatureTypeDto.STRING_ARRAY -> FeatureType.STRING_ARRAY
+        FeatureTypeDto.BOOLEAN -> FeatureType.BOOLEAN
     }
 }
 
@@ -26,6 +27,7 @@ fun FeatureType.toDto(): FeatureTypeDto {
         FeatureType.SMILES -> FeatureTypeDto.SMILES
         FeatureType.FLOAT_ARRAY -> FeatureTypeDto.FLOAT_ARRAY
         FeatureType.STRING_ARRAY -> FeatureTypeDto.STRING_ARRAY
+        FeatureType.BOOLEAN -> FeatureTypeDto.BOOLEAN
     }
 }
 
