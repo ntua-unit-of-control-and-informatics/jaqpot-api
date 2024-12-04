@@ -7,6 +7,7 @@ import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
+import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotDockerRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotPyV6Runtime
 import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotRV6Runtime
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
@@ -24,6 +25,7 @@ class PredictionChain(
     private val legacyPythonGeneric023Runtime: LegacyPythonGeneric023Runtime,
     private val legacyPythonGeneric024Runtime: LegacyPythonGeneric024Runtime,
     private val legacyJaqpotInferenceRuntime: LegacyJaqpotInferenceRuntime,
+    private val dockerRuntime: JaqpotDockerRuntime,
     private val qsarToolboxPredictionService: QSARToolboxPredictionService
 ) {
     companion object {
@@ -46,6 +48,11 @@ class PredictionChain(
         if (predictionModelDto.isRModel()) {
             return jaqpotRV6Runtime.sendPredictionRequest(predictionModelDto, datasetDto)
                 .orElseThrow { JaqpotRuntimeException("Failed to succeed on the latest R runtime, modelId: ${predictionModelDto.id}") }
+        }
+
+        if (predictionModelDto.isDockerModel()) {
+            return dockerRuntime.sendPredictionRequest(predictionModelDto, datasetDto)
+                .orElseThrow { JaqpotRuntimeException("Failed to succeed on the Docker runtime, modelId: ${predictionModelDto.id}") }
         }
 
         if (!predictionModelDto.isLegacyModel()) {
@@ -104,4 +111,8 @@ private fun PredictionModelDto.isLegacyModel(): Boolean {
 
 private fun PredictionModelDto.isRModel(): Boolean {
     return this.type.name.startsWith("R_")
+}
+
+private fun PredictionModelDto.isDockerModel(): Boolean {
+    return this.type == ModelTypeDto.DOCKER
 }

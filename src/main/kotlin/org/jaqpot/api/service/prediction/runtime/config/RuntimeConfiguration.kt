@@ -23,4 +23,6 @@ class RuntimeConfiguration(
 
     @Value("\${jaqpot.runtime.jaqpotr}")
     val jaqpotRUrl: String
+
+
 )
