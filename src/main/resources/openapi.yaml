@@ -1573,6 +1573,8 @@ components:
                 $ref: '#/components/schemas/Scores'
         rPbpkConfig:
           $ref: '#/components/schemas/RPbpkConfig'
+        dockerConfig:
+          $ref: '#/components/schemas/DockerConfig'
         createdAt:
           type: string
           format: date-time
@@ -1774,6 +1776,22 @@ components:
       properties:
         odeSolver:
           type: string
+    DockerConfig:
+      type: object
+      required:
+        - appName
+      properties:
+        appName:
+          type: string
+          description: Unique identifier used for internal service discovery
+          example: "my-docker-model"
+          pattern: "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+          maxLength: 63
+        dockerImage:
+          type: string
+          description: Reference to the Docker image (for admin documentation)
+          example: "my-repo/my-docker-model:1.0.0"
+          maxLength: 255
     OrganizationSummary:
       type: object
       required:
