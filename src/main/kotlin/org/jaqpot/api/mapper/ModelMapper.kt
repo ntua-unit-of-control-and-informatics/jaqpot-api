@@ -106,7 +106,7 @@ fun Model.toPredictionModelDto(
     rawPreprocessor: ByteArray?
 ): PredictionModelDto {
     return PredictionModelDto(
-        id = this.id,
+        id = this.id!!,
         dependentFeatures = this.dependentFeatures.map { it.toDto() },
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
