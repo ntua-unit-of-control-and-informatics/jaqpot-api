@@ -1,6 +1,9 @@
 package org.jaqpot.api.entity
 
 enum class ModelType {
+    // DOCKER models
+    DOCKER,
+
     SKLEARN_ONNX,
 
     // torch

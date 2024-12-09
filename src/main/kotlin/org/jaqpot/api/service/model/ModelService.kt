@@ -72,7 +72,8 @@ class ModelService(
             ModelTypeDto.R_RPART,
             ModelTypeDto.R_SVM,
             ModelTypeDto.R_TREE_CLASS,
-            ModelTypeDto.R_TREE_REGR
+            ModelTypeDto.R_TREE_REGR,
+            ModelTypeDto.DOCKER
         )
         const val ARCHIVED_MODEL_EXPIRATION_DAYS = 30L
         private val logger = KotlinLogging.logger {}

@@ -22,6 +22,7 @@ fun ModelTypeDto.toEntity(): ModelType {
         ModelTypeDto.QSAR_TOOLBOX_CALCULATOR -> ModelType.QSAR_TOOLBOX_CALCULATOR
         ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL -> ModelType.QSAR_TOOLBOX_QSAR_MODEL
         ModelTypeDto.QSAR_TOOLBOX_PROFILER -> ModelType.QSAR_TOOLBOX_PROFILER
+        ModelTypeDto.DOCKER -> ModelType.DOCKER
     }
 }
 
@@ -44,5 +45,6 @@ fun ModelType.toDto(): ModelTypeDto {
         ModelType.QSAR_TOOLBOX_CALCULATOR -> ModelTypeDto.QSAR_TOOLBOX_CALCULATOR
         ModelType.QSAR_TOOLBOX_QSAR_MODEL -> ModelTypeDto.QSAR_TOOLBOX_QSAR_MODEL
         ModelType.QSAR_TOOLBOX_PROFILER -> ModelTypeDto.QSAR_TOOLBOX_PROFILER
+        ModelType.DOCKER -> ModelTypeDto.DOCKER
     }
 }

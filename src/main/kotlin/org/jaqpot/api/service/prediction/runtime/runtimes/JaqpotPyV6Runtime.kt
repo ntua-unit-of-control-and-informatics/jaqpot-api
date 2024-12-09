@@ -18,7 +18,7 @@ class JaqpotPyV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) 
         )
     }
 
-    override fun getRuntimeUrl(): String {
+    override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {
         return runtimeConfiguration.jaqpotpyInferenceV6Url
     }
 

@@ -21,6 +21,11 @@ class RuntimeConfiguration(
     @Value("\${jaqpot.runtime.legacy.generic-python-1}")
     val legacyGenericPython1: String,
 
+
     @Value("\${jaqpot.runtime.jaqpotr}")
-    val jaqpotRUrl: String
+    val jaqpotRUrl: String,
+
+
+    @Value("\${jaqpot.runtime.jaqpot-docker}")
+    val jaqpotDocker: String,
 )

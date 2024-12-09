@@ -19,7 +19,7 @@ class LegacyPythonGeneric1Runtime(private val runtimeConfiguration: RuntimeConfi
         return generateLegacyPredictionRequest(predictionModelDto, datasetDto)
     }
 
-    override fun getRuntimeUrl(): String {
+    override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {
         return runtimeConfiguration.legacyGenericPython1
     }
 }

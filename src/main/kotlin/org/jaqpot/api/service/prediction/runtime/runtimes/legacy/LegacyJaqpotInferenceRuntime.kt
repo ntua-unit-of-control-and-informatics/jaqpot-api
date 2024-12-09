@@ -13,7 +13,7 @@ class LegacyJaqpotInferenceRuntime(private val runtimeConfiguration: RuntimeConf
         return "/predict/"
     }
 
-    override fun getRuntimeUrl(): String {
+    override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {
         return runtimeConfiguration.legacyJaqpotInference
     }
 

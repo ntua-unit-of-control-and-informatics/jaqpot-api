@@ -14,6 +14,7 @@ import org.jaqpot.api.service.model.dto.legacy.LegacyDatasetDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyPredictionRequestDto
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.awaitBody
 import reactor.netty.http.client.HttpClient
 import java.net.URI
@@ -40,7 +41,7 @@ abstract class RuntimeBase {
 
     abstract fun createRequestBody(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): Any
 
-    abstract fun getRuntimeUrl(): String
+    abstract fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String
 
     fun sendPredictionRequest(
         predictionModelDto: PredictionModelDto,
@@ -50,7 +51,7 @@ abstract class RuntimeBase {
             .clientConnector(ReactorClientHttpConnector(getHttpClient()))
             .codecs { it.defaultCodecs().maxInMemorySize(SIXTEEN_MEGABYTES_IN_BYTES) }
             .build()
-        val inferenceUrl = "${getRuntimeUrl()}${getRuntimePath(predictionModelDto)}"
+        val inferenceUrl = "${getRuntimeUrl(predictionModelDto)}${getRuntimePath(predictionModelDto)}"
 
         try {
 
@@ -70,11 +71,15 @@ abstract class RuntimeBase {
 
             val predictionResponseDto = body.await()
 
-            logger.trace { "Prediction successful using ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
+            logger.trace { "Prediction successful using ${getRuntimeUrl(predictionModelDto)} for model ${predictionModelDto.id}" }
 
             return@runBlocking Optional.of(predictionResponseDto)
         } catch (e: Exception) {
-            logger.warn(e) { "Prediction failed for ${getRuntimeUrl()} for model ${predictionModelDto.id}" }
+            if (e is WebClientResponseException.UnprocessableEntity)
+                logger.warn(e) { "Prediction failed for ${getRuntimeUrl(predictionModelDto)} for model ${predictionModelDto.id} ${e.responseBodyAsString}" }
+            else {
+                logger.warn(e) { "Prediction failed for ${getRuntimeUrl(predictionModelDto)} for model ${predictionModelDto.id}" }
+            }
             return@runBlocking Optional.empty()
         }
     }
