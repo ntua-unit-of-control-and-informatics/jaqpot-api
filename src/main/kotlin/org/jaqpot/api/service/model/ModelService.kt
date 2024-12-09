@@ -217,6 +217,8 @@ class ModelService(
             storeRawModelToStorage(model)
             // TODO once there are no models with rawPreprocessor in the database, remove this
             storeRawPreprocessorToStorage(model)
+            // TODO once there are no models with rawDoa in the database, remove this
+            model.doas.forEach(doaService::storeRawDoaToStorage)
 
             if (model.archived) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
