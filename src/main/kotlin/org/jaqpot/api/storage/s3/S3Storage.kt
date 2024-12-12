@@ -5,6 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.jaqpot.api.aws.AWSConfig
 import org.jaqpot.api.storage.Storage
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.util.*
 
 
+@Profile("!local")
 @Service
 class S3Storage(
     private val awsConfig: AWSConfig, private val s3Client: S3Client

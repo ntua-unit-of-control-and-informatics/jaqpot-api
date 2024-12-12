@@ -110,7 +110,7 @@ class Model(
     val rPbpkOdeSolver: String? = null,
 
     @OneToOne(mappedBy = "model", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    val dockerConfig: DockerConfig? = null,
+    var dockerConfig: DockerConfig? = null,
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     @SQLRestriction("score_type = 'TEST'")

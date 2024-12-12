@@ -34,6 +34,7 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
             test = this.testScores?.map { it.toDto() },
             crossValidation = this.crossValidationScores?.map { it.toDto() },
         ),
+        dockerConfig = this.dockerConfig?.toDto(),
         archived = this.archived,
         archivedAt = this.archivedAt,
         createdAt = this.createdAt,
@@ -96,6 +97,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
     this.scores?.crossValidation?.let {
         m.crossValidationScores = this.scores.crossValidation.map { it.toEntity(m, ScoreType.CROSS_VALIDATION) }
     }
+    this.dockerConfig?.let { m.dockerConfig = it.toEntity(m) }
 
     return m
 }

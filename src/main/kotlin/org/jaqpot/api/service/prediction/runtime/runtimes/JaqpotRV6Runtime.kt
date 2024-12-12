@@ -1,18 +1,13 @@
 package org.jaqpot.api.service.prediction.runtime.runtimes
 
-import io.netty.channel.ChannelOption
-import io.netty.handler.timeout.ReadTimeoutHandler
-import io.netty.handler.timeout.WriteTimeoutHandler
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
+import org.jaqpot.api.service.prediction.runtime.runtimes.util.HttpClientUtil
 import org.springframework.stereotype.Component
 import reactor.netty.http.client.HttpClient
-import reactor.netty.resources.ConnectionProvider
-import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 @Component
 class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) : RuntimeBase() {
@@ -30,22 +25,7 @@ class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) :
             ModelTypeDto.R_TREE_REGR to "predict_tree_regr",
         )
 
-        val connectionProvider =
-            ConnectionProvider.builder("custom")
-                .maxIdleTime(Duration.ofMinutes(10))
-                .maxLifeTime(Duration.ofMinutes(10))
-                .build()
-
-        val RHttpClient = HttpClient.create(connectionProvider)
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .option(ChannelOption.SO_KEEPALIVE, true)
-            .responseTimeout(Duration.ofMinutes(10))
-            .doOnConnected { conn ->
-                conn.addHandlerLast(ReadTimeoutHandler(10, TimeUnit.MINUTES))
-                    .addHandlerLast(WriteTimeoutHandler(10, TimeUnit.MINUTES))
-
-
-            }
+        val RHttpClient = HttpClientUtil.generateHttpClient(10, 10, 10, 10, 10)
     }
 
     override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {
