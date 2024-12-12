@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 abstract class RuntimeBase {
     companion object {
         private val logger = KotlinLogging.logger {}
-        private const val SIXTEEN_MEGABYTES_IN_BYTES = 16 * 1024 * 1024
+        const val SIXTEEN_MEGABYTES_IN_BYTES = 16 * 1024 * 1024
         private val httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
             .option(ChannelOption.SO_KEEPALIVE, true)
@@ -54,7 +54,6 @@ abstract class RuntimeBase {
         val inferenceUrl = "${getRuntimeUrl(predictionModelDto)}${getRuntimePath(predictionModelDto)}"
 
         try {
-
             // uncomment to test request json
 //            val objectMapper = ObjectMapper()
 //            objectMapper.registerModule(JavaTimeModule())

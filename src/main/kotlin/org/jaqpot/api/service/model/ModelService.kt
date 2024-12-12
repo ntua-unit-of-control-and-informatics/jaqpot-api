@@ -19,6 +19,7 @@ import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.model.config.ModelConfiguration
 import org.jaqpot.api.service.prediction.PredictionService
+import org.jaqpot.api.service.prediction.streaming.StreamingPredictionService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
 import org.jaqpot.api.storage.StorageService
@@ -34,6 +35,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import reactor.core.publisher.Flux
 import java.net.URI
 import java.time.OffsetDateTime
 
@@ -54,7 +56,8 @@ class ModelService(
     private val csvDataConverter: CSVDataConverter,
     private val storageService: StorageService,
     private val doaService: DoaService,
-    private val modelConfiguration: ModelConfiguration
+    private val modelConfiguration: ModelConfiguration,
+    private val streamingPredictionService: StreamingPredictionService
 ) : ModelApiDelegate {
 
     companion object {
@@ -215,10 +218,6 @@ class ModelService(
             }
             // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model)
-            // TODO once there are no models with rawPreprocessor in the database, remove this
-            storeRawPreprocessorToStorage(model)
-            // TODO once there are no models with rawDoa in the database, remove this
-            model.doas.forEach(doaService::storeRawDoaToStorage)
 
             if (model.archived) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
@@ -264,8 +263,6 @@ class ModelService(
             val userId = authenticationFacade.userId
             // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model)
-            // TODO once there are no models with rawPreprocessor in the database, remove this
-            storeRawPreprocessorToStorage(model)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
 
@@ -287,6 +284,45 @@ class ModelService(
             )
 
             return triggerPredictionAndReturnSuccessStatus(model, dataset)
+        }
+
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
+    }
+
+    fun streamPredictWithModel(modelId: Long, datasetDto: DatasetDto): Flux<String> {
+        if (datasetDto.type == DatasetTypeDto.PREDICTION) {
+            val model = modelRepository.findById(modelId).orElseThrow {
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+            }
+
+            if (model.archived) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
+            }
+
+            val userId = authenticationFacade.userId
+            val toEntity = datasetDto.toEntity(
+                model,
+                userId,
+                DatasetEntryType.ARRAY
+            )
+
+            if (toEntity.input!!.size > 1) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Only 1 input row is allowed for a streaming response"
+                )
+            }
+
+            toEntity.input.forEachIndexed { index, it: Any ->
+                if (it is Map<*, *>)
+                    (it as MutableMap<String, String>)[JAQPOT_ROW_ID_KEY] = index.toString()
+            }
+
+            val predictionModelDto = model.toPredictionModelDto(byteArrayOf(), emptyList(), byteArrayOf())
+            val dataset = this.datasetRepository.save(toEntity)
+            val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
+
+            return streamingPredictionService.getStreamingPrediction(predictionModelDto, datasetDto)
         }
 
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)

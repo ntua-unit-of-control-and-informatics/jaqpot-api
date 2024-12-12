@@ -4,7 +4,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.mapper.toDto
-import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.repository.DatasetRepository
@@ -41,7 +40,10 @@ class PredictionService(
         updateDatasetToExecuting(dataset)
 
         try {
-            val results: List<Any> = makePredictionRequest(predictionModelDto, datasetDto)
+            val response: PredictionResponseDto =
+                predictionChain.getPredictionResults(predictionModelDto, datasetDto)
+
+            val results: List<Any> = response.predictions
             storeDatasetSuccess(dataset, results)
         } catch (e: Exception) {
             logger.warn(e) { "Prediction failed for dataset with id ${dataset.id}" }
@@ -74,17 +76,6 @@ class PredictionService(
         if (storageService.storeRawDataset(dataset)) {
             datasetRepository.setDatasetInputAndResultToNull(dataset.id)
         }
-    }
-
-    private fun makePredictionRequest(
-        predictionModelDto: PredictionModelDto,
-        datasetDto: DatasetDto
-    ): List<Any> {
-        val response: PredictionResponseDto =
-            predictionChain.getPredictionResults(predictionModelDto, datasetDto)
-
-        val results: List<Any> = response.predictions
-        return results
     }
 }
 
