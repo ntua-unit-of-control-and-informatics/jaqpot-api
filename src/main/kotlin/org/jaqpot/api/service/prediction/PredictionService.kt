@@ -55,6 +55,9 @@ class PredictionService(
         dataset.status = DatasetStatus.EXECUTING
         dataset.executedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
+        if (storageService.storeRawDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
     }
 
     private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
