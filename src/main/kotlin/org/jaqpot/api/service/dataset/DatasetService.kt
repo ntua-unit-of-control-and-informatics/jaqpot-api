@@ -63,6 +63,19 @@ class DatasetService(
         return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(inputsMap, resultsMap))
     }
 
+    override fun getDatasetsByModelId(
+        modelId: Long,
+        page: Int,
+        size: Int,
+        sort: List<String>?
+    ): ResponseEntity<GetDatasets200ResponseDto> {
+        val userId = authenticationFacade.userId
+        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
+        val datasets = datasetRepository.findAllByUserIdAndModelId(userId, modelId, pageable)
+
+        return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(emptyMap(), emptyMap()))
+    }
+
     @Transactional
     @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
     fun purgeExpiredDatasets() {

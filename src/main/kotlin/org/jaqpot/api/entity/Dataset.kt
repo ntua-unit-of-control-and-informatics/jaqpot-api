@@ -17,6 +17,9 @@ class Dataset(
     @JoinColumn(name = "model_id", updatable = false, nullable = false)
     val model: Model,
 
+    @Column
+    val name: String? = null,
+
     @Column(nullable = false)
     val userId: String,
 

@@ -13,6 +13,7 @@ import java.time.OffsetDateTime
 
 interface DatasetRepository : CrudRepository<Dataset, Long> {
     fun findAllByUserId(userId: String, pageable: Pageable): Page<Dataset>
+    fun findAllByUserIdAndModelId(userId: String, modelId: Long, pageable: Pageable): Page<Dataset>
 
     fun findAllByCreatedAtBefore(date: OffsetDateTime): List<Dataset>
 
