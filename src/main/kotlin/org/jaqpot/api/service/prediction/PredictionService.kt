@@ -62,7 +62,7 @@ class PredictionService(
 
     private fun storeDatasetSuccess(dataset: Dataset, results: List<Any>) {
         dataset.status = DatasetStatus.SUCCESS
-        dataset.result = results
+        dataset.result = results.toMutableList()
         dataset.executionFinishedAt = OffsetDateTime.now()
         datasetRepository.save(dataset)
         if (storageService.storeRawDataset(dataset)) {

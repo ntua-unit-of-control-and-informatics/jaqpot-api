@@ -290,7 +290,7 @@ class ModelService(
     }
 
     fun streamPredictWithModel(modelId: Long, datasetDto: DatasetDto): Flux<String> {
-        if (datasetDto.type == DatasetTypeDto.PREDICTION) {
+        if (datasetDto.type == DatasetTypeDto.CHAT) {
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }

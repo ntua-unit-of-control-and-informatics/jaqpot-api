@@ -5,6 +5,7 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.repository.DockerConfigRepository
+import org.jaqpot.api.service.dataset.DatasetService
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
 import org.springframework.core.io.buffer.DataBuffer
@@ -20,7 +21,8 @@ import java.nio.charset.StandardCharsets
 @Service
 class StreamingRuntime(
     private val runtimeConfiguration: RuntimeConfiguration,
-    private val dockerConfigRepository: DockerConfigRepository
+    private val dockerConfigRepository: DockerConfigRepository,
+    private val datasetService: DatasetService
 ) : RuntimeBase() {
 
     companion object {
@@ -42,6 +44,8 @@ class StreamingRuntime(
 
         val inferenceUrl = "${getRuntimeUrl(predictionModelDto)}${getRuntimePath(predictionModelDto)}"
 
+        var output = ""
+
         return webClient.post()
             .uri(inferenceUrl)
             .bodyValue(createRequestBody(predictionModelDto, datasetDto))
@@ -58,12 +62,14 @@ class StreamingRuntime(
             }
             .doOnNext { response ->
                 logger.info { "Received chunk: $response" }
+                output += " $response"
             }
             .doOnError { e ->
                 logger.error(e) { "Stream error for model ${predictionModelDto.id}: ${e.message}" }
             }
             .doFinally { signal ->
                 logger.info { "Stream finished with signal $signal for model ${predictionModelDto.id}" }
+                datasetService.addResultToDataset(datasetDto.id!!, mapOf("output" to output))
             }
     }
 

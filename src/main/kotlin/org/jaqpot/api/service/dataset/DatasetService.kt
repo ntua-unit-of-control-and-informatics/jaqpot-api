@@ -3,11 +3,15 @@ package org.jaqpot.api.service.dataset
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.jaqpot.api.DatasetApiDelegate
+import org.jaqpot.api.entity.DatasetEntryType
+import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.mapper.toDto
+import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetDatasets200ResponseDto
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.GetDatasets200ResponseDto
 import org.jaqpot.api.repository.DatasetRepository
+import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
 import org.jaqpot.api.storage.StorageService
@@ -22,12 +26,25 @@ import java.time.OffsetDateTime
 @Service
 class DatasetService(
     private val datasetRepository: DatasetRepository,
+    private val modelRepository: ModelRepository,
     private val authenticationFacade: AuthenticationFacade,
     private val storageService: StorageService
 ) : DatasetApiDelegate {
     companion object {
         const val DATASET_EXPIRATION_DAYS = 30L
         private val logger = KotlinLogging.logger {}
+    }
+
+    override fun createDataset(modelId: Long, datasetDto: DatasetDto): ResponseEntity<DatasetDto> {
+        val userId = authenticationFacade.userId
+        val model = modelRepository.findById(modelId).orElseThrow {
+            throw JaqpotRuntimeException("Model with id ${datasetDto.modelId} not found")
+        }
+        val dataset = datasetDto.toEntity(model, userId, DatasetEntryType.ARRAY)
+        datasetRepository.save(dataset)
+        storageService.storeRawDataset(dataset)
+
+        return ResponseEntity.ok(dataset.toDto(dataset.input!!, dataset.result))
     }
 
     @PostAuthorize("@getDatasetAuthorizationLogic.decide(#root)")
@@ -74,6 +91,21 @@ class DatasetService(
         val datasets = datasetRepository.findAllByUserIdAndModelId(userId, modelId, pageable)
 
         return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(emptyMap(), emptyMap()))
+    }
+
+    fun addResultToDataset(datasetId: Long, result: Any) {
+        val dataset = datasetRepository.findById(datasetId).orElseThrow {
+            throw JaqpotRuntimeException("Dataset with id $datasetId not found")
+        }
+        if (dataset.result.isNullOrEmpty()) {
+            dataset.result = mutableListOf()
+        }
+        dataset.result!!.add(result)
+        if (storageService.storeRawDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
+
+        datasetRepository.save(dataset)
     }
 
     @Transactional

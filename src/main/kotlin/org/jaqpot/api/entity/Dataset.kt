@@ -41,7 +41,7 @@ class Dataset(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "result", columnDefinition = "jsonb")
-    var result: List<Any>? = null,
+    var result: MutableList<Any>? = null,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
@@ -51,8 +51,11 @@ class Dataset(
 
     var executionFinishedAt: OffsetDateTime? = null
 ) : BaseEntity() {
+    /**
+     * This is to avoid querying s3 for non-existing results.
+     */
     fun shouldHaveResult(): Boolean {
-        return this.type == DatasetType.PREDICTION && this.status == DatasetStatus.SUCCESS
+        return (this.type == DatasetType.PREDICTION && this.status == DatasetStatus.SUCCESS) || this.type == DatasetType.CHAT
     }
 }
 

@@ -718,6 +718,38 @@ paths:
         '404':
           description: User or datasets not found
   /v1/user/models/{modelId}/datasets:
+    post:
+      summary: Create a dataset
+      description: Create a new dataset from the provided data
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      operationId: createDataset
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: dataset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '400':
+          description: invalid input
+        '401':
+          description: unauthorized
     get:
       summary: Get Datasets by Model ID
       description: Retrieve all datasets associated with a specific model ID
@@ -2183,6 +2215,7 @@ components:
       type: string
       enum:
         - PREDICTION
+        - CHAT
       example: "PREDICTION"
     Dataset:
       type: object
