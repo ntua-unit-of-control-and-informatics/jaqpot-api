@@ -6,7 +6,7 @@ import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.repository.DockerConfigRepository
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
-import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotDockerRuntime
+import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -16,10 +16,10 @@ import reactor.core.publisher.Flux
 import java.nio.charset.StandardCharsets
 
 @Service
-class StreamingRuntime(
+class StreamingModelRuntime(
     private val runtimeConfiguration: RuntimeConfiguration,
     private val dockerConfigRepository: DockerConfigRepository,
-) : JaqpotDockerRuntime(runtimeConfiguration, dockerConfigRepository) {
+) : RuntimeBase() {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -81,7 +81,10 @@ class StreamingRuntime(
                 DataBufferUtils.release(dataBuffer)
                 String(bytes, StandardCharsets.UTF_8)
             }
+    }
 
+    override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {
+        return retrieveDockerModelInferenceUrl(runtimeConfiguration, dockerConfigRepository, predictionModelDto)
     }
 
     override fun createRequestBody(

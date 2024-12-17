@@ -10,7 +10,7 @@ import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.dataset.DatasetService
 import org.jaqpot.api.service.model.JAQPOT_ROW_ID_KEY
 import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
-import org.jaqpot.api.service.prediction.runtime.runtimes.streaming.StreamingRuntime
+import org.jaqpot.api.service.prediction.runtime.runtimes.streaming.StreamingModelRuntime
 import org.jaqpot.api.service.prediction.util.PredictionUtil
 import org.jaqpot.api.service.prediction.util.PredictionUtil.Companion.updateDatasetToExecuting
 import org.jaqpot.api.storage.StorageService
@@ -25,7 +25,7 @@ class StreamingPredictionService(
     private val datasetRepository: DatasetRepository,
     private val datasetService: DatasetService,
     private val modelRepository: ModelRepository,
-    private val streamingRuntime: StreamingRuntime
+    private val streamingRuntime: StreamingModelRuntime
 ) {
 
     companion object {
