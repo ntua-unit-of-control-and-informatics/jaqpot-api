@@ -6,22 +6,20 @@ import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.repository.DockerConfigRepository
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
-import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotDockerRuntime
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Flux
-import java.net.URI
 import java.nio.charset.StandardCharsets
 
 @Service
 class StreamingRuntime(
     private val runtimeConfiguration: RuntimeConfiguration,
     private val dockerConfigRepository: DockerConfigRepository,
-) : RuntimeBase() {
+) : JaqpotDockerRuntime(runtimeConfiguration, dockerConfigRepository) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -94,23 +92,6 @@ class StreamingRuntime(
             predictionModelDto,
             datasetDto,
         )
-    }
-
-    // New abstract method for streaming request body
-    override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {
-        val dockerUrlBase = URI(runtimeConfiguration.jaqpotDocker)
-        val dockerConfigOptional = dockerConfigRepository.findByModelId(predictionModelDto.id)
-        val inferenceUrl = if (dockerConfigOptional.isPresent) {
-            val dockerConfig = dockerConfigOptional.get()
-            UriComponentsBuilder.newInstance()
-                .scheme(dockerUrlBase.scheme)
-                .host("${dockerConfig.appName}.dockerUrlBase.host")
-                .build()
-                .toString()
-        } else {
-            dockerUrlBase.toString()
-        }
-        return inferenceUrl
     }
 
     override fun getRuntimePath(predictionModelDto: PredictionModelDto): String {
