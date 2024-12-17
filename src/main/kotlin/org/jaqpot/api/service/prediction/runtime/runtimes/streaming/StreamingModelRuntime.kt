@@ -7,6 +7,7 @@ import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.repository.DockerConfigRepository
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.util.DockerRuntimeUtil.Companion.retrieveDockerModelInferenceUrl
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
