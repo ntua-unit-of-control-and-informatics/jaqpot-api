@@ -717,6 +717,96 @@ paths:
                     type: integer
         '404':
           description: User or datasets not found
+  /v1/user/models/{modelId}/datasets:
+    post:
+      summary: Create a dataset
+      description: Create a new dataset from the provided data
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      operationId: createDataset
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: dataset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '400':
+          description: invalid input
+        '401':
+          description: unauthorized
+    get:
+      summary: Get Datasets by Model ID
+      description: Retrieve all datasets associated with a specific model ID
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      operationId: getDatasetsByModelId
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "field1|asc", "field2|desc" ]
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dataset'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+        '404':
+          description: Model or datasets not found
   '/v1/datasets/{id}':
     get:
       summary: Get a Dataset
@@ -2125,6 +2215,7 @@ components:
       type: string
       enum:
         - PREDICTION
+        - CHAT
       example: "PREDICTION"
     Dataset:
       type: object
@@ -2137,6 +2228,9 @@ components:
           type: integer
           format: int64
           example: 1
+        name:
+          type: string
+          example: "My Dataset"
         type:
           $ref: '#/components/schemas/DatasetType'
         entryType:

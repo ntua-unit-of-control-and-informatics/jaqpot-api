@@ -119,7 +119,7 @@ class StorageService(
             return input
         } else if (dataset.input != null) {
             logger.warn { "Failed to find input with id ${dataset.id} in storage, falling back to input from database" }
-            return dataset.input
+            return dataset.input!!
         }
 
         throw JaqpotRuntimeException("Failed to find raw dataset input with id ${dataset.id}")

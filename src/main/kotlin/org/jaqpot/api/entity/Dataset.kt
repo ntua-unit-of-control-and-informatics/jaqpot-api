@@ -17,6 +17,9 @@ class Dataset(
     @JoinColumn(name = "model_id", updatable = false, nullable = false)
     val model: Model,
 
+    @Column
+    val name: String? = null,
+
     @Column(nullable = false)
     val userId: String,
 
@@ -34,7 +37,7 @@ class Dataset(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "input", columnDefinition = "jsonb")
-    val input: List<Any>? = null,
+    var input: List<Any>? = null,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "result", columnDefinition = "jsonb")
@@ -48,8 +51,11 @@ class Dataset(
 
     var executionFinishedAt: OffsetDateTime? = null
 ) : BaseEntity() {
+    /**
+     * This is to avoid querying s3 for non-existing results.
+     */
     fun shouldHaveResult(): Boolean {
-        return this.type == DatasetType.PREDICTION && this.status == DatasetStatus.SUCCESS
+        return (this.type == DatasetType.PREDICTION && this.status == DatasetStatus.SUCCESS) || this.type == DatasetType.CHAT
     }
 }
 
