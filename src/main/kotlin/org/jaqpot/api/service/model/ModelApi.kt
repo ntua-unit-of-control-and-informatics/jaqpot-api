@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
-import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -36,7 +36,7 @@ class ModelApi(private val modelService: ModelService) {
     )
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/v1/models/{modelId}/predict/stream"],
+        value = ["/v1/models/{modelId}/predict/stream/{datasetId}"],
         produces = ["text/event-stream"],
         consumes = ["application/json"]
     )
@@ -45,13 +45,49 @@ class ModelApi(private val modelService: ModelService) {
             description = "The ID of the LLM model to use for prediction",
             required = true
         ) @PathVariable("modelId") modelId: kotlin.Long,
-        @Parameter(description = "", required = true) @Valid @RequestBody datasetDto: DatasetDto
+        @Parameter(
+            description = "The ID of the dataset for prediction",
+            required = true
+        ) @PathVariable("datasetId") datasetId: kotlin.Long,
+        @Parameter(
+            description = "",
+            required = true
+        ) @Valid @RequestBody streamPredictRequestDto: StreamPredictRequestDto
     ): ResponseBodyEmitter {
-        return ResponseBodyEmitter().apply {
-            modelService.streamPredictWithModel(modelId, datasetDto).subscribe {
-                send(it)
-            }
+        val emitter = ResponseBodyEmitter()
+
+        // Store the subscription so we can dispose of it later
+        val subscription = modelService.streamPredictWithModel(modelId, datasetId, streamPredictRequestDto)
+            .subscribe(
+                // OnNext handler
+                { result ->
+                    try {
+                        emitter.send(result)
+                    } catch (e: Exception) {
+                        emitter.completeWithError(e)
+                    }
+                },
+                // OnError handler
+                { error ->
+                    emitter.completeWithError(error)
+                },
+                // OnComplete handler
+                {
+                    emitter.complete()
+                }
+            )
+
+        // Set up completion callback to dispose of the subscription
+        emitter.onCompletion {
+            subscription.dispose()
         }
+
+        // Set up timeout callback
+        emitter.onTimeout {
+            subscription.dispose()
+        }
+
+        return emitter
     }
 
 }

@@ -18,6 +18,7 @@ import org.jaqpot.api.service.authentication.UserService
 import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.model.config.ModelConfiguration
+import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
 import org.jaqpot.api.service.prediction.PredictionService
 import org.jaqpot.api.service.prediction.streaming.StreamingPredictionService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
@@ -237,7 +238,7 @@ class ModelService(
                 )
             }
 
-            toEntity.input.forEachIndexed { index, it: Any ->
+            toEntity.input!!.forEachIndexed { index, it: Any ->
                 if (it is Map<*, *>)
                     (it as MutableMap<String, String>)[JAQPOT_ROW_ID_KEY] = index.toString()
             }
@@ -289,43 +290,16 @@ class ModelService(
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
     }
 
-    fun streamPredictWithModel(modelId: Long, datasetDto: DatasetDto): Flux<String> {
-        if (datasetDto.type == DatasetTypeDto.CHAT) {
-            val model = modelRepository.findById(modelId).orElseThrow {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
-            }
-
-            if (model.archived) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
-            }
-
-            val userId = authenticationFacade.userId
-            val toEntity = datasetDto.toEntity(
-                model,
-                userId,
-                DatasetEntryType.ARRAY
-            )
-
-            if (toEntity.input!!.size > 1) {
-                throw ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Only 1 input row is allowed for a streaming response"
-                )
-            }
-
-            toEntity.input.forEachIndexed { index, it: Any ->
-                if (it is Map<*, *>)
-                    (it as MutableMap<String, String>)[JAQPOT_ROW_ID_KEY] = index.toString()
-            }
-
-            val predictionModelDto = model.toPredictionModelDto(byteArrayOf(), emptyList(), byteArrayOf())
-            val dataset = this.datasetRepository.save(toEntity)
-            val datasetDto = dataset.toDto(dataset.input!!, dataset.result)
-
-            return streamingPredictionService.getStreamingPrediction(predictionModelDto, datasetDto)
-        }
-
-        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
+    fun streamPredictWithModel(
+        modelId: Long,
+        datasetId: Long,
+        streamPredictRequestDto: StreamPredictRequestDto
+    ): Flux<String> {
+        return streamingPredictionService.getStreamingPrediction(
+            modelId,
+            datasetId,
+            streamPredictRequestDto
+        )
     }
 
     private fun triggerPredictionAndReturnSuccessStatus(

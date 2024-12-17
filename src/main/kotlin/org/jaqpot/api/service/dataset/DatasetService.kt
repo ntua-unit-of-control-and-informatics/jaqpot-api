@@ -93,21 +93,6 @@ class DatasetService(
         return ResponseEntity.ok().body(datasets.toGetDatasets200ResponseDto(emptyMap(), emptyMap()))
     }
 
-    fun addResultToDataset(datasetId: Long, result: Any) {
-        val dataset = datasetRepository.findById(datasetId).orElseThrow {
-            throw JaqpotRuntimeException("Dataset with id $datasetId not found")
-        }
-        if (dataset.result.isNullOrEmpty()) {
-            dataset.result = mutableListOf()
-        }
-        dataset.result!!.add(result)
-        if (storageService.storeRawDataset(dataset)) {
-            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
-        }
-
-        datasetRepository.save(dataset)
-    }
-
     @Transactional
     @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
     fun purgeExpiredDatasets() {

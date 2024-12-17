@@ -5,7 +5,6 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.repository.DockerConfigRepository
-import org.jaqpot.api.service.dataset.DatasetService
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
 import org.springframework.core.io.buffer.DataBuffer
@@ -22,7 +21,6 @@ import java.nio.charset.StandardCharsets
 class StreamingRuntime(
     private val runtimeConfiguration: RuntimeConfiguration,
     private val dockerConfigRepository: DockerConfigRepository,
-    private val datasetService: DatasetService
 ) : RuntimeBase() {
 
     companion object {
@@ -33,6 +31,36 @@ class StreamingRuntime(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): Flux<String> {
+//        val mockResponses = listOf(
+//            "First chunk of response",
+//            "Second chunk of response",
+//            "Second chunk of response",
+//            "Second chunk of response",
+//            "Second chunk of response",
+//            "Second chunk of response",
+//            "Final chunk of response"
+//        )
+//
+//        var output = ""
+//
+//        return Flux.fromIterable(mockResponses)
+//            // Add artificial delay between emissions to simulate streaming
+//            .delayElements(Duration.ofMillis(100))
+//            .doOnSubscribe {
+//                logger.info { "Starting mock streaming request for model ${predictionModelDto.id}" }
+//            }
+//            .doOnNext { response ->
+//                logger.info { "Received mock chunk: $response" }
+//                output += response
+//            }
+//            .doOnError { e ->
+//                logger.error(e) { "Mock stream error for model ${predictionModelDto.id}: ${e.message}" }
+//            }
+//            .doFinally { signal ->
+//                logger.info { "Mock stream finished with signal $signal for model ${predictionModelDto.id}" }
+//                datasetService.addResultToDataset(datasetDto.id!!, mapOf("output" to mockResponses.joinToString(" ")))
+//            }
+
         val webClient = WebClient.builder()
             .clientConnector(ReactorClientHttpConnector(getHttpClient()))
             .codecs { clientCodecConfigurer ->
@@ -43,8 +71,6 @@ class StreamingRuntime(
             .build()
 
         val inferenceUrl = "${getRuntimeUrl(predictionModelDto)}${getRuntimePath(predictionModelDto)}"
-
-        var output = ""
 
         return webClient.post()
             .uri(inferenceUrl)
@@ -57,20 +83,7 @@ class StreamingRuntime(
                 DataBufferUtils.release(dataBuffer)
                 String(bytes, StandardCharsets.UTF_8)
             }
-            .doOnSubscribe {
-                logger.info { "Starting streaming request for model ${predictionModelDto.id}" }
-            }
-            .doOnNext { response ->
-                logger.info { "Received chunk: $response" }
-                output += " $response"
-            }
-            .doOnError { e ->
-                logger.error(e) { "Stream error for model ${predictionModelDto.id}: ${e.message}" }
-            }
-            .doFinally { signal ->
-                logger.info { "Stream finished with signal $signal for model ${predictionModelDto.id}" }
-                datasetService.addResultToDataset(datasetDto.id!!, mapOf("output" to output))
-            }
+
     }
 
     override fun createRequestBody(

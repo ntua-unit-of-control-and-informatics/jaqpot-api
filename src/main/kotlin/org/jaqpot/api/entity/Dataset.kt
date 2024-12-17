@@ -37,11 +37,11 @@ class Dataset(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "input", columnDefinition = "jsonb")
-    val input: List<Any>? = null,
+    var input: List<Any>? = null,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "result", columnDefinition = "jsonb")
-    var result: MutableList<Any>? = null,
+    var result: List<Any>? = null,
 
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
