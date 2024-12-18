@@ -42,7 +42,9 @@ class DatasetService(
         }
         val dataset = datasetDto.toEntity(model, userId, DatasetEntryType.ARRAY)
         datasetRepository.save(dataset)
-        storageService.storeRawDataset(dataset)
+        if (storageService.storeRawDataset(dataset)) {
+            datasetRepository.setDatasetInputAndResultToNull(dataset.id)
+        }
 
         return ResponseEntity.ok(dataset.toDto(dataset.input!!, dataset.result))
     }
