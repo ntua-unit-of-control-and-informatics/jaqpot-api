@@ -20,7 +20,7 @@ class DockerRuntimeUtil {
                 val dockerConfig = dockerConfigOptional.get()
                 UriComponentsBuilder.newInstance()
                     .scheme(dockerUrlBase.scheme)
-                    .host("${dockerConfig.appName}.dockerUrlBase.host")
+                    .host("${dockerConfig.appName}.${dockerUrlBase.host}")
                     .build()
                     .toString()
             } else {
