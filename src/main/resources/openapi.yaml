@@ -1913,7 +1913,7 @@ components:
         - R_TREE_CLASS
         - R_TREE_REGR
         - DOCKER
-        - DOCKER_LLM
+        - OPENAI_LLM
         - QSAR_TOOLBOX_CALCULATOR
         - QSAR_TOOLBOX_QSAR_MODEL
         - QSAR_TOOLBOX_PROFILER

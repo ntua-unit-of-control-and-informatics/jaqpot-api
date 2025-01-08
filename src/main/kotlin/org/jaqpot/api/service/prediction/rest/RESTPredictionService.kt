@@ -1,4 +1,4 @@
-package org.jaqpot.api.service.prediction
+package org.jaqpot.api.service.prediction.rest
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.Dataset
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class PredictionService(
+class RESTPredictionService(
     private val datasetRepository: DatasetRepository,
     private val predictionChain: PredictionChain,
     private val storageService: StorageService,
