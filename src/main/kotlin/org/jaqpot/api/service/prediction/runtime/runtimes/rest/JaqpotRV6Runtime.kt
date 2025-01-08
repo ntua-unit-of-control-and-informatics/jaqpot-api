@@ -1,10 +1,11 @@
-package org.jaqpot.api.service.prediction.runtime.runtimes
+package org.jaqpot.api.service.prediction.runtime.runtimes.rest
 
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
+import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
 import org.jaqpot.api.service.prediction.runtime.runtimes.util.HttpClientUtil
 import org.springframework.stereotype.Component
 import reactor.netty.http.client.HttpClient

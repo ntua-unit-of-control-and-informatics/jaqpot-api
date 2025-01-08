@@ -112,6 +112,9 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
     implementation("software.amazon.awssdk:sts")
 
+    // openai client
+    implementation("com.openai:openai-java:0.10.0")
+
     // tests
     // rest assured
     testImplementation("io.rest-assured:rest-assured:5.4.0")
