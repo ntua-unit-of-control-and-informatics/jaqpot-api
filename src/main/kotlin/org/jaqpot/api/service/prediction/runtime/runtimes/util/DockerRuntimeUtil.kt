@@ -14,18 +14,20 @@ class DockerRuntimeUtil {
             dockerConfigRepository: DockerConfigRepository,
             predictionModelDto: PredictionModelDto
         ): String {
-            val dockerUrlBase = URI(runtimeConfiguration.jaqpotDocker)
+            val jaqpotInternalServiceUrl = URI(runtimeConfiguration.jaqpotInternalServiceHost)
             val dockerConfigOptional = dockerConfigRepository.findByModelId(predictionModelDto.id)
+
             val inferenceUrl = if (dockerConfigOptional.isPresent) {
                 val dockerConfig = dockerConfigOptional.get()
                 UriComponentsBuilder.newInstance()
-                    .scheme(dockerUrlBase.scheme)
-                    .host("${dockerConfig.appName}.${dockerUrlBase.host}")
+                    .scheme(jaqpotInternalServiceUrl.scheme)
+                    .host("${dockerConfig.appName}.${jaqpotInternalServiceUrl.host}")
                     .build()
                     .toString()
             } else {
-                dockerUrlBase.toString()
+                jaqpotInternalServiceUrl.toString()
             }
+
             return inferenceUrl
         }
     }

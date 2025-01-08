@@ -11,10 +11,11 @@ import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.dataset.DatasetService
 import org.jaqpot.api.service.model.JAQPOT_ROW_ID_KEY
 import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
-import org.jaqpot.api.service.prediction.runtime.runtimes.streaming.StreamingModelRuntime
+import org.jaqpot.api.service.prediction.runtime.runtimes.streaming.OpenAIModelRuntime
 import org.jaqpot.api.storage.StorageService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
 import java.time.OffsetDateTime
@@ -25,7 +26,7 @@ class StreamingPredictionService(
     private val datasetRepository: DatasetRepository,
     private val datasetService: DatasetService,
     private val modelRepository: ModelRepository,
-    private val streamingRuntime: StreamingModelRuntime
+    private val streamingRuntime: OpenAIModelRuntime
 ) {
 
     companion object {
@@ -76,7 +77,11 @@ class StreamingPredictionService(
                 output += " $response"
             }
             .doOnError { e ->
-                logger.error(e) { "Stream error for model ${predictionModelDto.id}: ${e.message}" }
+                var message = e.message
+                if (e is WebClientResponseException) {
+                    message = (e as WebClientResponseException).responseBodyAsString
+                }
+                logger.error(e) { "Stream error for model ${predictionModelDto.id}: ${message}" }
                 storeDatasetFailure(toEntity, e, datasetRepository)
             }
             .doFinally { signal ->
