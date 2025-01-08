@@ -3,7 +3,9 @@ package org.jaqpot.api.entity
 enum class ModelType {
     // DOCKER models
     DOCKER,
-    DOCKER_LLM,
+
+    // LLM
+    OPENAI_LLM,
 
     SKLEARN_ONNX,
 
