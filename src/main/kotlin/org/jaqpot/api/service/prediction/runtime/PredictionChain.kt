@@ -7,11 +7,11 @@ import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
-import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotDockerModelRuntime
-import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotPyV6Runtime
-import org.jaqpot.api.service.prediction.runtime.runtimes.JaqpotRV6Runtime
 import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
 import org.jaqpot.api.service.prediction.runtime.runtimes.legacy.*
+import org.jaqpot.api.service.prediction.runtime.runtimes.rest.JaqpotDockerModelRuntime
+import org.jaqpot.api.service.prediction.runtime.runtimes.rest.JaqpotPyV6Runtime
+import org.jaqpot.api.service.prediction.runtime.runtimes.rest.JaqpotRV6Runtime
 import org.springframework.stereotype.Component
 
 
