@@ -50,7 +50,7 @@ class ModelService(
     private val authenticationFacade: AuthenticationFacade,
     private val modelRepository: ModelRepository,
     private val userService: UserService,
-    private val RESTPredictionService: RESTPredictionService,
+    private val restPredictionService: RESTPredictionService,
     private val datasetRepository: DatasetRepository,
     private val organizationRepository: OrganizationRepository,
     private val csvParser: CSVParser,
@@ -321,7 +321,7 @@ class ModelService(
             it.toPredictionDto(doaData)
         }
 
-        this.RESTPredictionService.executePredictionAndSaveResults(
+        this.restPredictionService.executePredictionAndSaveResults(
             model.toPredictionModelDto(rawModel, doaDtos, rawPreprocessor),
             dataset
         )
