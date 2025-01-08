@@ -19,7 +19,7 @@ import org.jaqpot.api.service.dataset.csv.CSVDataConverter
 import org.jaqpot.api.service.dataset.csv.CSVParser
 import org.jaqpot.api.service.model.config.ModelConfiguration
 import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
-import org.jaqpot.api.service.prediction.rest.RESTPredictionService
+import org.jaqpot.api.service.prediction.PredictionService
 import org.jaqpot.api.service.prediction.streaming.StreamingPredictionService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
@@ -50,7 +50,7 @@ class ModelService(
     private val authenticationFacade: AuthenticationFacade,
     private val modelRepository: ModelRepository,
     private val userService: UserService,
-    private val RESTPredictionService: RESTPredictionService,
+    private val predictionService: PredictionService,
     private val datasetRepository: DatasetRepository,
     private val organizationRepository: OrganizationRepository,
     private val csvParser: CSVParser,
@@ -325,7 +325,7 @@ class ModelService(
             it.toPredictionDto(doaData)
         }
 
-        this.RESTPredictionService.executePredictionAndSaveResults(
+        this.predictionService.executePredictionAndSaveResults(
             model.toPredictionModelDto(rawModel, doaDtos, rawPreprocessor),
             dataset
         )
