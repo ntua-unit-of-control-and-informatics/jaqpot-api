@@ -64,7 +64,7 @@ class OpenAIModelRuntime(
         datasetDto: DatasetDto
     ): ChatCompletionRequest {
         return ChatCompletionRequest(
-            model = ModelId("facebook/opt-125m"),
+            model = ModelId("mistralai/Mistral-7B-v0.3"),
             messages = listOf(
                 ChatMessage(
                     role = ChatRole.System,
