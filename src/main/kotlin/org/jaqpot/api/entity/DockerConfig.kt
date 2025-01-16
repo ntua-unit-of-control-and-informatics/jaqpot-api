@@ -19,4 +19,6 @@ class DockerConfig(
 
     @Column(nullable = true)
     val dockerImage: String?,
+
+    val llmModelId: String?
 ) : BaseEntity()

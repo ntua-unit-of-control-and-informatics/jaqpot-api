@@ -63,8 +63,11 @@ class OpenAIModelRuntime(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): ChatCompletionRequest {
+        val llmModelId = dockerConfigRepository.findByModelId(predictionModelDto.id)
+            .map { it.llmModelId ?: "facebook/opt-125m" }
+            .orElse("facebook/opt-125m")
         return ChatCompletionRequest(
-            model = ModelId("mistralai/Mistral-7B-v0.3"),
+            model = ModelId(llmModelId),
             messages = listOf(
                 ChatMessage(
                     role = ChatRole.System,
