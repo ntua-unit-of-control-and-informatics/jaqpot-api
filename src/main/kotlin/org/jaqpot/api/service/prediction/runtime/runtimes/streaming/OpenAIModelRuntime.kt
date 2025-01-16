@@ -66,18 +66,27 @@ class OpenAIModelRuntime(
         val llmModelId = dockerConfigRepository.findByModelId(predictionModelDto.id)
             .map { it.llmModelId ?: "facebook/opt-125m" }
             .orElse("facebook/opt-125m")
-        return ChatCompletionRequest(
-            model = ModelId(llmModelId),
-            messages = listOf(
-                ChatMessage(
-                    role = ChatRole.System,
-                    content = "You are a helpful assistant!"
-                ),
+
+        val messages = mutableListOf(
+            ChatMessage(
+                role = ChatRole.System,
+                content = "You are a helpful assistant!"
+            )
+        )
+
+        datasetDto.input.forEach { input ->
+            val prompt = (input as Map<String, String>)["prompt"]
+            messages.add(
                 ChatMessage(
                     role = ChatRole.User,
-                    content = (datasetDto.input[0] as Map<String, String>)["prompt"]
+                    content = prompt
                 )
             )
+        }
+
+        return ChatCompletionRequest(
+            model = ModelId(llmModelId),
+            messages = messages
         )
     }
 }
