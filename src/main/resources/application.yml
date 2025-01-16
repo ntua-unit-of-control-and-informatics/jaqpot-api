@@ -90,7 +90,7 @@ jaqpot:
   runtime:
     jaqpotpy-inference-v6: http://localhost.jaqpot.org:8002
     jaqpotr: http://localhost.jaqpot.org:8004
-    jaqpot-docker: http://localhost.jaqpot.org:8005
+    jaqpot-internal-service-host: http://localhost.jaqpot.org:8000
 
     legacy:
       jaqpot-inference: http://localhost.jaqpot.org:8880

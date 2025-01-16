@@ -113,7 +113,8 @@ dependencies {
     implementation("software.amazon.awssdk:sts")
 
     // openai client
-    implementation("com.openai:openai-java:0.10.0")
+    implementation("com.aallam.openai:openai-client:3.8.2")
+    runtimeOnly("io.ktor:ktor-client-okhttp:2.0.3")
 
     // tests
     // rest assured
