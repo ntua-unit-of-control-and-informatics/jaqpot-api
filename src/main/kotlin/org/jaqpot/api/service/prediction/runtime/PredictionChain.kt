@@ -7,7 +7,7 @@ import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionResponseDto
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
-import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.RESTRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.legacy.*
 import org.jaqpot.api.service.prediction.runtime.runtimes.rest.JaqpotDockerModelRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.rest.JaqpotPyV6Runtime
@@ -73,7 +73,7 @@ class PredictionChain(
             .orElseThrow { JaqpotRuntimeException("Failed to succeed on all the legacy runtimes for model ${predictionModelDto.id}") }
     }
 
-    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String): RuntimeBase {
+    private fun resolveRuntimeWithPredictionService(legacyPredictionService: String): RESTRuntime {
         if (legacyPredictionService.contains("jaqpot-inference.jaqpot")) {
             return legacyJaqpotInferenceRuntime
         } else if (legacyPredictionService.contains("jaqpot-python")) {

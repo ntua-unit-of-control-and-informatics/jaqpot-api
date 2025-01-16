@@ -15,7 +15,7 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.repository.DockerConfigRepository
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
-import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.StreamingRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.util.DockerRuntimeUtil.Companion.retrieveDockerModelInferenceUrl
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -26,13 +26,13 @@ class OpenAIModelRuntime(
     private val runtimeConfiguration: RuntimeConfiguration,
     private val dockerConfigRepository: DockerConfigRepository,
 
-    ) : RuntimeBase() {
+    ) : StreamingRuntime() {
 
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
-    fun sendStreamingPredictionRequest(
+    override fun sendStreamingPredictionRequest(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): Flux<String> {

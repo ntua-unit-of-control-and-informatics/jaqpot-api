@@ -24,6 +24,7 @@ fun ModelTypeDto.toEntity(): ModelType {
         ModelTypeDto.QSAR_TOOLBOX_PROFILER -> ModelType.QSAR_TOOLBOX_PROFILER
         ModelTypeDto.DOCKER -> ModelType.DOCKER
         ModelTypeDto.OPENAI_LLM -> ModelType.OPENAI_LLM
+        ModelTypeDto.CUSTOM_LLM -> ModelType.CUSTOM_LLM
     }
 }
 
@@ -48,5 +49,6 @@ fun ModelType.toDto(): ModelTypeDto {
         ModelType.QSAR_TOOLBOX_PROFILER -> ModelTypeDto.QSAR_TOOLBOX_PROFILER
         ModelType.DOCKER -> ModelTypeDto.DOCKER
         ModelType.OPENAI_LLM -> ModelTypeDto.OPENAI_LLM
+        ModelType.CUSTOM_LLM -> ModelTypeDto.CUSTOM_LLM
     }
 }
