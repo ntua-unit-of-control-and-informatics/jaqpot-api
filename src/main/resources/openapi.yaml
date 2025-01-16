@@ -1882,6 +1882,9 @@ components:
           description: Reference to the Docker image (for admin documentation)
           example: "my-repo/my-docker-model:1.0.0"
           maxLength: 255
+        llmModelId:
+          type: string
+          description: The ID of the LLM model
     OrganizationSummary:
       type: object
       required:

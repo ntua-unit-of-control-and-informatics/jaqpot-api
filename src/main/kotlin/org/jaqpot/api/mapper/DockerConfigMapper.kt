@@ -15,6 +15,7 @@ fun DockerConfigDto.toEntity(model: Model): DockerConfig {
     return DockerConfig(
         appName = this.appName,
         model = model,
-        dockerImage = this.dockerImage
+        dockerImage = this.dockerImage,
+        llmModelId = this.llmModelId
     )
 }
