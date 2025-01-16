@@ -1,19 +1,18 @@
 package org.jaqpot.api.service.prediction.runtime.runtimes
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.PredictionModelDto
+import reactor.core.publisher.Flux
 import reactor.netty.http.client.HttpClient
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
+abstract class StreamingRuntime : RuntimeBase() {
 
-abstract class RuntimeBase {
     companion object {
-        private val logger = KotlinLogging.logger {}
         private val httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
             .option(ChannelOption.SO_KEEPALIVE, true)
@@ -24,10 +23,12 @@ abstract class RuntimeBase {
             }
     }
 
-    abstract fun getRuntimePath(predictionModelDto: PredictionModelDto): String
+    abstract fun sendStreamingPredictionRequest(
+        predictionModelDto: PredictionModelDto,
+        datasetDto: DatasetDto
+    ): Flux<String>
 
-    abstract fun createRequestBody(predictionModelDto: PredictionModelDto, datasetDto: DatasetDto): Any
-
-    abstract fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String
-
+    open fun getHttpClient(): HttpClient {
+        return httpClient
+    }
 }

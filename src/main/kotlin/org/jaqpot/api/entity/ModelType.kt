@@ -6,6 +6,7 @@ enum class ModelType {
 
     // LLM
     OPENAI_LLM,
+    CUSTOM_LLM,
 
     SKLEARN_ONNX,
 

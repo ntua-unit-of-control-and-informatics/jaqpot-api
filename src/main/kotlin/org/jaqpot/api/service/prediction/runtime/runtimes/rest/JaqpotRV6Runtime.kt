@@ -5,13 +5,13 @@ import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
-import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.RESTRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.util.HttpClientUtil
 import org.springframework.stereotype.Component
 import reactor.netty.http.client.HttpClient
 
 @Component
-class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) : RuntimeBase() {
+class JaqpotRV6Runtime(private val runtimeConfiguration: RuntimeConfiguration) : RESTRuntime() {
     companion object {
         val R_RUNTIME_PATHS = mapOf(
             ModelTypeDto.R_BNLEARN_DISCRETE to "predict_bnlearn_discrete",

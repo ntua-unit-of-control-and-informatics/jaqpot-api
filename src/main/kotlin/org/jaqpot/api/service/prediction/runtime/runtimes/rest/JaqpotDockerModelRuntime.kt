@@ -5,7 +5,7 @@ import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionRequestDto
 import org.jaqpot.api.repository.DockerConfigRepository
 import org.jaqpot.api.service.prediction.runtime.config.RuntimeConfiguration
-import org.jaqpot.api.service.prediction.runtime.runtimes.RuntimeBase
+import org.jaqpot.api.service.prediction.runtime.runtimes.RESTRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.util.DockerRuntimeUtil.Companion.retrieveDockerModelInferenceUrl
 import org.jaqpot.api.service.prediction.runtime.runtimes.util.HttpClientUtil
 import org.springframework.stereotype.Service
@@ -15,7 +15,7 @@ import reactor.netty.http.client.HttpClient
 class JaqpotDockerModelRuntime(
     private val runtimeConfiguration: RuntimeConfiguration,
     private val dockerConfigRepository: DockerConfigRepository
-) : RuntimeBase() {
+) : RESTRuntime() {
 
     companion object {
         val dockerRuntimeHttpClient = HttpClientUtil.generateHttpClient(30, 30, 30, 30, 30)

@@ -3,6 +3,8 @@ package org.jaqpot.api.service.prediction.streaming
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetStatus
+import org.jaqpot.api.entity.Model
+import org.jaqpot.api.entity.ModelType
 import org.jaqpot.api.error.JaqpotRuntimeException
 import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toPredictionModelDto
@@ -11,6 +13,8 @@ import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.dataset.DatasetService
 import org.jaqpot.api.service.model.JAQPOT_ROW_ID_KEY
 import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
+import org.jaqpot.api.service.prediction.runtime.runtimes.StreamingRuntime
+import org.jaqpot.api.service.prediction.runtime.runtimes.streaming.JaqpotModelRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.streaming.OpenAIModelRuntime
 import org.jaqpot.api.storage.StorageService
 import org.springframework.http.HttpStatus
@@ -26,7 +30,8 @@ class StreamingPredictionService(
     private val datasetRepository: DatasetRepository,
     private val datasetService: DatasetService,
     private val modelRepository: ModelRepository,
-    private val streamingRuntime: OpenAIModelRuntime
+    private val openAIModelRuntime: OpenAIModelRuntime,
+    private val jaqpotModelRuntime: JaqpotModelRuntime
 ) {
 
     companion object {
@@ -68,7 +73,9 @@ class StreamingPredictionService(
 
         var output = ""
 
-        return streamingRuntime.sendStreamingPredictionRequest(predictionModelDto, datasetDto)
+        val streamingResponse = determineRuntime(model).sendStreamingPredictionRequest(predictionModelDto, datasetDto)
+
+        return streamingResponse
             .doOnSubscribe {
                 logger.info { "Starting streaming request for model ${predictionModelDto.id}" }
             }
@@ -88,6 +95,16 @@ class StreamingPredictionService(
                 logger.info { "Stream finished with signal $signal for model ${predictionModelDto.id}" }
                 storeDatasetSuccess(datasetDto.id!!, mapOf("output" to output))
             }
+    }
+
+    private fun determineRuntime(model: Model): StreamingRuntime {
+        return when (model.type) {
+            ModelType.OPENAI_LLM -> openAIModelRuntime
+            ModelType.CUSTOM_LLM -> jaqpotModelRuntime
+            else -> {
+                throw JaqpotRuntimeException("Model type ${model.type} is not supported for streaming prediction")
+            }
+        }
     }
 
     private fun updateDatasetToExecuting(
