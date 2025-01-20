@@ -84,16 +84,20 @@ class OpenAIModelRuntime(
             )
 
             // add assistant reply
-            val resultRow = datasetDto.result?.get(index)
-            if (resultRow != null) {
+            val result = datasetDto.result
+            if (result != null && index < result.size) {  // Add bounds check
+                val resultRow = result[index]
                 val reply = (resultRow as Map<String, String>)["output"]
-                messages.add(
-                    ChatMessage(
-                        role = ChatRole.Assistant,
-                        content = reply
+                if (reply != null) {
+                    messages.add(
+                        ChatMessage(
+                            role = ChatRole.Assistant,
+                            content = reply
+                        )
                     )
-                )
+                }
             }
+
         }
 
         return ChatCompletionRequest(
