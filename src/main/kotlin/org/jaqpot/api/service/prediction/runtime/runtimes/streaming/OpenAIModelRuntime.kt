@@ -74,14 +74,26 @@ class OpenAIModelRuntime(
             )
         )
 
-        datasetDto.input.forEach { input ->
-            val prompt = (input as Map<String, String>)["prompt"]
+        datasetDto.input.forEachIndexed { index, inputRow ->
+            val prompt = (inputRow as Map<String, String>)["prompt"]
             messages.add(
                 ChatMessage(
                     role = ChatRole.User,
                     content = prompt
                 )
             )
+
+            // add assistant reply
+            val resultRow = datasetDto.result?.get(index)
+            if (resultRow != null) {
+                val reply = (resultRow as Map<String, String>)["output"]
+                messages.add(
+                    ChatMessage(
+                        role = ChatRole.Assistant,
+                        content = reply
+                    )
+                )
+            }
         }
 
         return ChatCompletionRequest(
