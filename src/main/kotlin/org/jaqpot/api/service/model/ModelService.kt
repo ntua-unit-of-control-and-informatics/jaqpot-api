@@ -293,7 +293,7 @@ class ModelService(
     @WithRateLimitProtectionByUser(
         limit = 30,
         intervalInSeconds = 60 * 60
-    ) // 30 requests per hour, up to 100 predictions per request
+    ) // 30 requests per hour
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
     fun streamPredictWithModel(
         modelId: Long,
