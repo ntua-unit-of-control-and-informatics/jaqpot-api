@@ -290,6 +290,10 @@ class ModelService(
         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown dataset type", null)
     }
 
+    @WithRateLimitProtectionByUser(
+        limit = 30,
+        intervalInSeconds = 60 * 60
+    ) // 30 requests per hour, up to 100 predictions per request
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
     fun streamPredictWithModel(
         modelId: Long,
