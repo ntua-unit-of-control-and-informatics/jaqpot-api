@@ -1,0 +1,120 @@
+[versions]
+kotlin = "1.9.24"
+springBoot = "3.3.4"
+springDependencyManagement = "1.1.4"
+kotlinSpringPlugin = "1.9.23"
+openapiGenerator = "7.9.0"
+flyway = "10.13.0"
+caffeine = "3.1.8"
+freemarker = "2.3.33"
+coroutines = "1.9.0"
+slf4j = "2.0.13"
+kotlinLogging = "6.0.9"
+logbackJson = "0.1.5"
+janino = "3.1.12"
+swaggerAnnotations = "2.2.19"
+springdocOpenapi = "2.5.0"
+flywayCore = "10.12.0"
+keycloak = "24.0.5"
+bucket4j = "8.10.1"
+commonsCsv = "1.11.0"
+awsSdk = "2.21.1"
+openaiClient = "3.8.2"
+ktor = "2.0.3"
+restAssured = "5.4.0"
+testcontainers = "1.19.8"
+testcontainersKeycloak = "3.3.1"
+mockk = "1.13.11"
+
+[libraries]
+# Spring Boot dependencies
+spring-boot-starter-oauth2-resource-server = { group = "org.springframework.boot", name = "spring-boot-starter-oauth2-resource-server" }
+spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security" }
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation" }
+spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
+spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
+spring-boot-starter-mail = { group = "org.springframework.boot", name = "spring-boot-starter-mail" }
+spring-boot-starter-cache = { group = "org.springframework.boot", name = "spring-boot-starter-cache" }
+spring-boot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux" }
+spring-boot-gradle-plugin = { group = "org.springframework.boot", name = "spring-boot-gradle-plugin", version.ref = "springBoot" }
+spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor" }
+spring-boot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+spring-boot-testcontainers = { group = "org.springframework.boot", name = "spring-boot-testcontainers" }
+spring-security-test = { group = "org.springframework.security", name = "spring-security-test" }
+
+# Cache
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+
+# Prometheus
+micrometer-prometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus" }
+
+# Freemarker
+freemarker = { group = "org.freemarker", name = "freemarker", version.ref = "freemarker" }
+
+# Coroutines
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-reactor = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-reactor", version.ref = "coroutines" }
+
+# Logging
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
+kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLogging" }
+logback-json-classic = { group = "ch.qos.logback.contrib", name = "logback-json-classic", version.ref = "logbackJson" }
+logback-jackson = { group = "ch.qos.logback.contrib", name = "logback-jackson", version.ref = "logbackJson" }
+janino = { group = "org.codehaus.janino", name = "janino", version.ref = "janino" }
+
+# Jackson
+jackson-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin" }
+
+# Kotlin
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
+
+# Swagger
+swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swaggerAnnotations" }
+springdoc-openapi = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdocOpenapi" }
+
+# Lombok
+lombok = { group = "org.projectlombok", name = "lombok" }
+
+# Flyway
+flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayCore" }
+flyway-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flywayCore" }
+
+# Keycloak
+keycloak-admin = { group = "org.keycloak", name = "keycloak-admin-client", version.ref = "keycloak" }
+
+# Bucket4j
+bucket4j = { group = "com.bucket4j", name = "bucket4j-core", version.ref = "bucket4j" }
+
+# Apache CSV
+commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "commonsCsv" }
+
+# Database
+postgresql = { group = "org.postgresql", name = "postgresql" }
+
+# AWS
+aws-bom = { group = "software.amazon.awssdk", name = "bom", version.ref = "awsSdk" }
+aws-s3 = { group = "software.amazon.awssdk", name = "s3" }
+aws-sts = { group = "software.amazon.awssdk", name = "sts" }
+
+# OpenAI
+openai-client = { group = "com.aallam.openai", name = "openai-client", version.ref = "openaiClient" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+
+# Testing
+rest-assured = { group = "io.rest-assured", name = "rest-assured", version.ref = "restAssured" }
+rest-assured-kotlin = { group = "io.rest-assured", name = "kotlin-extensions", version.ref = "restAssured" }
+testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
+testcontainers-keycloak = { group = "com.github.dasniko", name = "testcontainers-keycloak", version.ref = "testcontainersKeycloak" }
+testcontainers-junit = { group = "org.testcontainers", name = "junit-jupiter", version.ref = "testcontainers" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlinSpringPlugin" }
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
+flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }

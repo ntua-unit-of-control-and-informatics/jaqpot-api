@@ -1,20 +1,5 @@
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
-plugins {
-    val kotlinVersion = "1.9.24"
-
-    java
-    id("org.springframework.boot") version "3.3.4"
-    id("io.spring.dependency-management") version "1.1.4"
-    id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    kotlin("plugin.jpa") version kotlinVersion
-    id("org.jetbrains.kotlin.plugin.spring") version "1.9.23"
-
-    id("org.openapi.generator") version "7.9.0"
-
-    id("org.flywaydb.flyway") version "10.13.0"
-}
-
 group = "org.jaqpot"
 version = "{{VERSION_PLACEHOLDER}}"
 
@@ -36,98 +21,105 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    // spring boot dependencies
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-
-    // cache
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
-
-    // prometheus
-    implementation("io.micrometer:micrometer-registry-prometheus")
-
-    // freemarker
-    implementation("org.freemarker:freemarker:2.3.33")
-
-    // coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0")
-
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
-
-    // spring boot gradle plugin for dockerizing the app
-    implementation("org.springframework.boot:spring-boot-gradle-plugin:3.3.0")
-
-    // logger
-    implementation("org.slf4j:slf4j-api:2.0.13")
-    implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
-    // json logs for loki and promtail
-    implementation("ch.qos.logback.contrib:logback-json-classic:0.1.5")
-    implementation("ch.qos.logback.contrib:logback-jackson:0.1.5")
-    implementation("org.codehaus.janino:janino:3.1.12")
-
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    // swagger needed dependencies
-    implementation("io.swagger.core.v3:swagger-annotations:2.2.19")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
-
-    // lombok
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-
-    // flyway
-    implementation("org.flywaydb:flyway-core:10.12.0")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
-
-    // keycloak admin client
-    implementation("org.keycloak:keycloak-admin-client:24.0.5")
-
-    // bucket4j for rate limiting
-    implementation("com.bucket4j:bucket4j-core:8.10.1")
-
-    // apache csv parser
-    implementation("org.apache.commons:commons-csv:1.11.0")
-
-    runtimeOnly("org.postgresql:postgresql")
-
-    // aws
-    implementation(platform("software.amazon.awssdk:bom:2.21.1"))
-    // With the bom declared, you specify individual SDK dependencies without a version.
-    implementation("software.amazon.awssdk:s3")
-    implementation("software.amazon.awssdk:sts")
-
-    // openai client
-    implementation("com.aallam.openai:openai-client:3.8.2")
-    runtimeOnly("io.ktor:ktor-client-okhttp:2.0.3")
-
-    // tests
-    // rest assured
-    testImplementation("io.rest-assured:rest-assured:5.4.0")
-    testImplementation("io.rest-assured:kotlin-extensions:5.4.0")
-    // testcontainers
-    testImplementation("org.testcontainers:postgresql:1.19.8")
-    testImplementation("com.github.dasniko:testcontainers-keycloak:3.3.1")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.8")
-    // mockK
-    testImplementation("io.mockk:mockk:1.13.11")
-
+plugins {
+    java
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.openapi.generator)
+    alias(libs.plugins.flyway)
 }
+
+// Rest of your build file configuration remains the same until dependencies
+
+dependencies {
+    // Spring Boot dependencies
+    implementation(libs.spring.boot.starter.oauth2.resource.server)
+    implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.mail)
+    implementation(libs.spring.boot.starter.cache)
+    implementation(libs.spring.boot.starter.webflux)
+
+    // Cache
+    implementation(libs.caffeine)
+
+    // Prometheus
+    implementation(libs.micrometer.prometheus)
+
+    // Freemarker
+    implementation(libs.freemarker)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.reactor)
+
+    annotationProcessor(libs.spring.boot.configuration.processor)
+    developmentOnly(libs.spring.boot.devtools)
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.security.test)
+    testImplementation(libs.spring.boot.testcontainers)
+
+    // Spring Boot Gradle Plugin
+    implementation(libs.spring.boot.gradle.plugin)
+
+    // Logging
+    implementation(libs.slf4j.api)
+    implementation(libs.kotlin.logging)
+    implementation(libs.logback.json.classic)
+    implementation(libs.logback.jackson)
+    implementation(libs.janino)
+
+    implementation(libs.jackson.kotlin)
+    implementation(libs.kotlin.reflect)
+
+    // Swagger
+    implementation(libs.swagger.annotations)
+    implementation(libs.springdoc.openapi)
+
+    // Lombok
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
+    // Flyway
+    implementation(libs.flyway.core)
+    runtimeOnly(libs.flyway.postgresql)
+
+    // Keycloak
+    implementation(libs.keycloak.admin)
+
+    // Bucket4j
+    implementation(libs.bucket4j)
+
+    // Apache CSV
+    implementation(libs.commons.csv)
+
+    runtimeOnly(libs.postgresql)
+
+    // AWS
+    implementation(platform(libs.aws.bom))
+    implementation(libs.aws.s3)
+    implementation(libs.aws.sts)
+
+    // OpenAI
+    implementation(libs.openai.client)
+    runtimeOnly(libs.ktor.client.okhttp)
+
+    // Testing
+    testImplementation(libs.rest.assured)
+    testImplementation(libs.rest.assured.kotlin)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.keycloak)
+    testImplementation(libs.testcontainers.junit)
+    testImplementation(libs.mockk)
+}
+
 
 springBoot {
     mainClass.set("org.jaqpot.api.JaqpotApiApplicationKt")
