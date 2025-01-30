@@ -1540,7 +1540,6 @@ components:
     Model:
       type: object
       required:
-        - jaqpotpyVersion
         - libraries
         - dependentFeatures
         - independentFeatures

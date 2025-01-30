@@ -32,8 +32,8 @@ class Model(
     @Column(nullable = false)
     val type: ModelType,
 
-    @Column(nullable = false)
-    val jaqpotpyVersion: String,
+    @Column(nullable = true)
+    val jaqpotpyVersion: String?,
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
     val libraries: MutableList<Library>,
