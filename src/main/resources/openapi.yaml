@@ -1901,6 +1901,7 @@ components:
       type: string
       enum:
         - SKLEARN_ONNX
+        - TORCH_ONNX
         - TORCH_SEQUENCE_ONNX
         - TORCH_GEOMETRIC_ONNX
         - TORCHSCRIPT

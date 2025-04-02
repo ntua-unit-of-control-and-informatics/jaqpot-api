@@ -11,6 +11,7 @@ enum class ModelType {
     SKLEARN_ONNX,
 
     // torch
+    TORCH_ONNX,
     TORCH_GEOMETRIC_ONNX,
     TORCH_SEQUENCE_ONNX,
     TORCHSCRIPT,

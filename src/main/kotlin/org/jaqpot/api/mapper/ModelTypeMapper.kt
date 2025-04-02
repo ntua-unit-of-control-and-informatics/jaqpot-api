@@ -6,6 +6,7 @@ import org.jaqpot.api.model.ModelTypeDto
 fun ModelTypeDto.toEntity(): ModelType {
     return when (this) {
         ModelTypeDto.SKLEARN_ONNX -> ModelType.SKLEARN_ONNX
+        ModelTypeDto.TORCH_ONNX -> ModelType.TORCH_ONNX
         ModelTypeDto.TORCH_GEOMETRIC_ONNX -> ModelType.TORCH_GEOMETRIC_ONNX
         ModelTypeDto.TORCH_SEQUENCE_ONNX -> ModelType.TORCH_SEQUENCE_ONNX
         ModelTypeDto.TORCHSCRIPT -> ModelType.TORCHSCRIPT
@@ -31,6 +32,7 @@ fun ModelTypeDto.toEntity(): ModelType {
 fun ModelType.toDto(): ModelTypeDto {
     return when (this) {
         ModelType.SKLEARN_ONNX -> ModelTypeDto.SKLEARN_ONNX
+        ModelType.TORCH_ONNX -> ModelTypeDto.TORCH_ONNX
         ModelType.TORCH_GEOMETRIC_ONNX -> ModelTypeDto.TORCH_GEOMETRIC_ONNX
         ModelType.TORCH_SEQUENCE_ONNX -> ModelTypeDto.TORCH_SEQUENCE_ONNX
         ModelType.TORCHSCRIPT -> ModelTypeDto.TORCHSCRIPT
