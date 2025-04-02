@@ -12,7 +12,7 @@ enum class ModelType {
 
     // torch
     TORCH_GEOMETRIC_ONNX,
-    TORCH_ONNX,
+    TORCH_SEQUENCE_ONNX,
     TORCHSCRIPT,
 
     // R models

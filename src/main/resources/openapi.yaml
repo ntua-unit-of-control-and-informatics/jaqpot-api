@@ -1874,6 +1874,7 @@ components:
           type: string
           description: Unique identifier used for internal service discovery
           example: "my-docker-model"
+          pattern: "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
           maxLength: 63
         dockerImage:
           type: string
@@ -1900,7 +1901,7 @@ components:
       type: string
       enum:
         - SKLEARN_ONNX
-        - TORCH_ONNX
+        - TORCH_SEQUENCE_ONNX
         - TORCH_GEOMETRIC_ONNX
         - TORCHSCRIPT
         - R_BNLEARN_DISCRETE

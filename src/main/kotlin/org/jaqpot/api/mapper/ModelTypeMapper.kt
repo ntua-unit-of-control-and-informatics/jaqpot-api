@@ -7,7 +7,7 @@ fun ModelTypeDto.toEntity(): ModelType {
     return when (this) {
         ModelTypeDto.SKLEARN_ONNX -> ModelType.SKLEARN_ONNX
         ModelTypeDto.TORCH_GEOMETRIC_ONNX -> ModelType.TORCH_GEOMETRIC_ONNX
-        ModelTypeDto.TORCH_ONNX -> ModelType.TORCH_ONNX
+        ModelTypeDto.TORCH_SEQUENCE_ONNX -> ModelType.TORCH_SEQUENCE_ONNX
         ModelTypeDto.TORCHSCRIPT -> ModelType.TORCHSCRIPT
         ModelTypeDto.R_BNLEARN_DISCRETE -> ModelType.R_BNLEARN_DISCRETE
         ModelTypeDto.R_CARET -> ModelType.R_CARET
@@ -32,7 +32,7 @@ fun ModelType.toDto(): ModelTypeDto {
     return when (this) {
         ModelType.SKLEARN_ONNX -> ModelTypeDto.SKLEARN_ONNX
         ModelType.TORCH_GEOMETRIC_ONNX -> ModelTypeDto.TORCH_GEOMETRIC_ONNX
-        ModelType.TORCH_ONNX -> ModelTypeDto.TORCH_ONNX
+        ModelType.TORCH_SEQUENCE_ONNX -> ModelTypeDto.TORCH_SEQUENCE_ONNX
         ModelType.TORCHSCRIPT -> ModelTypeDto.TORCHSCRIPT
         ModelType.R_BNLEARN_DISCRETE -> ModelTypeDto.R_BNLEARN_DISCRETE
         ModelType.R_CARET -> ModelTypeDto.R_CARET
