@@ -2214,6 +2214,7 @@ components:
         - BOOLEAN
         - FLOAT_ARRAY
         - STRING_ARRAY
+        - IMAGE
       example: FLOAT
     DatasetType:
       type: string

@@ -14,6 +14,7 @@ fun FeatureTypeDto.toEntity(): FeatureType {
         FeatureTypeDto.FLOAT_ARRAY -> FeatureType.FLOAT_ARRAY
         FeatureTypeDto.STRING_ARRAY -> FeatureType.STRING_ARRAY
         FeatureTypeDto.BOOLEAN -> FeatureType.BOOLEAN
+        FeatureTypeDto.IMAGE -> FeatureType.IMAGE
     }
 }
 
@@ -28,6 +29,7 @@ fun FeatureType.toDto(): FeatureTypeDto {
         FeatureType.FLOAT_ARRAY -> FeatureTypeDto.FLOAT_ARRAY
         FeatureType.STRING_ARRAY -> FeatureTypeDto.STRING_ARRAY
         FeatureType.BOOLEAN -> FeatureTypeDto.BOOLEAN
+        FeatureType.IMAGE -> FeatureTypeDto.IMAGE
     }
 }
 
