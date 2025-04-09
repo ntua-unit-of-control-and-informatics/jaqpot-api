@@ -39,6 +39,7 @@ fun DatasetDto.toEntity(model: Model, userId: String, entryType: DatasetEntryTyp
         type = this.type.toEntity(),
         status = DatasetStatus.CREATED,
         input = this.input,
+        resultTypes = this.resultTypes?.toEntity(),
         failureReason = this.failureReason
     )
 }
