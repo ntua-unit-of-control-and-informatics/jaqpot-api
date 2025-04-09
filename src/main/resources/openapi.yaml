@@ -2222,6 +2222,9 @@ components:
         - PREDICTION
         - CHAT
       example: "PREDICTION"
+    DatasetResultType:
+      type: string
+      enum: [ BASE64 ]
     Dataset:
       type: object
       required:
@@ -2250,6 +2253,11 @@ components:
         result:
           type: array
           items: { }
+        resultTypes:
+          type: object
+          maxItems: 100
+          additionalProperties:
+            $ref: '#/components/schemas/DatasetResultType'
         status:
           type: string
           enum:

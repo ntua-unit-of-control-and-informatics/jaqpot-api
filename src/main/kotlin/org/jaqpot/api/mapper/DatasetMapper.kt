@@ -18,6 +18,7 @@ fun Dataset.toDto(input: List<Any>, result: List<Any>?): DatasetDto {
         failureReason = this.failureReason,
         input = input,
         result = result,
+        resultTypes = this.resultTypes?.toDto(),
         userId = this.userId,
         modelId = this.model.id,
         modelName = this.model.name,
