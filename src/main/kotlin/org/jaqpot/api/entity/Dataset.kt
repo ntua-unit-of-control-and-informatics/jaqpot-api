@@ -43,6 +43,10 @@ class Dataset(
     @Column(name = "result", columnDefinition = "jsonb")
     var result: List<Any>? = emptyList(),
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "result_types", columnDefinition = "jsonb")
+    var resultTypes: Map<String, String>? = emptyMap(),
+
     @Size(min = 3, max = 15000)
     @Column(columnDefinition = "TEXT")
     var failureReason: String?,
