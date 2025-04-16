@@ -1627,7 +1627,7 @@ components:
           type: string
           format: byte
           description: A base64 representation of the raw model.
-          maxLength: 10000000 # ~10MB
+          maxLength: 100000000 # ~100MB
         creator:
           $ref: '#/components/schemas/User'
         canEdit:
