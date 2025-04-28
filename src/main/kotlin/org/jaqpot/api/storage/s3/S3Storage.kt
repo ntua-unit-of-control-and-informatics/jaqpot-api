@@ -13,6 +13,9 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
+import java.time.Duration
 import java.util.*
 
 
@@ -120,4 +123,25 @@ class S3Storage(
         }
     }
 
+    override fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String>): String {
+        S3Presigner.create().use { presigner ->
+            val objectRequest =
+                PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .metadata(metadata)
+                    .build()
+
+            val presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10)) // The URL expires in 10 minutes.
+                .putObjectRequest(objectRequest)
+                .build()
+
+            val presignedRequest = presigner.presignPutObject(presignRequest)
+            val myURL = presignedRequest.url().toString()
+            logger.info { "Presigned URL to upload a file to: $myURL" }
+            logger.info { "HTTP method: ${presignedRequest.httpRequest().method()}" }
+            return presignedRequest.url().toExternalForm()
+        }
+    }
 }

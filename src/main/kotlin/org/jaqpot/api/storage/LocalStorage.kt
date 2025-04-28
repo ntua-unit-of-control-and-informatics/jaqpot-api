@@ -79,6 +79,10 @@ class LocalStorage : Storage {
         storage[bucketName]?.remove(keyName)
     }
 
+    override fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String>): String {
+        TODO("Not yet implemented")
+    }
+
     // Additional helper methods for testing
     fun clearStorage() {
         storage.clear()

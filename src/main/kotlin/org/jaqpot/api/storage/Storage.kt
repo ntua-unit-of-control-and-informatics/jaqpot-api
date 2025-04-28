@@ -31,4 +31,6 @@ interface Storage {
         bucketName: String,
         keyName: String
     )
+
+    fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String> = emptyMap()): String
 }
