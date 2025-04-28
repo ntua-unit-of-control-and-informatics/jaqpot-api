@@ -2258,6 +2258,7 @@ components:
           maxItems: 100
           additionalProperties:
             $ref: '#/components/schemas/DatasetResultType'
+          default: { }
         status:
           type: string
           enum:
