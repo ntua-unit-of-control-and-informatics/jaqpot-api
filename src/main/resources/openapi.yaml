@@ -159,6 +159,59 @@ paths:
           description: Invalid input
       x-stoplight:
         id: 9ffjy7o77jc41
+  /v1/models/uploads:
+    post:
+      summary: Prepare upload for large model (presigned S3 URL)
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: prepareLargeModelUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "huge_model.onnx"
+      responses:
+        '201':
+          description: Upload URL created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  modelId:
+                    type: string
+                  uploadUrl:
+                    type: string
+                  s3Key:
+                    type: string
+        '400':
+          description: Invalid input
+
+  /v1/models/uploads/{modelId}/confirm:
+    post:
+      summary: Confirm that a large model upload is completed
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model
+      operationId: confirmLargeModelUpload
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Upload confirmed successfully
+
   /v1/models/search:
     get:
       x-spring-paginated: true

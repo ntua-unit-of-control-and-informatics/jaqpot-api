@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.jaqpot.api.aws.AWSConfig
+import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.storage.Storage
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -22,7 +23,9 @@ import java.util.*
 @Profile("!local")
 @Service
 class S3Storage(
-    private val awsConfig: AWSConfig, private val s3Client: S3Client
+    private val awsConfig: AWSConfig,
+    private val s3Client: S3Client,
+    private val authenticationFacade: AuthenticationFacade
 ) : Storage {
 
     companion object {
@@ -139,7 +142,7 @@ class S3Storage(
 
             val presignedRequest = presigner.presignPutObject(presignRequest)
             val myURL = presignedRequest.url().toString()
-            logger.info { "Presigned URL to upload a file to: $myURL" }
+            logger.info { "Presigned URL to upload a file to: $myURL. Authorizing user ${authenticationFacade.userId}" }
             logger.info { "HTTP method: ${presignedRequest.httpRequest().method()}" }
             return presignedRequest.url().toExternalForm()
         }
