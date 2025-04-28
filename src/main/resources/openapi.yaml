@@ -2257,8 +2257,8 @@ components:
           type: object
           maxItems: 100
           additionalProperties:
-            $ref: '#/components/schemas/DatasetResultType'
-          default: { }
+            $ref: '#/components/schemas/AnyValue'
+          nullable: true
         status:
           type: string
           enum:
