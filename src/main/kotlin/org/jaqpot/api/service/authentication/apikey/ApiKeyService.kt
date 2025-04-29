@@ -111,7 +111,7 @@ class ApiKeyService(
             if (!apiKey.enabled) {
                 throw InvalidApiKeyException("API key is disabled")
             } else if (apiKey.expiresAt.isBefore(todayStart)) {
-                throw InvalidApiKeyException("API key has expired")
+                throw ExpiredApiKeyException("API key has expired")
             } else if (passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
                 apiKeyRepository.updateLastUsed(apiKey.id, OffsetDateTime.now(), ip)
                 return apiKey
