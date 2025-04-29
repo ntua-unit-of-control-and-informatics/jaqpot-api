@@ -30,7 +30,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -78,7 +77,6 @@ class ModelService(
             ModelTypeDto.R_TREE_CLASS,
             ModelTypeDto.R_TREE_REGR,
         )
-        const val ARCHIVED_MODEL_EXPIRATION_DAYS = 30L
         private val logger = KotlinLogging.logger {}
     }
 
@@ -146,6 +144,7 @@ class ModelService(
         storeRawModelToStorage(savedModel)
         storeRawPreprocessorToStorage(savedModel)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
+        toEntity.uploadConfirmed = true
 
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")
@@ -480,51 +479,22 @@ class ModelService(
 //        return ResponseEntity.noContent().build()
     }
 
-    private fun deleteModel(model: Model) {
-        logger.info { "Deleting model with id ${model.id}" }
-
-        if (model.doas.isNotEmpty()) {
-            model.doas.forEach {
-                logger.info { "Deleting DOA with id ${it.id} for model with id ${model.id}" }
-                val deletedRawDoa = storageService.deleteRawDoa(it)
-                logger.info { "Deleted raw DOA for model with id ${model.id}: $deletedRawDoa" }
-            }
+    override fun prepareLargeModelUpload(modelId: Long): ResponseEntity<PrepareLargeModelUpload201ResponseDto> {
+        val model = modelRepository.findById(modelId).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-        logger.info { "Deleting raw preprocessor for model with id ${model.id}" }
-        val deletedRawPreprocessor = storageService.deleteRawPreprocessor(model)
-        logger.info { "Deleted raw preprocessor for model with id ${model.id}: $deletedRawPreprocessor" }
-
-        logger.info { "Deleting raw model for model with id ${model.id}" }
-        val deletedRawModel = storageService.deleteRawModel(model)
-        logger.info { "Deleted raw model for model with id ${model.id}: $deletedRawModel" }
-
-        modelRepository.delete(model)
-
-        logger.info { "Deleted model with id ${model.id}" }
+        return ResponseEntity.ok(
+            PrepareLargeModelUpload201ResponseDto(
+                modelId = model.id.toString(),
+                uploadUrl = storageService.getPreSignedModelUploadUrl(model, emptyMap()),
+                s3Key = model.id.toString()
+            )
+        )
     }
 
-    @Transactional
-    @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
-    fun purgeExpiredArchivedModels() {
-        logger.info { "Purging expired archived models" }
-
-        val expiredArchivedModels = modelRepository.findAllByArchivedIsTrueAndArchivedAtBefore(
-            OffsetDateTime.now().minusDays(ARCHIVED_MODEL_EXPIRATION_DAYS)
-        )
-
-        var deletionCount = 0
-
-        expiredArchivedModels.forEach {
-            try {
-                this.deleteModel(it)
-                deletionCount++
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete model with id ${it.id}" }
-            }
-        }
-
-        logger.info { "Purged $deletionCount expired archived models" }
+    override fun confirmLargeModelUpload(modelId: Long): ResponseEntity<Unit> {
+        return super.confirmLargeModelUpload(modelId)
     }
 }
 

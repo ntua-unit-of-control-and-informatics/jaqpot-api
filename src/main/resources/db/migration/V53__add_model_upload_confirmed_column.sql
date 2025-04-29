@@ -1,0 +1,2 @@
+ALTER TABLE model
+    ADD upload_confirmed BOOLEAN NOT NULL DEFAULT TRUE;

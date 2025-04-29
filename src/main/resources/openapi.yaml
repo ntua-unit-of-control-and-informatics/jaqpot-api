@@ -159,7 +159,7 @@ paths:
           description: Invalid input
       x-stoplight:
         id: 9ffjy7o77jc41
-  /v1/models/uploads:
+  /v1/models/uploads/{modelId}:
     post:
       summary: Prepare upload for large model (presigned S3 URL)
       security:
@@ -167,16 +167,14 @@ paths:
       tags:
         - model
       operationId: prepareLargeModelUpload
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: "huge_model.onnx"
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
       responses:
         '201':
           description: Upload URL created successfully
@@ -207,7 +205,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
+            example: 0
       responses:
         '204':
           description: Upload confirmed successfully
