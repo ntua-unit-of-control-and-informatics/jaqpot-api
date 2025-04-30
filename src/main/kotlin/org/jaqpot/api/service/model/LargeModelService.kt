@@ -1,6 +1,6 @@
 package org.jaqpot.api.service.model
 
-import org.jaqpot.api.LargeModelApi
+import org.jaqpot.api.LargeModelApiDelegate
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.model.CreateLargeModel201ResponseDto
 import org.jaqpot.api.model.ModelDto
@@ -22,7 +22,7 @@ class LargeModelService(
     private val doaService: DoaService,
     private val storageService: StorageService,
     private val modelConfiguration: ModelConfiguration
-) : LargeModelApi {
+) : LargeModelApiDelegate {
 
     override fun createLargeModel(
         modelDto: ModelDto
