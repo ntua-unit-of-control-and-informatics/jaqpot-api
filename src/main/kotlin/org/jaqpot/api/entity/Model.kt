@@ -73,6 +73,9 @@ class Model(
 
     var archivedAt: OffsetDateTime? = null,
 
+    @Column(nullable = false)
+    var uploadConfirmed: Boolean = false,
+
     @Size(min = 3, max = 1000)
     @Column(columnDefinition = "TEXT")
     var tags: String?,

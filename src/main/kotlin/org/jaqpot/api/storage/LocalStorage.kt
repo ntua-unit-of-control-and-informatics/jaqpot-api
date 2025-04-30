@@ -2,6 +2,7 @@ package org.jaqpot.api.storage
 
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -43,6 +44,10 @@ class LocalStorage : Storage {
         )
     }
 
+    override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
+        TODO("Not yet implemented")
+    }
+
     override fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray> {
         return storage[bucketName]?.let { bucket ->
             keyNames.mapNotNull { keyName ->
@@ -79,6 +84,10 @@ class LocalStorage : Storage {
         storage[bucketName]?.remove(keyName)
     }
 
+    override fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String>): String {
+        TODO("Not yet implemented")
+    }
+
     // Additional helper methods for testing
     fun clearStorage() {
         storage.clear()
@@ -86,10 +95,6 @@ class LocalStorage : Storage {
 
     fun getBuckets(): Set<String> {
         return storage.keys
-    }
-
-    fun getObjectMetadata(bucketName: String, keyName: String): Map<String, String>? {
-        return storage[bucketName]?.get(keyName)?.metadata
     }
 
     fun getObjectContentType(bucketName: String, keyName: String): String? {

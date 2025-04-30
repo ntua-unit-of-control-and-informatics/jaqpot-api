@@ -4,22 +4,25 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.jaqpot.api.aws.AWSConfig
+import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.storage.Storage
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.*
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
+import java.time.Duration
 import java.util.*
 
 
 @Profile("!local")
 @Service
 class S3Storage(
-    private val awsConfig: AWSConfig, private val s3Client: S3Client
+    private val awsConfig: AWSConfig,
+    private val s3Client: S3Client,
+    private val authenticationFacade: AuthenticationFacade
 ) : Storage {
 
     companion object {
@@ -120,4 +123,31 @@ class S3Storage(
         }
     }
 
+    override fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String>): String {
+        S3Presigner.create().use { presigner ->
+            val objectRequest =
+                PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .metadata(metadata)
+                    .build()
+
+            val presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10)) // The URL expires in 10 minutes.
+                .putObjectRequest(objectRequest)
+                .build()
+
+            val presignedRequest = presigner.presignPutObject(presignRequest)
+            val myURL = presignedRequest.url().toString()
+            logger.info { "Presigned URL to upload a file to: $myURL. Authorizing user ${authenticationFacade.userId}" }
+            logger.info { "HTTP method: ${presignedRequest.httpRequest().method()}" }
+            return presignedRequest.url().toExternalForm()
+        }
+    }
+
+    override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
+        val objectRequest = HeadObjectRequest.builder().bucket(bucketName).key(keyName).build()
+
+        return s3Client.headObject(objectRequest)
+    }
 }

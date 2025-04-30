@@ -12,6 +12,7 @@ import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import java.util.*
 
 @Service
@@ -249,6 +250,10 @@ class StorageService(
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
     }
 
+    fun readRawModelMetadata(model: Model): HeadObjectResponse {
+        return this.storage.getObjectMetadata(awsS3Config.modelsBucketName, getModelStorageKey(model))
+    }
+
     private fun getModelStorageKey(model: Model) = model.id.toString()
 
     // Preprocessor
@@ -347,6 +352,10 @@ class StorageService(
             logger.error { "Failed to delete user avatar for user with id $userId" }
             return false
         }
+    }
+
+    fun getPreSignedModelUploadUrl(model: Model, metadata: Map<String, String> = emptyMap()): String {
+        return this.storage.getPreSignedUploadUrl(awsS3Config.modelsBucketName, model.id.toString(), metadata)
     }
 
     private fun getUserAvatarStorageKey(userId: String, extension: String): String {

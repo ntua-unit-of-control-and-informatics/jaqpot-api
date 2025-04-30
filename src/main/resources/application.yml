@@ -85,6 +85,7 @@ keycloak:
 jaqpot:
   model:
     max-input-prediction-rows: 100
+    max-size-bytes: 104857600 # 100MB
   frontend:
     url: http://localhost.jaqpot.org:3000
   runtime:

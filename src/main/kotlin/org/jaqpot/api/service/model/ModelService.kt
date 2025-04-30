@@ -30,7 +30,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -78,8 +77,35 @@ class ModelService(
             ModelTypeDto.R_TREE_CLASS,
             ModelTypeDto.R_TREE_REGR,
         )
-        const val ARCHIVED_MODEL_EXPIRATION_DAYS = 30L
         private val logger = KotlinLogging.logger {}
+
+        fun storeRawModelToStorage(model: Model, storageService: StorageService, modelRepository: ModelRepository) {
+            if (model.rawModel == null) {
+                // model is already stored in storage
+                return
+            }
+            logger.info { "Storing raw model to storage for model with id ${model.id}" }
+            if (storageService.storeRawModel(model)) {
+                logger.info { "Successfully moved raw model to storage for model ${model.id}" }
+                modelRepository.setRawModelToNull(model.id)
+            }
+        }
+
+        fun storeRawPreprocessorToStorage(
+            model: Model,
+            storageService: StorageService,
+            modelRepository: ModelRepository
+        ) {
+            if (model.rawPreprocessor == null) {
+                // model is already stored in storage
+                return
+            }
+            logger.info { "Storing raw preprocessor to storage for model with id ${model.id}" }
+            if (storageService.storeRawPreprocessor(model)) {
+                logger.info { "Successfully moved raw model to storage for model ${model.id}" }
+                modelRepository.setRawPreprocessorToNull(model.id)
+            }
+        }
     }
 
     @PreAuthorize("hasAnyAuthority('admin', 'upci')")
@@ -140,11 +166,16 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "${modelDto.type} is not supported for creation.")
         }
 
+        if (modelDto.rawModel == null || modelDto.rawModel.isEmpty()) {
+            throw IllegalArgumentException("rawModel is required for model uploads.")
+        }
+
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
+        toEntity.uploadConfirmed = true
         val savedModel = modelRepository.save(toEntity)
-        storeRawModelToStorage(savedModel)
-        storeRawPreprocessorToStorage(savedModel)
+        storeRawModelToStorage(savedModel, storageService, modelRepository)
+        storeRawPreprocessorToStorage(savedModel, storageService, modelRepository)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
 
         val location: URI = ServletUriComponentsBuilder
@@ -153,29 +184,6 @@ class ModelService(
         return ResponseEntity.created(location).build()
     }
 
-    private fun storeRawModelToStorage(model: Model) {
-        if (model.rawModel == null) {
-            // model is already stored in storage
-            return
-        }
-        logger.info { "Storing raw model to storage for model with id ${model.id}" }
-        if (storageService.storeRawModel(model)) {
-            logger.info { "Successfully moved raw model to storage for model ${model.id}" }
-            modelRepository.setRawModelToNull(model.id)
-        }
-    }
-
-    private fun storeRawPreprocessorToStorage(model: Model) {
-        if (model.rawPreprocessor == null) {
-            // model is already stored in storage
-            return
-        }
-        logger.info { "Storing raw preprocessor to storage for model with id ${model.id}" }
-        if (storageService.storeRawPreprocessor(model)) {
-            logger.info { "Successfully moved raw model to storage for model ${model.id}" }
-            modelRepository.setRawPreprocessorToNull(model.id)
-        }
-    }
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     override fun getModelById(id: Long): ResponseEntity<ModelDto> {
@@ -217,7 +225,7 @@ class ModelService(
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
             // TODO once there are no models with rawModel in the database, remove this
-            storeRawModelToStorage(model)
+            storeRawModelToStorage(model, storageService, modelRepository)
 
             if (model.archived) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
@@ -262,7 +270,7 @@ class ModelService(
             }
             val userId = authenticationFacade.userId
             // TODO once there are no models with rawModel in the database, remove this
-            storeRawModelToStorage(model)
+            storeRawModelToStorage(model, storageService, modelRepository)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
 
@@ -480,51 +488,5 @@ class ModelService(
 //        return ResponseEntity.noContent().build()
     }
 
-    private fun deleteModel(model: Model) {
-        logger.info { "Deleting model with id ${model.id}" }
-
-        if (model.doas.isNotEmpty()) {
-            model.doas.forEach {
-                logger.info { "Deleting DOA with id ${it.id} for model with id ${model.id}" }
-                val deletedRawDoa = storageService.deleteRawDoa(it)
-                logger.info { "Deleted raw DOA for model with id ${model.id}: $deletedRawDoa" }
-            }
-        }
-
-        logger.info { "Deleting raw preprocessor for model with id ${model.id}" }
-        val deletedRawPreprocessor = storageService.deleteRawPreprocessor(model)
-        logger.info { "Deleted raw preprocessor for model with id ${model.id}: $deletedRawPreprocessor" }
-
-        logger.info { "Deleting raw model for model with id ${model.id}" }
-        val deletedRawModel = storageService.deleteRawModel(model)
-        logger.info { "Deleted raw model for model with id ${model.id}: $deletedRawModel" }
-
-        modelRepository.delete(model)
-
-        logger.info { "Deleted model with id ${model.id}" }
-    }
-
-    @Transactional
-    @Scheduled(cron = "0 0 3 * * *" /* every day at 3:00 AM */)
-    fun purgeExpiredArchivedModels() {
-        logger.info { "Purging expired archived models" }
-
-        val expiredArchivedModels = modelRepository.findAllByArchivedIsTrueAndArchivedAtBefore(
-            OffsetDateTime.now().minusDays(ARCHIVED_MODEL_EXPIRATION_DAYS)
-        )
-
-        var deletionCount = 0
-
-        expiredArchivedModels.forEach {
-            try {
-                this.deleteModel(it)
-                deletionCount++
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete model with id ${it.id}" }
-            }
-        }
-
-        logger.info { "Purged $deletionCount expired archived models" }
-    }
 }
 
