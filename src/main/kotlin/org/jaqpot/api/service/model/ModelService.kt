@@ -78,6 +78,34 @@ class ModelService(
             ModelTypeDto.R_TREE_REGR,
         )
         private val logger = KotlinLogging.logger {}
+
+        fun storeRawModelToStorage(model: Model, storageService: StorageService, modelRepository: ModelRepository) {
+            if (model.rawModel == null) {
+                // model is already stored in storage
+                return
+            }
+            logger.info { "Storing raw model to storage for model with id ${model.id}" }
+            if (storageService.storeRawModel(model)) {
+                logger.info { "Successfully moved raw model to storage for model ${model.id}" }
+                modelRepository.setRawModelToNull(model.id)
+            }
+        }
+
+        fun storeRawPreprocessorToStorage(
+            model: Model,
+            storageService: StorageService,
+            modelRepository: ModelRepository
+        ) {
+            if (model.rawPreprocessor == null) {
+                // model is already stored in storage
+                return
+            }
+            logger.info { "Storing raw preprocessor to storage for model with id ${model.id}" }
+            if (storageService.storeRawPreprocessor(model)) {
+                logger.info { "Successfully moved raw model to storage for model ${model.id}" }
+                modelRepository.setRawPreprocessorToNull(model.id)
+            }
+        }
     }
 
     @PreAuthorize("hasAnyAuthority('admin', 'upci')")
@@ -138,11 +166,15 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "${modelDto.type} is not supported for creation.")
         }
 
+        if (modelDto.rawModel == null || modelDto.rawModel.isEmpty()) {
+            throw IllegalArgumentException("rawModel is required for model uploads.")
+        }
+
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
         val savedModel = modelRepository.save(toEntity)
-        storeRawModelToStorage(savedModel)
-        storeRawPreprocessorToStorage(savedModel)
+        storeRawModelToStorage(savedModel, storageService, modelRepository)
+        storeRawPreprocessorToStorage(savedModel, storageService, modelRepository)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
         toEntity.uploadConfirmed = true
 
@@ -152,29 +184,6 @@ class ModelService(
         return ResponseEntity.created(location).build()
     }
 
-    private fun storeRawModelToStorage(model: Model) {
-        if (model.rawModel == null) {
-            // model is already stored in storage
-            return
-        }
-        logger.info { "Storing raw model to storage for model with id ${model.id}" }
-        if (storageService.storeRawModel(model)) {
-            logger.info { "Successfully moved raw model to storage for model ${model.id}" }
-            modelRepository.setRawModelToNull(model.id)
-        }
-    }
-
-    private fun storeRawPreprocessorToStorage(model: Model) {
-        if (model.rawPreprocessor == null) {
-            // model is already stored in storage
-            return
-        }
-        logger.info { "Storing raw preprocessor to storage for model with id ${model.id}" }
-        if (storageService.storeRawPreprocessor(model)) {
-            logger.info { "Successfully moved raw model to storage for model ${model.id}" }
-            modelRepository.setRawPreprocessorToNull(model.id)
-        }
-    }
 
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     override fun getModelById(id: Long): ResponseEntity<ModelDto> {
@@ -216,7 +225,7 @@ class ModelService(
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
             // TODO once there are no models with rawModel in the database, remove this
-            storeRawModelToStorage(model)
+            storeRawModelToStorage(model, storageService, modelRepository)
 
             if (model.archived) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
@@ -261,7 +270,7 @@ class ModelService(
             }
             val userId = authenticationFacade.userId
             // TODO once there are no models with rawModel in the database, remove this
-            storeRawModelToStorage(model)
+            storeRawModelToStorage(model, storageService, modelRepository)
 
             val csvData = csvParser.readCsv(datasetCSVDto.inputFile.inputStream())
 
@@ -479,22 +488,5 @@ class ModelService(
 //        return ResponseEntity.noContent().build()
     }
 
-    override fun prepareLargeModelUpload(modelId: Long): ResponseEntity<PrepareLargeModelUpload201ResponseDto> {
-        val model = modelRepository.findById(modelId).orElseThrow {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
-        }
-
-        return ResponseEntity.ok(
-            PrepareLargeModelUpload201ResponseDto(
-                modelId = model.id.toString(),
-                uploadUrl = storageService.getPreSignedModelUploadUrl(model, emptyMap()),
-                s3Key = model.id.toString()
-            )
-        )
-    }
-
-    override fun confirmLargeModelUpload(modelId: Long): ResponseEntity<Unit> {
-        return super.confirmLargeModelUpload(modelId)
-    }
 }
 

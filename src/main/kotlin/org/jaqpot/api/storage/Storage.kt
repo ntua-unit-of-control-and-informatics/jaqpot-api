@@ -1,5 +1,6 @@
 package org.jaqpot.api.storage
 
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import java.util.*
 
 interface Storage {
@@ -7,6 +8,8 @@ interface Storage {
         bucketName: String,
         keyName: String,
     ): Optional<ByteArray>
+
+    fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse
 
     fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray>
 

@@ -10,10 +10,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
 import java.time.Duration
@@ -146,5 +143,11 @@ class S3Storage(
             logger.info { "HTTP method: ${presignedRequest.httpRequest().method()}" }
             return presignedRequest.url().toExternalForm()
         }
+    }
+
+    override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
+        val objectRequest = HeadObjectRequest.builder().bucket(bucketName).key(keyName).build()
+
+        return s3Client.headObject(objectRequest)
     }
 }
