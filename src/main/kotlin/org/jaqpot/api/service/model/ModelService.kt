@@ -172,11 +172,11 @@ class ModelService(
 
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
+        toEntity.uploadConfirmed = true
         val savedModel = modelRepository.save(toEntity)
         storeRawModelToStorage(savedModel, storageService, modelRepository)
         storeRawPreprocessorToStorage(savedModel, storageService, modelRepository)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
-        toEntity.uploadConfirmed = true
 
         val location: URI = ServletUriComponentsBuilder
             .fromCurrentRequest().path("/{id}")

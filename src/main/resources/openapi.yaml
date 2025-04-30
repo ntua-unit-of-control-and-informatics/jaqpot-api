@@ -1557,8 +1557,6 @@ paths:
                     type: string
                   uploadUrl:
                     type: string
-                  s3Key:
-                    type: string
         '400':
           description: Invalid input
         '403':

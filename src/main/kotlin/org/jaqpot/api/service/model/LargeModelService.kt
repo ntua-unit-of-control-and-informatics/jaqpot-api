@@ -7,26 +7,22 @@ import org.jaqpot.api.model.ModelDto
 import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.model.ModelService.Companion.FORBIDDEN_MODEL_TYPES_FOR_CREATION
+import org.jaqpot.api.service.model.config.ModelConfiguration
 import org.jaqpot.api.storage.StorageService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.net.URI
 
 @Service
 class LargeModelService(
     private val authenticationFacade: AuthenticationFacade,
     private val modelRepository: ModelRepository,
     private val doaService: DoaService,
-    private val storageService: StorageService
+    private val storageService: StorageService,
+    private val modelConfiguration: ModelConfiguration
 ) : LargeModelApi {
-
-    companion object {
-        const val MAX_MODEL_SIZE_BYTES = 100 * 1024 * 1024 // 100 MB
-    }
 
     override fun createLargeModel(
         modelDto: ModelDto
@@ -45,16 +41,15 @@ class LargeModelService(
 
         val creatorId = authenticationFacade.userId
         val toEntity = modelDto.toEntity(creatorId)
+        toEntity.uploadConfirmed = false
         val savedModel = modelRepository.save(toEntity)
         ModelService.storeRawModelToStorage(savedModel, storageService, modelRepository)
         ModelService.storeRawPreprocessorToStorage(savedModel, storageService, modelRepository)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
-        toEntity.uploadConfirmed = false
 
-        val location: URI = ServletUriComponentsBuilder
-            .fromCurrentRequest().path("/{id}")
-            .buildAndExpand(savedModel.id).toUri()
-        return ResponseEntity.created(location).build()
+        val preSignedModelUploadUrl = storageService.getPreSignedModelUploadUrl(savedModel, emptyMap())
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(CreateLargeModel201ResponseDto(savedModel.id.toString(), preSignedModelUploadUrl))
     }
 
     @PreAuthorize("@largeModelConfirmUploadAuthorizationLogic.decide(#root, #modelId)")
@@ -68,7 +63,7 @@ class LargeModelService(
 
         try {
             val objectMeta = storageService.readRawModelMetadata(model)
-            if (objectMeta.contentLength() > MAX_MODEL_SIZE_BYTES) {
+            if (objectMeta.contentLength() > modelConfiguration.maxSizeBytes) {
                 storageService.deleteRawModel(model)
                 throw ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
