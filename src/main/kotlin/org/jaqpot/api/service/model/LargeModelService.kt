@@ -43,7 +43,6 @@ class LargeModelService(
         val toEntity = modelDto.toEntity(creatorId)
         toEntity.uploadConfirmed = false
         val savedModel = modelRepository.save(toEntity)
-        ModelService.storeRawModelToStorage(savedModel, storageService, modelRepository)
         ModelService.storeRawPreprocessorToStorage(savedModel, storageService, modelRepository)
         savedModel.doas.forEach(doaService::storeRawDoaToStorage)
 
