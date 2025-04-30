@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 abstract class RESTRuntime : RuntimeBase() {
     companion object {
         private val logger = KotlinLogging.logger {}
-        const val SIXTEEN_MEGABYTES_IN_BYTES = 16 * 1024 * 1024
+        const val HUNDRED_MEGABYTES_IN_BYTES = 100 * 1024 * 1024
         private val httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
             .option(ChannelOption.SO_KEEPALIVE, true)
@@ -43,7 +43,7 @@ abstract class RESTRuntime : RuntimeBase() {
     ): Optional<PredictionResponseDto> = runBlocking {
         val client = WebClient.builder()
             .clientConnector(ReactorClientHttpConnector(getHttpClient()))
-            .codecs { it.defaultCodecs().maxInMemorySize(SIXTEEN_MEGABYTES_IN_BYTES) }
+            .codecs { it.defaultCodecs().maxInMemorySize(HUNDRED_MEGABYTES_IN_BYTES) }
             .build()
         val inferenceUrl = "${getRuntimeUrl(predictionModelDto)}${getRuntimePath(predictionModelDto)}"
 

@@ -60,17 +60,18 @@ class LargeModelService(
             throw ResponseStatusException(HttpStatus.CONFLICT, "Upload already confirmed")
         }
 
-        try {
-            val objectMeta = storageService.readRawModelMetadata(model)
-            if (objectMeta.contentLength() > modelConfiguration.maxSizeBytes) {
-                storageService.deleteRawModel(model)
-                throw ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Uploaded model exceeds 100MB and has been removed"
-                )
-            }
+        val objectMeta = try {
+            storageService.readRawModelMetadata(model)
         } catch (ex: Exception) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model file not found in storage")
+        }
+
+        if (objectMeta.contentLength() > modelConfiguration.maxSizeBytes) {
+            storageService.deleteRawModel(model)
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Uploaded model exceeds 100MB and has been removed"
+            )
         }
 
         model.uploadConfirmed = true
