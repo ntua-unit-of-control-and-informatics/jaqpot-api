@@ -77,4 +77,6 @@ interface ModelRepository : PagingAndSortingRepository<Model, Long>, CrudReposit
     fun setRawPreprocessorToNull(@Param("id") id: Long?)
 
     fun findAllByArchivedIsTrueAndArchivedAtBefore(date: OffsetDateTime): List<Model>
+
+    fun findAllByUploadConfirmedIsFalseAndCreatedAtBefore(date: OffsetDateTime): List<Model>
 }

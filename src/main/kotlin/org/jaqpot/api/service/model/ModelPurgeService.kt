@@ -17,6 +17,7 @@ class ModelPurgeService(
 
     companion object {
         const val ARCHIVED_MODEL_EXPIRATION_DAYS = 30L
+        const val UNCONFIRMED_UPLOAD_MODEL_EXPIRATION_DAYS = 30L
         private val logger = KotlinLogging.logger {}
     }
 
@@ -65,5 +66,30 @@ class ModelPurgeService(
         }
 
         logger.info { "Purged $deletionCount expired archived models" }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 4 * * *" /* every day at 4:00 AM */)
+    fun purgeExpiredUnconfirmedUploadModels() {
+        logger.info { "Purging expired unconfirmed upload models models" }
+
+        val expiredArchivedModels = modelRepository.findAllByUploadConfirmedIsFalseAndCreatedAtBefore(
+            OffsetDateTime.now().minusDays(UNCONFIRMED_UPLOAD_MODEL_EXPIRATION_DAYS)
+        )
+
+        var deletionCount = 0
+
+        expiredArchivedModels.forEach {
+            try {
+                logger.info { "Deleting unconfirmed upload model with id ${it.id}" }
+                // TODO uncomment next line once we're sure this works correctly
+//                this.deleteModel(it)
+                deletionCount++
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to delete model with id ${it.id}" }
+            }
+        }
+
+        logger.info { "Purged $deletionCount expired unconfirmed upload models" }
     }
 }
