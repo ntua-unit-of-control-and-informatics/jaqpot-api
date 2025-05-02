@@ -2520,7 +2520,6 @@ components:
         - dependentFeatures
         - independentFeatures
         - type
-        - rawModel
         - task
       properties:
         id:

@@ -103,7 +103,7 @@ fun ModelDto.toEntity(creatorId: String): Model {
 }
 
 fun Model.toPredictionModelDto(
-    rawModel: ByteArray,
+    rawModel: ByteArray?,
     doas: List<PredictionDoaDto>,
     rawPreprocessor: ByteArray?
 ): PredictionModelDto {
@@ -113,7 +113,7 @@ fun Model.toPredictionModelDto(
         independentFeatures = this.independentFeatures.map { it.toDto() },
         type = this.type.toDto(),
         task = this.task.toDto(),
-        rawModel = this.encodeRawModel(rawModel),
+        rawModel = rawModel?.let { this.encodeRawModel(rawModel) },
         rawPreprocessor = this.encodeRawPreprocessor(rawPreprocessor),
         doas = doas,
         selectedFeatures = this.selectedFeatures ?: emptyList(),
