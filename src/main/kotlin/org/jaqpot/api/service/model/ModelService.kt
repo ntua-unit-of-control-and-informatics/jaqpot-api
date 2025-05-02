@@ -78,6 +78,7 @@ class ModelService(
             ModelTypeDto.R_TREE_REGR,
         )
         private val logger = KotlinLogging.logger {}
+        const val FIVE_MEGABYTES_IN_BYTES = 5e+6
 
         fun storeRawModelToStorage(model: Model, storageService: StorageService, modelRepository: ModelRepository) {
             if (model.rawModel == null) {
@@ -321,7 +322,11 @@ class ModelService(
         val rawModel = if (model.isQsarToolboxModel()) {
             byteArrayOf()
         } else {
-            storageService.readRawModel(model)
+            if (storageService.readRawModelMetadata(model).contentLength() > FIVE_MEGABYTES_IN_BYTES) {
+                null
+            } else {
+                storageService.readRawModel(model)
+            }
         }
         val rawPreprocessor = storageService.readRawPreprocessor(model)
 

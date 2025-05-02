@@ -111,7 +111,7 @@ abstract class RESTRuntime : RuntimeBase() {
 
 
         val legacyPredictionRequestDto = LegacyPredictionRequestDto(
-            rawModel = arrayOf(predictionModelDto.rawModel),
+            rawModel = arrayOf(predictionModelDto.rawModel!!),
             dataset = LegacyDatasetDto(
                 LegacyDataEntryDto(values = values),
                 features = predictionModelDto.independentFeatures.mapIndexed { index, it ->
