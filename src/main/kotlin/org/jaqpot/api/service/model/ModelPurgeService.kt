@@ -22,7 +22,7 @@ class ModelPurgeService(
     }
 
     private fun deleteModel(model: Model) {
-        logger.info { "Deleting model with id ${model.id}" }
+        logger.info { "Deleting model with id ${model.id} and creator id: ${model.creatorId}" }
 
         if (model.doas.isNotEmpty()) {
             model.doas.forEach {
