@@ -45,7 +45,9 @@ class LocalStorage : Storage {
     }
 
     override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
-        TODO("Not yet implemented")
+        return HeadObjectResponse.builder()
+            .contentLength(10)
+            .build()
     }
 
     override fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray> {
