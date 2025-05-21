@@ -122,7 +122,8 @@ fun Model.toPredictionModelDto(
         torchConfig = this.torchConfig,
         rPbpkOdeSolver = this.rPbpkOdeSolver,
         legacyAdditionalInfo = this.legacyAdditionalInfo,
-        legacyPredictionService = this.legacyPredictionService
+        legacyPredictionService = this.legacyPredictionService,
+        supportsPredictionCaching = this.supportsPredictionCaching
     )
 }
 

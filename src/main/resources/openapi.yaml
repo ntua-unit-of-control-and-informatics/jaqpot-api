@@ -1655,6 +1655,8 @@ components:
           $ref: '#/components/schemas/ModelTask'
         archived:
           type: boolean
+        supportsPredictionCaching:
+          type: boolean
         archivedAt:
           type: string
           format: date-time
@@ -2576,6 +2578,8 @@ components:
           nullable: true
         rPbpkOdeSolver:
           type: string
+        supportsPredictionCaching:
+          type: boolean
         legacyAdditionalInfo:
           type: object
           additionalProperties:
