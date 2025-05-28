@@ -31,6 +31,7 @@ plugins {
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.openapi.generator)
     alias(libs.plugins.flyway)
+    alias(libs.plugins.owasp.dependency.check)
 }
 
 // Rest of your build file configuration remains the same until dependencies
@@ -174,4 +175,9 @@ sourceSets {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("org.apache.tomcat.embed:tomcat-embed-core:10.1.35")
+    }
+}
 

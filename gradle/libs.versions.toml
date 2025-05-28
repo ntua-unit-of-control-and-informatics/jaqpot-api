@@ -25,6 +25,7 @@ restAssured = "5.4.0"
 testcontainers = "1.19.8"
 testcontainersKeycloak = "3.3.1"
 mockk = "1.13.11"
+owaspDependencyCheck = "12.1.1"
 
 [libraries]
 # Spring Boot dependencies
@@ -118,3 +119,5 @@ spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
 flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }
+owasp-dependency-check = { id = "org.owasp.dependencycheck", version.ref = "owaspDependencyCheck" }
+
