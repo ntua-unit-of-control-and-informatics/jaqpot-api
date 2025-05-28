@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.24"
-springBoot = "3.3.4"
+spring-boot = "3.5.0"
 springDependencyManagement = "1.1.4"
 kotlinSpringPlugin = "1.9.23"
 openapiGenerator = "7.9.0"
@@ -37,7 +37,7 @@ spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spr
 spring-boot-starter-mail = { group = "org.springframework.boot", name = "spring-boot-starter-mail" }
 spring-boot-starter-cache = { group = "org.springframework.boot", name = "spring-boot-starter-cache" }
 spring-boot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux" }
-spring-boot-gradle-plugin = { group = "org.springframework.boot", name = "spring-boot-gradle-plugin", version.ref = "springBoot" }
+spring-boot-gradle-plugin = { group = "org.springframework.boot", name = "spring-boot-gradle-plugin", version.ref = "spring-boot" }
 spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor" }
 spring-boot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools" }
 spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
@@ -114,7 +114,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlinSpringPlugin" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
-spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
 flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }
