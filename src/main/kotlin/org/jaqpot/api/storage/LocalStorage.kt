@@ -45,8 +45,10 @@ class LocalStorage : Storage {
     }
 
     override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
+        val length = storage[bucketName]?.get(keyName)?.data?.size?.toLong() ?: 0L
+
         return HeadObjectResponse.builder()
-            .contentLength(10)
+            .contentLength(length)
             .build()
     }
 
@@ -87,7 +89,7 @@ class LocalStorage : Storage {
     }
 
     override fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String>): String {
-        TODO("Not yet implemented")
+        return "local://$bucketName/$keyName"
     }
 
     // Additional helper methods for testing
