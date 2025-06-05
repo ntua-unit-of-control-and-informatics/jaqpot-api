@@ -65,7 +65,6 @@ aws:
     doas-bucket:
     preprocessors-bucket:
     images-bucket:
-    skip-web-identity: false
   cloudfront:
     images-distribution-url:
 

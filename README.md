@@ -45,10 +45,6 @@ Run the application locally:
 gradle bootRun
 ```
 
-### Configuration
-
-When running outside an AWS environment, ensure that the application does not try to use the Web Identity token credentials provider. Set the environment variable `AWS_S3_SKIP_WEB_IDENTITY=true` to force the application to fall back to the default AWS credential chain.
-
 ## OpenAPI Specs
 
 In our project, we leverage the OpenAPI Generator to streamline our development process. Here’s how it works:
