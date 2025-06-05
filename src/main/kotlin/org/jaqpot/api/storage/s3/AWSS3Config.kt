@@ -22,14 +22,17 @@ class AWSS3Config(
     @Value("\${aws.s3.images-bucket}")
     val imagesBucketName: String,
     @Value("\${aws.cloudfront.images-distribution-url}")
-    val cloudfrontImagesDistributionUrl: String
+    val cloudfrontImagesDistributionUrl: String,
+    @Value("\${aws.s3.skip-web-identity:false}")
+    val skipWebIdentity: Boolean
 ) {
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {
-        val credentialsProvider = if (System.getenv("AWS_WEB_IDENTITY_TOKEN_FILE").isNullOrBlank()) {
-            DefaultCredentialsProvider.create()
-        } else {
+        val useWebIdentity = System.getenv("AWS_WEB_IDENTITY_TOKEN_FILE").isNullOrBlank().not()
+        val credentialsProvider = if (useWebIdentity && !skipWebIdentity) {
             WebIdentityTokenFileCredentialsProvider.create()
+        } else {
+            DefaultCredentialsProvider.create()
         }
 
         return S3Client.builder()
