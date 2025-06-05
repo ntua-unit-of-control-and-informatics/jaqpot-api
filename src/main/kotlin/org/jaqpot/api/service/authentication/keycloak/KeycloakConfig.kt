@@ -36,7 +36,6 @@ data class KeycloakConfig(
             .connectTimeout(10000, TimeUnit.MILLISECONDS)
             .readTimeout(7000, TimeUnit.MILLISECONDS)
             .connectionTTL(-1, TimeUnit.MILLISECONDS)
-            .disableTrustManager()
             .build()
     }
 

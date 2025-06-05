@@ -60,8 +60,11 @@ class StreamingPredictionService(
         toEntity.result = storageService.readRawDatasetResult(toEntity)
 
         toEntity.input!!.forEachIndexed { index, it: Any ->
-            if (it is Map<*, *>)
-                (it as MutableMap<String, String>)[JAQPOT_ROW_ID_KEY] = index.toString()
+            if (it is MutableMap<*, *>) {
+                @Suppress("UNCHECKED_CAST")
+                val map = it as MutableMap<String, Any?>
+                map[JAQPOT_ROW_ID_KEY] = index.toString()
+            }
         }
         toEntity.input = (toEntity.input ?: emptyList()) + listOf(mapOf("prompt" to streamPredictRequestDto.prompt))
 
