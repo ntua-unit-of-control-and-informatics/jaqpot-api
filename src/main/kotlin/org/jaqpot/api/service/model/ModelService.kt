@@ -323,9 +323,9 @@ class ModelService(
         dataset: Dataset
     ): ResponseEntity<Unit> {
         val rawModel = if (model.isQsarToolboxModel()) {
-            byteArrayOf()
+            null
         } else {
-            if (storageService.readRawModelMetadata(model).contentLength() > FIVE_MEGABYTES_IN_BYTES) {
+            if (storageService.readRawModelContentLength(model) > FIVE_MEGABYTES_IN_BYTES) {
                 null
             } else {
                 storageService.readRawModel(model)
