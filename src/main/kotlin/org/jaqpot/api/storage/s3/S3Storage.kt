@@ -145,9 +145,13 @@ class S3Storage(
         }
     }
 
-    override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
+    override fun getObjectContentLength(bucketName: String, keyName: String): Optional<Long> {
         val objectRequest = HeadObjectRequest.builder().bucket(bucketName).key(keyName).build()
 
-        return s3Client.headObject(objectRequest)
+        try {
+            return Optional.of(s3Client.headObject(objectRequest).contentLength())
+        } catch (e: NoSuchKeyException) {
+            return Optional.empty()
+        }
     }
 }

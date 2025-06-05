@@ -1,74 +1,36 @@
 package org.jaqpot.api.storage
 
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jaqpot.api.error.JaqpotRuntimeException
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 @Profile("local")
 @Service
 class LocalStorage : Storage {
-    // Structure: Map<BucketName, Map<KeyName, StorageObject>>
-    private val storage = ConcurrentHashMap<String, ConcurrentHashMap<String, StorageObject>>()
-
-    data class StorageObject(
-        val data: ByteArray,
-        val contentType: String = "application/octet-stream",
-        val metadata: Map<String, String> = emptyMap()
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as StorageObject
-
-            if (!data.contentEquals(other.data)) return false
-            if (contentType != other.contentType) return false
-            if (metadata != other.metadata) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = data.contentHashCode()
-            result = 31 * result + contentType.hashCode()
-            result = 31 * result + metadata.hashCode()
-            return result
-        }
+    companion object {
+        private val logger = KotlinLogging.logger {}
     }
 
     override fun getObject(bucketName: String, keyName: String): Optional<ByteArray> {
-        return Optional.ofNullable(
-            storage[bucketName]?.get(keyName)?.data
-        )
-    }
-
-    override fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse {
-        return HeadObjectResponse.builder()
-            .contentLength(10)
-            .build()
+        logger.info { "Local storage: Simulating S3 failure for getObject, returning empty Optional to fall back to database storage" }
+        return Optional.empty()
     }
 
     override fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray> {
-        return storage[bucketName]?.let { bucket ->
-            keyNames.mapNotNull { keyName ->
-                bucket[keyName]?.let { obj ->
-                    keyName to obj.data
-                }
-            }.toMap()
-        } ?: emptyMap()
+        logger.info { "Local storage: Simulating S3 failure for getObjects, returning empty map to fall back to database storage" }
+        return emptyMap()
     }
 
     override fun listObjects(bucketName: String, prefix: String): List<String> {
-        return storage[bucketName]?.keys
-            ?.filter { it.startsWith(prefix) }
-            ?.toList()
-            ?: emptyList()
+        logger.info { "Local storage: Simulating S3 failure for listObjects, returning empty list" }
+        return emptyList()
     }
 
     override fun putObject(bucketName: String, keyName: String, obj: ByteArray, metadata: Map<String, String>) {
-        putObject(bucketName, keyName, "application/octet-stream", obj, metadata)
+        logger.info { "Local storage: Simulating S3 failure for putObject, data will remain in database" }
+        throw JaqpotRuntimeException("Failing so object can be stored in database")
     }
 
     override fun putObject(
@@ -78,28 +40,22 @@ class LocalStorage : Storage {
         obj: ByteArray,
         metadata: Map<String, String>
     ) {
-        val bucket = storage.computeIfAbsent(bucketName) { ConcurrentHashMap() }
-        bucket[keyName] = StorageObject(obj, contentType, metadata)
+        logger.info { "Local storage: Simulating S3 failure for putObject with content type, data will remain in database" }
+        throw JaqpotRuntimeException("Failing so object can be stored in database")
     }
 
     override fun deleteObject(bucketName: String, keyName: String) {
-        storage[bucketName]?.remove(keyName)
+        logger.info { "Local storage: Simulating S3 failure for deleteObject" }
+        // Do nothing
     }
 
     override fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String>): String {
-        TODO("Not yet implemented")
+        logger.info { "Local storage: Returning dummy pre-signed URL for local development" }
+        return "local://$bucketName/$keyName"
     }
 
-    // Additional helper methods for testing
-    fun clearStorage() {
-        storage.clear()
-    }
-
-    fun getBuckets(): Set<String> {
-        return storage.keys
-    }
-
-    fun getObjectContentType(bucketName: String, keyName: String): String? {
-        return storage[bucketName]?.get(keyName)?.contentType
+    override fun getObjectContentLength(bucketName: String, keyName: String): Optional<Long> {
+        logger.info { "Local storage: Simulating S3 failure for getObjectMetadata" }
+        return Optional.of(10L)
     }
 }
