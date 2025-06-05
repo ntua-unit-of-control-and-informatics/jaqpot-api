@@ -28,8 +28,7 @@ class AWSS3Config(
 ) {
     @Bean("s3Client")
     fun s3Client(awsConfig: AWSConfig): S3Client {
-        val useWebIdentity = System.getenv("AWS_WEB_IDENTITY_TOKEN_FILE").isNullOrBlank().not()
-        val credentialsProvider = if (useWebIdentity && !skipWebIdentity) {
+        val credentialsProvider = if (!skipWebIdentity) {
             WebIdentityTokenFileCredentialsProvider.create()
         } else {
             DefaultCredentialsProvider.create()
