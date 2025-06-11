@@ -80,7 +80,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
 
     // Swagger
-    implementation(libs.swagger.annotations)
     implementation(libs.springdoc.openapi)
 
     // Lombok
