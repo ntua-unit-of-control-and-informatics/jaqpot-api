@@ -8,14 +8,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `./gradlew build` - Build the project
 - `./gradlew bootRun` - Run the application locally
 - `./gradlew test` - Run all tests
+- `./gradlew test --tests "ClassName"` - Run specific test class
+- `./gradlew test --tests "ClassName.methodName"` - Run specific test method
 - `./gradlew bootJar` - Create executable JAR (produces `jaqpot-api.jar`)
 - `./gradlew bootBuildImage` - Create Docker image (`upcintua/jaqpot-api`)
 
 ### Testing
 - Tests use Testcontainers with PostgreSQL and Keycloak
 - Integration tests extend `AbstractIntegrationTest` which provides container setup
-- Use RestAssured for API testing
+- Use RestAssured for API testing with predefined RequestSpecification
 - MockK for Kotlin mocking
+- Test containers automatically start PostgreSQL (alpine3.19) and Keycloak (24.0.3)
+- Test realm configuration imported from `/test-realm-export.json`
 
 ## Architecture Overview
 
@@ -62,3 +66,17 @@ This is a Spring Boot REST API for machine learning model management and predict
 - Keycloak realm: `jaqpot-local` for development
 - Database connection defaults to `localhost.jaqpot.org:5432`
 - Multiple service endpoints configured for different runtime environments
+
+## Development Workflow
+- API changes require updating `src/main/resources/openapi.yaml` first
+- Generated code appears in `build/openapi/` and is automatically included in compilation
+- Service implementations use the delegate pattern to interface with generated controllers
+- Authorization logic is separated into dedicated classes in `service.authorization` package
+- Rate limiting applied via `@WithRateLimitProtectionByUser` annotation
+
+## Key Implementation Patterns
+- **Service Layer**: Business logic in `@Service` classes that implement generated API delegates
+- **Authorization**: Method-level security with `@PreAuthorize` and custom authorization logic classes
+- **Caching**: Strategic caching with `@Cacheable` and custom key generators
+- **Storage**: Pluggable storage abstraction supporting local filesystem and S3
+- **Error Handling**: Centralized via `ExceptionControllerAdvice` with structured error responses

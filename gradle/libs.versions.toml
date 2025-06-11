@@ -12,8 +12,7 @@ slf4j = "2.0.13"
 kotlinLogging = "6.0.9"
 logbackJson = "0.1.5"
 janino = "3.1.12"
-swaggerAnnotations = "2.2.19"
-springdocOpenapi = "2.5.0"
+springdocOpenapi = "2.7.0"
 flywayCore = "10.12.0"
 keycloak = "24.0.5"
 bucket4j = "8.10.1"
@@ -71,7 +70,6 @@ jackson-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-modul
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
 
 # Swagger
-swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swaggerAnnotations" }
 springdoc-openapi = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdocOpenapi" }
 
 # Lombok
