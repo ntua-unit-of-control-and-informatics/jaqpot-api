@@ -167,7 +167,7 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "${modelDto.type} is not supported for creation.")
         }
 
-        if (modelDto.rawModel == null || modelDto.rawModel.isEmpty()) {
+        if ((modelDto.rawModel == null || modelDto.rawModel.isEmpty()) && modelDto.type != ModelTypeDto.DOCKER) {
             throw IllegalArgumentException("rawModel is required for model uploads.")
         }
 
