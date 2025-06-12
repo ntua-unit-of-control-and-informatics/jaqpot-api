@@ -47,7 +47,7 @@ class RESTPredictionService(
             val results: List<Any> = response.predictions
             storeDatasetSuccess(dataset, results, datasetRepository, storageService)
         } catch (e: Throwable) {
-            logger.warn(e) { "Prediction failed for dataset with id ${dataset.id}" }
+            logger.warn(e) { "Prediction failed for dataset with id ${dataset.id} and model id ${predictionModelDto.id}" }
             storeDatasetFailure(dataset, e, datasetRepository, storageService)
         }
     }
