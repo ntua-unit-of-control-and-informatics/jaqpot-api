@@ -109,18 +109,6 @@ class ModelService(
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('admin', 'upci')")
-    override fun getAllModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val modelsPage = modelRepository.findAll(pageable)
-        val modelIdToUserMap = modelsPage.content.associateBy(
-            { it.id!! },
-            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
-        )
-
-        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
-    }
-
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
