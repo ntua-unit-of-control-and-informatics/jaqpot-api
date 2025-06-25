@@ -44,10 +44,26 @@ class AdminService(
         logger.info { "Admin user ${authenticationFacade.userId} requested users page $page with size $size" }
         
         try {
-            val users = keycloakUserService.getUsersPaginated(page, size)
+            // Parse sort parameters
+            val (sortBy, sortOrder) = if (!sort.isNullOrEmpty()) {
+                val sortParam = sort.first()
+                val parts = sortParam.split("|")
+                if (parts.size == 2) {
+                    Pair(parts[0], parts[1])
+                } else {
+                    Pair("createdTimestamp", "desc")
+                }
+            } else {
+                Pair("createdTimestamp", "desc")
+            }
+            
+            val result = keycloakUserService.getUsersPaginated(page, size, sortBy, sortOrder)
+            
+            val totalPages = (result.totalCount + size - 1) / size
+            val numberOfElements = result.users.size
             
             val response = GetUsers200ResponseDto(
-                content = users.map { userMapper.generateUserDto(it) },
+                content = result.users.map { userMapper.generateUserDto(it) },
                 pageable = org.jaqpot.api.model.GetUsers200ResponsePageableDto(
                     sort = org.jaqpot.api.model.GetUsers200ResponsePageableSortDto(
                         empty = sort.isNullOrEmpty(),
@@ -60,9 +76,9 @@ class AdminService(
                     unpaged = false,
                     paged = true
                 ),
-                last = (page + 1) * size >= users.size,
-                totalPages = (users.size + size - 1) / size,
-                totalElements = users.size,
+                last = page >= totalPages - 1,
+                totalPages = totalPages,
+                totalElements = result.totalCount,
                 propertySize = size,
                 number = page,
                 sort = org.jaqpot.api.model.GetUsers200ResponsePageableSortDto(
@@ -71,8 +87,8 @@ class AdminService(
                     unsorted = sort.isNullOrEmpty()
                 ),
                 first = page == 0,
-                numberOfElements = minOf(size, users.size - page * size),
-                empty = users.isEmpty()
+                numberOfElements = numberOfElements,
+                empty = result.users.isEmpty()
             )
             
             return ResponseEntity.ok(response)
