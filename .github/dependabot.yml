@@ -9,15 +9,13 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     target-branch: "main"
-    reviewers:
-      - "ntua-unit-of-control-and-informatics"
     labels:
       - "dependencies"
       - "gradle"
     commit-message:
       prefix: "deps"
       include: "scope"
-    
+
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
