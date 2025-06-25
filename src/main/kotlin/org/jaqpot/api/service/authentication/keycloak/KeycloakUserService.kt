@@ -54,4 +54,15 @@ class KeycloakUserService(private val keycloakConfig: KeycloakConfig, private va
 
     }
 
+    fun getUsersPaginated(firstResult: Int, maxResults: Int): List<UserRepresentation> {
+        try {
+            return keycloakAdminClient.realm(keycloakConfig.realm).users()
+                .list(firstResult * maxResults, maxResults)
+                .sortedByDescending { it.createdTimestamp }
+        } catch (e: Exception) {
+            logger.error(e) { "Could not retrieve paginated users" }
+            return emptyList()
+        }
+    }
+
 }

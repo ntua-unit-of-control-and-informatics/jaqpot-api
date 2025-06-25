@@ -2,6 +2,8 @@ openapi: 3.0.3
 tags:
   - name: model
     description: model operations
+  - name: admin
+    description: administrative operations
 x-stoplight:
   id: 4vb63zck1yndo
 info:
@@ -35,6 +37,194 @@ paths:
           description: JWT is valid
         '401':
           description: Unauthorized
+  /v1/admin/users:
+    get:
+      x-spring-paginated: true
+      summary: Get paginated users for admins
+      description: Retrieve a paginated list of users ordered by signup date descending. Only accessible by admin or UPCI users.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - admin
+      operationId: getUsers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "createdAt|desc" ]
+      responses:
+        '200':
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  pageable:
+                    type: object
+                    properties:
+                      sort:
+                        type: object
+                        properties:
+                          empty:
+                            type: boolean
+                          sorted:
+                            type: boolean
+                          unsorted:
+                            type: boolean
+                      offset:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      pageNumber:
+                        type: integer
+                      unpaged:
+                        type: boolean
+                      paged:
+                        type: boolean
+                  last:
+                    type: boolean
+                  totalPages:
+                    type: integer
+                  totalElements:
+                    type: integer
+                  size:
+                    type: integer
+                  number:
+                    type: integer
+                  sort:
+                    type: object
+                    properties:
+                      empty:
+                        type: boolean
+                      sorted:
+                        type: boolean
+                      unsorted:
+                        type: boolean
+                  first:
+                    type: boolean
+                  numberOfElements:
+                    type: integer
+                  empty:
+                    type: boolean
+        '401':
+          description: Unauthorized - user must be authenticated as admin or UPCI user
+        '403':
+          description: Forbidden - insufficient privileges
+  /v1/admin/models:
+    get:
+      x-spring-paginated: true
+      summary: Get all models for admins
+      description: Retrieve a paginated list of all models in the system. Only accessible by admin or UPCI users.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - admin
+      operationId: getAllModels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "field1|asc", "field2|desc" ]
+      responses:
+        '200':
+          description: Paginated list of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelSummary'
+                  pageable:
+                    type: object
+                    properties:
+                      sort:
+                        type: object
+                        properties:
+                          empty:
+                            type: boolean
+                          sorted:
+                            type: boolean
+                          unsorted:
+                            type: boolean
+                      offset:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      pageNumber:
+                        type: integer
+                      unpaged:
+                        type: boolean
+                      paged:
+                        type: boolean
+                  last:
+                    type: boolean
+                  totalPages:
+                    type: integer
+                  totalElements:
+                    type: integer
+                  size:
+                    type: integer
+                  number:
+                    type: integer
+                  sort:
+                    type: object
+                    properties:
+                      empty:
+                        type: boolean
+                      sorted:
+                        type: boolean
+                      unsorted:
+                        type: boolean
+                  first:
+                    type: boolean
+                  numberOfElements:
+                    type: integer
+                  empty:
+                    type: boolean
+        '401':
+          description: Unauthorized - user must be authenticated as admin or UPCI user
+        '403':
+          description: Forbidden - insufficient privileges
   /v1/user/models:
     get:
       x-spring-paginated: true
@@ -88,57 +278,6 @@ paths:
         '400':
           description: Invalid input
   /v1/models:
-    get:
-      x-spring-paginated: true
-      summary: Get paginated models
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - model
-      operationId: getAllModels
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-            example: [ "field1|asc", "field2|desc" ]
-      responses:
-        '200':
-          description: Paginated list of models
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ModelSummary'
-                  totalElements:
-                    type: integer
-                  totalPages:
-                    type: integer
-                  pageSize:
-                    type: integer
-                  pageNumber:
-                    type: integer
-        '400':
-          description: Invalid input
     post:
       summary: Create a new model
       security:
