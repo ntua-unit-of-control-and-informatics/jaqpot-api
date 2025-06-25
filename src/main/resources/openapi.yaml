@@ -2772,6 +2772,11 @@ components:
           type: string
         canEdit:
           type: boolean
+        createdAt:
+          type: string
+          format: date-time
+          description: User signup date
+          readOnly: true
     UserSettings:
       type: object
       properties:

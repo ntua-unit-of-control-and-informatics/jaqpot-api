@@ -18,7 +18,13 @@ class UserMapper(
             lastName = userRepresentation.lastName,
             email = userRepresentation.email,
             emailVerified = userRepresentation.isEmailVerified,
-            avatarUrl = userSettingsService.getUserAvatar(userRepresentation.id)
+            avatarUrl = userSettingsService.getUserAvatar(userRepresentation.id),
+            createdAt = userRepresentation.createdTimestamp?.let { 
+                java.time.OffsetDateTime.ofInstant(
+                    java.time.Instant.ofEpochMilli(it), 
+                    java.time.ZoneOffset.UTC
+                ) 
+            }
         )
     }
 }
