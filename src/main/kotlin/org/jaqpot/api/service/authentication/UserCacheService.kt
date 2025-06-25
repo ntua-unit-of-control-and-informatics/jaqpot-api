@@ -18,12 +18,12 @@ class UserCacheService(
     private val userSettingsService: UserSettingsService
 ) : UserService {
 
-    private val usersCache: Cache<String, UserRepresentation> = Caffeine.newBuilder()
+    private val usersCache: Cache<String, UserRepresentation?> = Caffeine.newBuilder()
         .expireAfterWrite(4, TimeUnit.HOURS)
         .maximumSize(10_000)
         .build()
 
-    private val usernameCache: Cache<String, UserRepresentation> = Caffeine.newBuilder()
+    private val usernameCache: Cache<String, UserRepresentation?> = Caffeine.newBuilder()
         .expireAfterWrite(4, TimeUnit.HOURS)
         .maximumSize(10_000)
         .build()
