@@ -9,7 +9,12 @@ import org.jaqpot.api.service.authorization.GetModelAuthorizationLogic
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.storage.StorageService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.env.Environment
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.stereotype.Service
@@ -17,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.util.*
 
 /**
  * Service for local model development operations.
@@ -40,6 +46,15 @@ class LocalModelService {
     @Autowired
     private lateinit var getModelAuthorizationLogic: GetModelAuthorizationLogic
 
+    @Autowired
+    private lateinit var environment: Environment
+
+    @Value("\${server.port:8080}")
+    private lateinit var serverPort: String
+
+    @Value("\${server.servlet.context-path:}")
+    private lateinit var contextPath: String
+
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -58,38 +73,59 @@ class LocalModelService {
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60)
     fun getModelDownloadUrl(modelId: Long, expirationMinutes: Int): ResponseEntity<GetModelDownloadUrl200ResponseDto> {
-        logger.info { "Generating presigned download URL for model $modelId" }
+        logger.info { "Generating download URL for model $modelId (profile: ${environment.activeProfiles.contentToString()})" }
         
         val model = modelRepository.findById(modelId).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-        // Check if model is stored in S3 (not just in database)
-        val modelContentLength = try {
-            storageService.readRawModelContentLength(model)
-        } catch (e: Exception) {
-            logger.warn(e) { "Model file not found in storage for model $modelId" }
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model file not found in storage")
-        }
-
+        val isLocalProfile = environment.activeProfiles.contains("local")
         val effectiveExpirationMinutes = expirationMinutes.coerceIn(1, 60)
-        logger.debug { "Using expiration minutes: $effectiveExpirationMinutes for model $modelId" }
-        
-        try {
-            val downloadUrl = storageService.getPreSignedModelDownloadUrl(model, effectiveExpirationMinutes)
-            val expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(effectiveExpirationMinutes.toLong())
+        val expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(effectiveExpirationMinutes.toLong())
+
+        return if (isLocalProfile && model.rawModel != null) {
+            // Local profile: Return URL that points to our direct download endpoint
+            val localDownloadUrl = "http://localhost.jaqpot.org:$serverPort$contextPath/v1/models/$modelId/download/local"
+            logger.info { "Generated local download URL for model $modelId: $localDownloadUrl" }
             
-            logger.info { "Successfully generated presigned URL for model $modelId, expires at $expiresAt" }
-            
-            return ResponseEntity.ok(
+            ResponseEntity.ok(
                 GetModelDownloadUrl200ResponseDto(
-                    downloadUrl = URI(downloadUrl),
+                    downloadUrl = URI(localDownloadUrl),
                     expiresAt = expiresAt
                 )
             )
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to generate presigned download URL for model $modelId" }
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate download URL")
+        } else {
+            // Production profile or no model in database: Use S3 presigned URL
+            try {
+                val modelContentLength = storageService.readRawModelContentLength(model)
+                val downloadUrl = storageService.getPreSignedModelDownloadUrl(model, effectiveExpirationMinutes)
+                
+                logger.info { "Successfully generated S3 presigned URL for model $modelId, expires at $expiresAt" }
+                
+                ResponseEntity.ok(
+                    GetModelDownloadUrl200ResponseDto(
+                        downloadUrl = URI(downloadUrl),
+                        expiresAt = expiresAt
+                    )
+                )
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to generate S3 presigned download URL for model $modelId" }
+                
+                if (isLocalProfile && model.rawModel != null) {
+                    // Fallback to local endpoint even in error case for local profile
+                    val localDownloadUrl = "http://localhost.jaqpot.org:$serverPort$contextPath/v1/models/$modelId/download/local"
+                    logger.info { "Fallback to local download URL for model $modelId: $localDownloadUrl" }
+                    
+                    ResponseEntity.ok(
+                        GetModelDownloadUrl200ResponseDto(
+                            downloadUrl = URI(localDownloadUrl),
+                            expiresAt = expiresAt
+                        )
+                    )
+                } else {
+                    throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model file not found in storage")
+                }
+            }
         }
     }
 
@@ -107,43 +143,63 @@ class LocalModelService {
     @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
     @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60)
     fun getModelPreprocessorDownloadUrl(modelId: Long, expirationMinutes: Int): ResponseEntity<GetModelPreprocessorDownloadUrl200ResponseDto> {
-        logger.info { "Generating presigned preprocessor download URL for model $modelId" }
+        logger.info { "Generating preprocessor download URL for model $modelId (profile: ${environment.activeProfiles.contentToString()})" }
         
         val model = modelRepository.findById(modelId).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-        // Check if preprocessor exists
-        val preprocessor = try {
-            storageService.readRawPreprocessor(model)
-        } catch (e: Exception) {
-            logger.debug(e) { "Preprocessor check failed for model $modelId" }
-            null
-        }
-
-        if (preprocessor == null) {
-            logger.warn { "Preprocessor not found for model $modelId" }
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Preprocessor not found for model $modelId")
-        }
-
+        val isLocalProfile = environment.activeProfiles.contains("local")
         val effectiveExpirationMinutes = expirationMinutes.coerceIn(1, 60)
-        logger.debug { "Using expiration minutes: $effectiveExpirationMinutes for preprocessor of model $modelId" }
-        
-        try {
-            val downloadUrl = storageService.getPreSignedPreprocessorDownloadUrl(model, effectiveExpirationMinutes)
-            val expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(effectiveExpirationMinutes.toLong())
+        val expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(effectiveExpirationMinutes.toLong())
+
+        return if (isLocalProfile && model.rawPreprocessor != null) {
+            // Local profile: Return URL that points to our direct download endpoint
+            val localDownloadUrl = "http://localhost.jaqpot.org:$serverPort$contextPath/v1/models/$modelId/preprocessor/download/local"
+            logger.info { "Generated local preprocessor download URL for model $modelId: $localDownloadUrl" }
             
-            logger.info { "Successfully generated presigned preprocessor URL for model $modelId, expires at $expiresAt" }
-            
-            return ResponseEntity.ok(
+            ResponseEntity.ok(
                 GetModelPreprocessorDownloadUrl200ResponseDto(
-                    downloadUrl = URI(downloadUrl),
+                    downloadUrl = URI(localDownloadUrl),
                     expiresAt = expiresAt
                 )
             )
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to generate presigned preprocessor download URL for model $modelId" }
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate download URL")
+        } else {
+            // Production profile or no preprocessor in database: Use S3 presigned URL
+            try {
+                val preprocessor = storageService.readRawPreprocessor(model)
+                if (preprocessor == null) {
+                    throw ResponseStatusException(HttpStatus.NOT_FOUND, "Preprocessor not found for model $modelId")
+                }
+
+                val downloadUrl = storageService.getPreSignedPreprocessorDownloadUrl(model, effectiveExpirationMinutes)
+                
+                logger.info { "Successfully generated S3 presigned preprocessor URL for model $modelId, expires at $expiresAt" }
+                
+                ResponseEntity.ok(
+                    GetModelPreprocessorDownloadUrl200ResponseDto(
+                        downloadUrl = URI(downloadUrl),
+                        expiresAt = expiresAt
+                    )
+                )
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to generate S3 presigned preprocessor download URL for model $modelId" }
+                
+                if (isLocalProfile && model.rawPreprocessor != null) {
+                    // Fallback to local endpoint for local profile
+                    val localDownloadUrl = "http://localhost.jaqpot.org:$serverPort$contextPath/v1/models/$modelId/preprocessor/download/local"
+                    logger.info { "Fallback to local preprocessor download URL for model $modelId: $localDownloadUrl" }
+                    
+                    ResponseEntity.ok(
+                        GetModelPreprocessorDownloadUrl200ResponseDto(
+                            downloadUrl = URI(localDownloadUrl),
+                            expiresAt = expiresAt
+                        )
+                    )
+                } else {
+                    throw ResponseStatusException(HttpStatus.NOT_FOUND, "Preprocessor not found for model $modelId")
+                }
+            }
         }
     }
 
@@ -232,5 +288,101 @@ class LocalModelService {
         logger.info { "Compatibility check for model $modelId: compatible=${compatibility["isCompatible"]}" }
         
         return ResponseEntity.ok(compatibility)
+    }
+
+    /**
+     * Download model file directly from database (local profile only).
+     * 
+     * This endpoint serves model files directly from the database for local development
+     * when the local profile is active and the model is stored in the database.
+     */
+    @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
+    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60)
+    fun downloadModelFromDatabase(modelId: Long): ResponseEntity<ByteArrayResource> {
+        logger.info { "Direct model download request for model $modelId (profile: ${environment.activeProfiles.contentToString()})" }
+        
+        val isLocalProfile = environment.activeProfiles.contains("local")
+        if (!isLocalProfile) {
+            logger.warn { "Direct model download attempted outside local profile for model $modelId" }
+            throw ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Direct database download only available in local profile")
+        }
+        
+        val model = modelRepository.findById(modelId).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+        }
+
+        if (model.rawModel == null) {
+            logger.warn { "Model $modelId has no raw model data stored in database" }
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model data not stored in database")
+        }
+
+        try {
+            val modelBytes = Base64.getDecoder().decode(model.rawModel)
+            val resource = ByteArrayResource(modelBytes)
+            
+            val headers = HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_OCTET_STREAM
+                setContentDispositionFormData("attachment", "model_${modelId}.onnx")
+                contentLength = modelBytes.size.toLong()
+            }
+            
+            logger.info { "Successfully serving model $modelId from database (${modelBytes.size} bytes)" }
+            
+            return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource)
+                
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to decode or serve model $modelId from database" }
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to serve model from database")
+        }
+    }
+
+    /**
+     * Download preprocessor file directly from database (local profile only).
+     * 
+     * This endpoint serves preprocessor files directly from the database for local development
+     * when the local profile is active and the preprocessor is stored in the database.
+     */
+    @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
+    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60)
+    fun downloadPreprocessorFromDatabase(modelId: Long): ResponseEntity<ByteArrayResource> {
+        logger.info { "Direct preprocessor download request for model $modelId (profile: ${environment.activeProfiles.contentToString()})" }
+        
+        val isLocalProfile = environment.activeProfiles.contains("local")
+        if (!isLocalProfile) {
+            logger.warn { "Direct preprocessor download attempted outside local profile for model $modelId" }
+            throw ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Direct database download only available in local profile")
+        }
+        
+        val model = modelRepository.findById(modelId).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+        }
+
+        if (model.rawPreprocessor == null) {
+            logger.warn { "Model $modelId has no preprocessor data stored in database" }
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Preprocessor data not stored in database")
+        }
+
+        try {
+            val preprocessorBytes = Base64.getDecoder().decode(model.rawPreprocessor)
+            val resource = ByteArrayResource(preprocessorBytes)
+            
+            val headers = HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_OCTET_STREAM
+                setContentDispositionFormData("attachment", "preprocessor_${modelId}.pkl")
+                contentLength = preprocessorBytes.size.toLong()
+            }
+            
+            logger.info { "Successfully serving preprocessor for model $modelId from database (${preprocessorBytes.size} bytes)" }
+            
+            return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource)
+                
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to decode or serve preprocessor for model $modelId from database" }
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to serve preprocessor from database")
+        }
     }
 }

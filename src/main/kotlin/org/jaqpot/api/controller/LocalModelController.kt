@@ -13,6 +13,9 @@ import org.jaqpot.api.service.model.LocalModelService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 
 /**
  * REST controller for local model development operations.
@@ -115,5 +118,47 @@ class LocalModelController {
         @PathVariable modelId: Long
     ): ResponseEntity<Map<String, Any>> {
         return localModelService.checkLocalInferenceCompatibility(modelId)
+    }
+
+    @Operation(
+        summary = "Download model directly from database (local profile only)",
+        description = "Download the ONNX model file directly from database storage for local development"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Model file downloaded successfully"),
+            ApiResponse(responseCode = "404", description = "Model not found or not stored in database"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden"),
+            ApiResponse(responseCode = "405", description = "Method not allowed - local profile required")
+        ]
+    )
+    @GetMapping("/{modelId}/download/local")
+    fun downloadModelFromDatabase(
+        @Parameter(description = "The ID of the model to download", required = true)
+        @PathVariable modelId: Long
+    ): ResponseEntity<ByteArrayResource> {
+        return localModelService.downloadModelFromDatabase(modelId)
+    }
+
+    @Operation(
+        summary = "Download preprocessor directly from database (local profile only)",
+        description = "Download the preprocessor file directly from database storage for local development"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Preprocessor file downloaded successfully"),
+            ApiResponse(responseCode = "404", description = "Model or preprocessor not found in database"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden"),
+            ApiResponse(responseCode = "405", description = "Method not allowed - local profile required")
+        ]
+    )
+    @GetMapping("/{modelId}/preprocessor/download/local")
+    fun downloadPreprocessorFromDatabase(
+        @Parameter(description = "The ID of the model to download preprocessor for", required = true)
+        @PathVariable modelId: Long
+    ): ResponseEntity<ByteArrayResource> {
+        return localModelService.downloadPreprocessorFromDatabase(modelId)
     }
 }
