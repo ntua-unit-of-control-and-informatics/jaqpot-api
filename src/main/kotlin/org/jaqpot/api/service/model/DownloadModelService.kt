@@ -25,17 +25,17 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 
 /**
- * Service for local model development operations.
+ * Service for model download operations.
  * 
  * This service provides functionality for downloading models and preprocessors
- * for local development and testing using presigned URLs.
+ * for local development and testing using presigned URLs or direct database access.
  * 
  * Separated from ModelService to keep concerns focused:
  * - ModelService: Core model CRUD operations
- * - LocalModelService: Local development support (downloads, testing)
+ * - DownloadModelService: Model download support (presigned URLs, local downloads)
  */
 @Service
-class LocalModelService {
+class DownloadModelService {
 
     @Autowired
     private lateinit var modelRepository: ModelRepository

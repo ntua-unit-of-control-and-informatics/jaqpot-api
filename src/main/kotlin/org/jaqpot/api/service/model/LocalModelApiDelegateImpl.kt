@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 /**
  * Implementation of LocalModelApiDelegate following the OpenAPI-first architecture.
  * 
- * This service delegates LocalModel API operations to the LocalModelService,
+ * This service delegates LocalModel API operations to the DownloadModelService,
  * maintaining consistency with the established pattern where:
  * - Controllers are auto-generated from OpenAPI specs
  * - Business logic is implemented in Service classes
@@ -23,16 +23,16 @@ import org.springframework.stereotype.Service
  * The direct database download endpoints (for local profile) that were in the manual controller
  * are not yet included in the OpenAPI spec and thus not available through this delegate.
  * These endpoints (/v1/models/{modelId}/download/local and /v1/models/{modelId}/preprocessor/download/local)
- * remain accessible through the LocalModelService if needed in the future.
+ * remain accessible through the DownloadModelService if needed in the future.
  */
 @Service
 class LocalModelApiDelegateImpl : LocalModelApiDelegate {
 
     @Autowired
-    private lateinit var localModelService: LocalModelService
+    private lateinit var downloadModelService: DownloadModelService
 
     override fun checkLocalInferenceCompatibility(modelId: kotlin.Long): ResponseEntity<CheckLocalInferenceCompatibility200ResponseDto> {
-        val result = localModelService.checkLocalInferenceCompatibility(modelId)
+        val result = downloadModelService.checkLocalInferenceCompatibility(modelId)
         
         // Convert from generic Map<String, Any> to specific DTO
         val compatibility = result.body?.let { data ->
@@ -57,11 +57,11 @@ class LocalModelApiDelegateImpl : LocalModelApiDelegate {
         modelId: kotlin.Long,
         expirationMinutes: kotlin.Int
     ): ResponseEntity<GetModelDownloadUrl200ResponseDto> {
-        return localModelService.getModelDownloadUrl(modelId, expirationMinutes)
+        return downloadModelService.getModelDownloadUrl(modelId, expirationMinutes)
     }
 
     override fun getModelMetadataForLocal(modelId: kotlin.Long): ResponseEntity<ModelDto> {
-        val result = localModelService.getModelMetadataForLocal(modelId)
+        val result = downloadModelService.getModelMetadataForLocal(modelId)
         
         // Convert Model entity to ModelDto using the mapper
         val modelDto = result.body?.toDto()
@@ -73,6 +73,6 @@ class LocalModelApiDelegateImpl : LocalModelApiDelegate {
         modelId: kotlin.Long,
         expirationMinutes: kotlin.Int
     ): ResponseEntity<GetModelPreprocessorDownloadUrl200ResponseDto> {
-        return localModelService.getModelPreprocessorDownloadUrl(modelId, expirationMinutes)
+        return downloadModelService.getModelPreprocessorDownloadUrl(modelId, expirationMinutes)
     }
 }
