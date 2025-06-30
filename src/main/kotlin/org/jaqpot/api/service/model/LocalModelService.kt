@@ -9,12 +9,7 @@ import org.jaqpot.api.service.authorization.GetModelAuthorizationLogic
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.storage.StorageService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
-import org.springframework.core.io.ByteArrayResource
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.stereotype.Service
@@ -22,7 +17,12 @@ import org.springframework.web.server.ResponseStatusException
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.util.*
+import org.springframework.core.env.Environment
+import org.springframework.beans.factory.annotation.Value
+import java.util.Base64
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 
 /**
  * Service for local model development operations.
