@@ -379,6 +379,10 @@ class StorageService(
         return this.storage.getPreSignedDownloadUrl(awsS3Config.preprocessorsBucketName, getModelStorageKey(model), expirationMinutes)
     }
 
+    fun getPreSignedDoaDownloadUrl(doa: Doa, expirationMinutes: Int = 10): String {
+        return this.storage.getPreSignedDownloadUrl(awsS3Config.doasBucketName, getDoaStorageKey(doa), expirationMinutes)
+    }
+
     private fun getUserAvatarStorageKey(userId: String, extension: String): String {
         return "avatars/${userId}.$extension"
     }
