@@ -2,14 +2,14 @@ package org.jaqpot.api.service.model
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.ModelDownloadApiDelegate
-import org.jaqpot.api.model.GetModelDownloadUrl200ResponseDto
-import org.jaqpot.api.model.GetModelPreprocessorDownloadUrl200ResponseDto
+import org.jaqpot.api.model.GetModelDownloadUrls200ResponseDoaUrlsInnerDto
+import org.jaqpot.api.model.GetModelDownloadUrls200ResponseDto
 import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.storage.StorageService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PostAuthorize
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.net.URI
@@ -32,99 +32,88 @@ class DownloadModelService(
     private val storageService: StorageService,
 ) : ModelDownloadApiDelegate {
 
-
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
     /**
-     * Get a presigned URL to download the ONNX model file for local inference.
+     * Get all presigned download URLs for model assets (model, preprocessor, DOAs).
      *
-     * This endpoint enables local model development by providing secure, time-limited
-     * download URLs for model files stored in S3.
+     * This endpoint enables comprehensive model download by providing secure, time-limited
+     * download URLs for all available model assets stored in S3.
      *
-     * @param modelId The ID of the model to get download URL for
+     * @param modelId The ID of the model to get download URLs for
      * @param expirationMinutes URL expiration time in minutes (default 10, max 60)
-     * @return Presigned download URL with expiration timestamp
+     * @return Presigned download URLs for all available model assets
      */
-    @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
-    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60)
-    override fun getModelDownloadUrl(
+    @PreAuthorize("@downloadModelAuthorizationLogic.decide(#root, #modelId)")
+    @WithRateLimitProtectionByUser(limit = 5, intervalInSeconds = 3600)
+    override fun getModelDownloadUrls(
         modelId: Long,
         expirationMinutes: Int
-    ): ResponseEntity<GetModelDownloadUrl200ResponseDto> {
-        logger.info { "Generating S3 presigned download URL for model $modelId" }
+    ): ResponseEntity<GetModelDownloadUrls200ResponseDto> {
+        logger.info { "Generating S3 presigned download URLs for model $modelId" }
 
         val model = modelRepository.findById(modelId).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
         }
 
-        val effectiveExpirationMinutes = expirationMinutes.coerceIn(1, 60)
+        val effectiveExpirationMinutes = expirationMinutes.coerceIn(1, 10)
         val expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(effectiveExpirationMinutes.toLong())
 
+        // Generate model download URL
+        var modelUrl: URI? = null
         try {
             val downloadUrl = storageService.getPreSignedModelDownloadUrl(model, effectiveExpirationMinutes)
-
-            logger.info { "Successfully generated S3 presigned URL for model $modelId, expires at $expiresAt" }
-
-            return ResponseEntity.ok(
-                GetModelDownloadUrl200ResponseDto(
-                    downloadUrl = URI(downloadUrl),
-                    expiresAt = expiresAt
-                )
-            )
+            modelUrl = URI(downloadUrl)
+            logger.debug { "Generated S3 presigned model URL for model $modelId" }
         } catch (e: Exception) {
-            logger.error(e) { "Failed to generate S3 presigned download URL for model $modelId" }
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model file not found in storage")
-        }
-    }
-
-    /**
-     * Get a presigned URL to download the preprocessor file for local inference.
-     *
-     * This endpoint provides access to preprocessing pipelines stored with models,
-     * enabling local development workflows that require the same preprocessing
-     * as production inference.
-     *
-     * @param modelId The ID of the model to get preprocessor download URL for
-     * @param expirationMinutes URL expiration time in minutes (default 10, max 60)
-     * @return Presigned download URL with expiration timestamp
-     */
-    @PostAuthorize("@getModelAuthorizationLogic.decide(#root)")
-    @WithRateLimitProtectionByUser(limit = 30, intervalInSeconds = 60)
-    override fun getModelPreprocessorDownloadUrl(
-        modelId: Long,
-        expirationMinutes: Int
-    ): ResponseEntity<GetModelPreprocessorDownloadUrl200ResponseDto> {
-        logger.info { "Generating S3 presigned preprocessor download URL for model $modelId" }
-
-        val model = modelRepository.findById(modelId).orElseThrow {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
+            logger.warn(e) { "Failed to generate S3 presigned model download URL for model $modelId" }
         }
 
-        val effectiveExpirationMinutes = expirationMinutes.coerceIn(1, 60)
-        val expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(effectiveExpirationMinutes.toLong())
-
+        // Generate preprocessor download URL
+        var preprocessorUrl: URI? = null
         try {
             val preprocessor = storageService.readRawPreprocessor(model)
-            if (preprocessor == null) {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Preprocessor not found for model $modelId")
+            if (preprocessor != null) {
+                val downloadUrl = storageService.getPreSignedPreprocessorDownloadUrl(model, effectiveExpirationMinutes)
+                preprocessorUrl = URI(downloadUrl)
+                logger.debug { "Generated S3 presigned preprocessor URL for model $modelId" }
             }
-
-            val downloadUrl = storageService.getPreSignedPreprocessorDownloadUrl(model, effectiveExpirationMinutes)
-
-            logger.info { "Successfully generated S3 presigned preprocessor URL for model $modelId, expires at $expiresAt" }
-
-            return ResponseEntity.ok(
-                GetModelPreprocessorDownloadUrl200ResponseDto(
-                    downloadUrl = URI(downloadUrl),
-                    expiresAt = expiresAt
-                )
-            )
         } catch (e: Exception) {
-            logger.error(e) { "Failed to generate S3 presigned preprocessor download URL for model $modelId" }
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Preprocessor not found for model $modelId")
+            logger.warn(e) { "Failed to generate S3 presigned preprocessor download URL for model $modelId" }
         }
+
+        // Generate DOA download URLs
+        val doaUrls = mutableListOf<GetModelDownloadUrls200ResponseDoaUrlsInnerDto>()
+        for (doa in model.doas) {
+            try {
+                val doaRaw = storageService.readRawDoa(doa)
+                if (doaRaw.isNotEmpty()) {
+                    val downloadUrl = storageService.getPreSignedDoaDownloadUrl(doa, effectiveExpirationMinutes)
+                    doaUrls.add(
+                        GetModelDownloadUrls200ResponseDoaUrlsInnerDto(
+                            method = doa.method.name,
+                            downloadUrl = URI(downloadUrl)
+                        )
+                    )
+                    logger.debug { "Generated S3 presigned DOA URL for model $modelId, method ${doa.method.name}" }
+                }
+            } catch (e: Exception) {
+                logger.warn(e) { "Failed to generate S3 presigned DOA download URL for model $modelId, method ${doa.method.name}" }
+            }
+        }
+
+        logger.info { "Successfully generated S3 presigned URLs for model $modelId: model=${modelUrl != null}, preprocessor=${preprocessorUrl != null}, doas=${doaUrls.size}" }
+
+        return ResponseEntity.ok(
+            GetModelDownloadUrls200ResponseDto(
+                modelUrl = modelUrl,
+                preprocessorUrl = preprocessorUrl,
+                doaUrls = doaUrls.ifEmpty { null },
+                expiresAt = expiresAt
+            )
+        )
     }
 
 
