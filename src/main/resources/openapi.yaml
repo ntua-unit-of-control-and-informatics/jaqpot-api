@@ -4,6 +4,8 @@ tags:
     description: model operations
   - name: admin
     description: administrative operations
+  - name: model-download
+    description: model download operations using S3 presigned URLs
 x-stoplight:
   id: 4vb63zck1yndo
 info:
@@ -424,14 +426,14 @@ paths:
           description: Model is not currently archived
         '403':
           description: Insufficient permissions to unarchive the model
-  /v1/models/{modelId}/local/download-url:
+  /v1/models/{modelId}/download/url:
     get:
       summary: Get presigned download URL for model
-      description: Get a presigned URL to download the ONNX model file directly from S3 for local inference
+      description: Get a presigned URL to download the ONNX model file directly from S3.
       security:
         - bearerAuth: [ ]
       tags:
-        - local-model
+        - model-download
       operationId: getModelDownloadUrl
       parameters:
         - name: modelId
@@ -471,14 +473,14 @@ paths:
           description: Model not found or not stored in S3
         '403':
           description: Insufficient permissions to download the model
-  /v1/models/{modelId}/local/preprocessor/download-url:
+  /v1/models/{modelId}/preprocessor/download/url:
     get:
       summary: Get presigned download URL for model preprocessor
-      description: Get a presigned URL to download the model preprocessor file directly from S3 for local inference
+      description: Get a presigned URL to download the model preprocessor file directly from S3.
       security:
         - bearerAuth: [ ]
       tags:
-        - local-model
+        - model-download
       operationId: getModelPreprocessorDownloadUrl
       parameters:
         - name: modelId
@@ -518,97 +520,6 @@ paths:
           description: Model or preprocessor not found or not stored in S3
         '403':
           description: Insufficient permissions to download the model preprocessor
-  /v1/models/{modelId}/local/metadata:
-    get:
-      summary: Get model metadata for local development
-      description: Retrieve essential model information needed for local inference setup
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - local-model
-      operationId: getModelMetadataForLocal
-      parameters:
-        - name: modelId
-          in: path
-          required: true
-          description: The ID of the model to get metadata for
-          schema:
-            type: integer
-            format: int64
-            example: 0
-      responses:
-        '200':
-          description: Model metadata retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Model'
-        '404':
-          description: Model not found
-        '403':
-          description: Insufficient permissions to access the model
-  /v1/models/{modelId}/local/compatibility:
-    get:
-      summary: Check local inference compatibility
-      description: Validate that a model has all necessary components for local development
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - local-model
-      operationId: checkLocalInferenceCompatibility
-      parameters:
-        - name: modelId
-          in: path
-          required: true
-          description: The ID of the model to check compatibility for
-          schema:
-            type: integer
-            format: int64
-            example: 0
-      responses:
-        '200':
-          description: Compatibility information retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  modelId:
-                    type: integer
-                    format: int64
-                    description: The model ID
-                  hasOnnxModel:
-                    type: boolean
-                    description: Whether the model has an ONNX file available
-                  hasPreprocessor:
-                    type: boolean
-                    description: Whether the model has a preprocessor available
-                  modelType:
-                    type: string
-                    description: The type of the model
-                  isTypeSupported:
-                    type: boolean
-                    description: Whether the model type is supported for local inference
-                  independentFeatures:
-                    type: integer
-                    description: Number of independent features
-                  dependentFeatures:
-                    type: integer
-                    description: Number of dependent features
-                  isCompatible:
-                    type: boolean
-                    description: Whether the model is compatible with local inference
-                  modelSizeBytes:
-                    type: integer
-                    description: Model file size in bytes (if available)
-                  modelSizeMB:
-                    type: number
-                    format: float
-                    description: Model file size in megabytes (if available)
-        '404':
-          description: Model not found
-        '403':
-          description: Insufficient permissions to access the model
   /v1/user/shared-models:
     get:
       x-spring-paginated: true
