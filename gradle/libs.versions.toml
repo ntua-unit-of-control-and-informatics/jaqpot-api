@@ -23,7 +23,7 @@ ktor = "3.2.0"
 restAssured = "5.5.5"
 testcontainers = "1.21.3"
 testcontainersKeycloak = "3.3.1"
-mockk = "1.13.11"
+mockk = "1.14.4"
 
 [libraries]
 # Spring Boot dependencies
