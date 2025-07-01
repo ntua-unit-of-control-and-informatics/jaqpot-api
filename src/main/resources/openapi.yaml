@@ -4,6 +4,8 @@ tags:
     description: model operations
   - name: admin
     description: administrative operations
+  - name: model-download
+    description: model download operations using S3 presigned URLs
 x-stoplight:
   id: 4vb63zck1yndo
 info:
@@ -424,6 +426,100 @@ paths:
           description: Model is not currently archived
         '403':
           description: Insufficient permissions to unarchive the model
+  /v1/models/{modelId}/download/url:
+    get:
+      summary: Get presigned download URL for model
+      description: Get a presigned URL to download the ONNX model file directly from S3.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model-download
+      operationId: getModelDownloadUrl
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model to get download URL for
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - name: expirationMinutes
+          in: query
+          required: false
+          description: URL expiration time in minutes (default 10, max 60)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 60
+            default: 10
+      responses:
+        '200':
+          description: Presigned download URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  downloadUrl:
+                    type: string
+                    format: uri
+                    description: Presigned S3 URL for downloading the model
+                  expiresAt:
+                    type: string
+                    format: date-time
+                    description: URL expiration timestamp
+        '404':
+          description: Model not found or not stored in S3
+        '403':
+          description: Insufficient permissions to download the model
+  /v1/models/{modelId}/preprocessor/download/url:
+    get:
+      summary: Get presigned download URL for model preprocessor
+      description: Get a presigned URL to download the model preprocessor file directly from S3.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model-download
+      operationId: getModelPreprocessorDownloadUrl
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model to get preprocessor download URL for
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - name: expirationMinutes
+          in: query
+          required: false
+          description: URL expiration time in minutes (default 10, max 60)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 60
+            default: 10
+      responses:
+        '200':
+          description: Presigned download URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  downloadUrl:
+                    type: string
+                    format: uri
+                    description: Presigned S3 URL for downloading the preprocessor
+                  expiresAt:
+                    type: string
+                    format: date-time
+                    description: URL expiration timestamp
+        '404':
+          description: Model or preprocessor not found or not stored in S3
+        '403':
+          description: Insufficient permissions to download the model preprocessor
   /v1/user/shared-models:
     get:
       x-spring-paginated: true
