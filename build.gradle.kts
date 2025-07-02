@@ -79,6 +79,9 @@ dependencies {
     implementation(libs.jackson.kotlin)
     implementation(libs.kotlin.reflect)
 
+    // Gson
+    implementation(libs.gson)
+
     // Swagger
     implementation(libs.springdoc.openapi)
 
