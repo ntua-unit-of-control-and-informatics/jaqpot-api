@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
 import java.time.Duration
 import java.util.*
 
@@ -152,6 +153,26 @@ class S3Storage(
             return Optional.of(s3Client.headObject(objectRequest).contentLength())
         } catch (e: NoSuchKeyException) {
             return Optional.empty()
+        }
+    }
+
+    override fun getPreSignedDownloadUrl(bucketName: String, keyName: String, expirationMinutes: Int): String {
+        S3Presigner.create().use { presigner ->
+            val getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(keyName)
+                .build()
+
+            val presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(expirationMinutes.toLong()))
+                .getObjectRequest(getObjectRequest)
+                .build()
+
+            val presignedRequest = presigner.presignGetObject(presignRequest)
+            val myURL = presignedRequest.url().toString()
+            logger.info { "Presigned URL to download file from: $myURL. Authorizing user ${authenticationFacade.userId}" }
+            logger.info { "HTTP method: ${presignedRequest.httpRequest().method()}" }
+            return presignedRequest.url().toExternalForm()
         }
     }
 }
