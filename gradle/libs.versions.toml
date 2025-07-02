@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.2.0"
 spring-boot = "3.5.3"
-springDependencyManagement = "1.1.4"
+springDependencyManagement = "1.1.7"
 kotlinSpringPlugin = "2.2.0"
 openapiGenerator = "7.14.0"
 flyway = "11.10.0"
