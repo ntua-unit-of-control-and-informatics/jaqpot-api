@@ -21,6 +21,7 @@ awsSdk = "2.31.73"
 openaiClient = "4.0.1"
 ktor = "3.2.0"
 restAssured = "5.5.5"
+gson = "2.11.0"
 testcontainers = "1.21.3"
 testcontainersKeycloak = "3.3.1"
 mockk = "1.14.4"
@@ -99,6 +100,9 @@ aws-sts = { group = "software.amazon.awssdk", name = "sts" }
 # OpenAI
 openai-client = { group = "com.aallam.openai", name = "openai-client", version.ref = "openaiClient" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+
+# Gson
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # Testing
 rest-assured = { group = "io.rest-assured", name = "rest-assured", version.ref = "restAssured" }
