@@ -58,4 +58,9 @@ class LocalStorage : Storage {
         logger.info { "Local storage: Simulating S3 failure for getObjectMetadata" }
         return Optional.of(10L)
     }
+
+    override fun getPreSignedDownloadUrl(bucketName: String, keyName: String, expirationMinutes: Int): String {
+        logger.info { "Local storage: Returning dummy pre-signed download URL for local development" }
+        return "local://$bucketName/$keyName?expires=${System.currentTimeMillis() + (expirationMinutes * 60 * 1000)}"
+    }
 }

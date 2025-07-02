@@ -4,6 +4,8 @@ tags:
     description: model operations
   - name: admin
     description: administrative operations
+  - name: model-download
+    description: model download operations using S3 presigned URLs
 x-stoplight:
   id: 4vb63zck1yndo
 info:
@@ -424,6 +426,72 @@ paths:
           description: Model is not currently archived
         '403':
           description: Insufficient permissions to unarchive the model
+  /v1/models/{modelId}/download/urls:
+    get:
+      summary: Get all presigned download URLs for model assets
+      description: Get presigned URLs to download all available model assets (model file, preprocessor, and DOAs) directly from S3.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model-download
+      operationId: getModelDownloadUrls
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model to get download URLs for
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - name: expirationMinutes
+          in: query
+          required: false
+          description: URL expiration time in minutes (default 10, max 60)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 60
+            default: 10
+      responses:
+        '200':
+          description: Presigned download URLs generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  modelUrl:
+                    type: string
+                    format: uri
+                    description: Presigned S3 URL for downloading the model file
+                    nullable: true
+                  preprocessorUrl:
+                    type: string
+                    format: uri
+                    description: Presigned S3 URL for downloading the preprocessor
+                    nullable: true
+                  doaUrls:
+                    type: array
+                    description: Presigned S3 URLs for downloading DOA files
+                    items:
+                      type: object
+                      properties:
+                        method:
+                          type: string
+                          description: DOA method name
+                        downloadUrl:
+                          type: string
+                          format: uri
+                          description: Presigned S3 URL for downloading the DOA file
+                  expiresAt:
+                    type: string
+                    format: date-time
+                    description: URL expiration timestamp for all URLs
+        '404':
+          description: Model not found
+        '403':
+          description: Insufficient permissions to download the model
   /v1/user/shared-models:
     get:
       x-spring-paginated: true
