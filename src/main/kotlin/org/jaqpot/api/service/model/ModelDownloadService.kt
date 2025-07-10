@@ -27,7 +27,7 @@ import java.time.ZoneOffset
  * - DownloadModelService: Model download support (S3 presigned URLs)
  */
 @Service
-class DownloadModelService(
+class ModelDownloadService(
     private val modelRepository: ModelRepository,
     private val storageService: StorageService,
 ) : ModelDownloadApiDelegate {
