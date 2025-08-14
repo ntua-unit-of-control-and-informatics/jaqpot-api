@@ -26,8 +26,10 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Update version in build.gradle.kts
-        run: sed -i "s#{{VERSION_PLACEHOLDER}}#${{ steps.meta.outputs.version }}#g" build.gradle.kts
+      - name: Update version in build.gradle.kts and OpenAPI spec
+        run: |
+          sed -i "s#{{VERSION_PLACEHOLDER}}#${{ steps.meta.outputs.version }}#g" build.gradle.kts
+          sed -i "s#{{VERSION_PLACEHOLDER}}#${{ steps.meta.outputs.version }}#g" src/main/resources/openapi.yaml
 
       - name: Setup Java
         uses: actions/setup-java@v4
