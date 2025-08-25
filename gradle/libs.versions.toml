@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.10"
-spring-boot = "3.5.4"
+spring-boot = "3.5.5"
 springDependencyManagement = "1.1.7"
 kotlinSpringPlugin = "2.2.10"
 openapiGenerator = "7.14.0"
