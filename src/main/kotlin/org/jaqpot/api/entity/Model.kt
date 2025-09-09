@@ -110,6 +110,8 @@ class Model(
     @SQLRestriction("score_type = 'TRAIN'")
     var trainScores: List<Scores>? = null,
 
+    val supportsPredictionCaching: Boolean = false,
+
     val rPbpkOdeSolver: String? = null,
 
     @OneToOne(mappedBy = "model", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
