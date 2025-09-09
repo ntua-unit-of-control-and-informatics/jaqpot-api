@@ -13,7 +13,6 @@ enum class ModelType {
     // torch
     TORCH_ONNX,
     TORCH_GEOMETRIC_ONNX,
-    TORCH_SEQUENCE_ONNX,
     TORCHSCRIPT,
 
     // R models

@@ -109,18 +109,6 @@ class ModelService(
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('admin', 'upci')")
-    override fun getAllModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
-        val modelsPage = modelRepository.findAll(pageable)
-        val modelIdToUserMap = modelsPage.content.associateBy(
-            { it.id!! },
-            { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
-        )
-
-        return ResponseEntity.ok().body(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
-    }
-
     override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
@@ -167,7 +155,7 @@ class ModelService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "${modelDto.type} is not supported for creation.")
         }
 
-        if (modelDto.rawModel == null || modelDto.rawModel.isEmpty()) {
+        if ((modelDto.rawModel == null || modelDto.rawModel?.isEmpty() == true) && modelDto.type != ModelTypeDto.DOCKER) {
             throw IllegalArgumentException("rawModel is required for model uploads.")
         }
 
@@ -247,8 +235,11 @@ class ModelService(
             }
 
             toEntity.input!!.forEachIndexed { index, it: Any ->
-                if (it is Map<*, *>)
-                    (it as MutableMap<String, String>)[JAQPOT_ROW_ID_KEY] = index.toString()
+                if (it is MutableMap<*, *>) {
+                    @Suppress("UNCHECKED_CAST")
+                    val map = it as MutableMap<String, Any?>
+                    map[JAQPOT_ROW_ID_KEY] = index.toString()
+                }
             }
 
             val dataset = this.datasetRepository.save(toEntity)
@@ -320,9 +311,9 @@ class ModelService(
         dataset: Dataset
     ): ResponseEntity<Unit> {
         val rawModel = if (model.isQsarToolboxModel()) {
-            byteArrayOf()
+            null
         } else {
-            if (storageService.readRawModelMetadata(model).contentLength() > FIVE_MEGABYTES_IN_BYTES) {
+            if (storageService.readRawModelContentLength(model) > FIVE_MEGABYTES_IN_BYTES) {
                 null
             } else {
                 storageService.readRawModel(model)

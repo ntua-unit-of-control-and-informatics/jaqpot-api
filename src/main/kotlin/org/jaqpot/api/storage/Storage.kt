@@ -1,6 +1,5 @@
 package org.jaqpot.api.storage
 
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import java.util.*
 
 interface Storage {
@@ -9,7 +8,7 @@ interface Storage {
         keyName: String,
     ): Optional<ByteArray>
 
-    fun getObjectMetadata(bucketName: String, keyName: String): HeadObjectResponse
+    fun getObjectContentLength(bucketName: String, keyName: String): Optional<Long>
 
     fun getObjects(bucketName: String, keyNames: List<String>): Map<String, ByteArray>
 
@@ -36,4 +35,6 @@ interface Storage {
     )
 
     fun getPreSignedUploadUrl(bucketName: String, keyName: String, metadata: Map<String, String> = emptyMap()): String
+    
+    fun getPreSignedDownloadUrl(bucketName: String, keyName: String, expirationMinutes: Int = 10): String
 }

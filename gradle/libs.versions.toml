@@ -1,31 +1,30 @@
 [versions]
-kotlin = "1.9.24"
-springBoot = "3.3.4"
-springDependencyManagement = "1.1.4"
-kotlinSpringPlugin = "1.9.23"
-openapiGenerator = "7.9.0"
-flyway = "10.13.0"
-caffeine = "3.1.8"
-freemarker = "2.3.33"
-coroutines = "1.9.0"
-slf4j = "2.0.13"
-kotlinLogging = "6.0.9"
+kotlin = "2.2.10"
+spring-boot = "3.5.5"
+springDependencyManagement = "1.1.7"
+kotlinSpringPlugin = "2.2.10"
+openapiGenerator = "7.15.0"
+flyway = "11.12.0"
+caffeine = "3.2.2"
+freemarker = "2.3.34"
+coroutines = "1.10.2"
+slf4j = "2.0.17"
+kotlinLogging = "7.0.13"
 logbackJson = "0.1.5"
 janino = "3.1.12"
-swaggerAnnotations = "2.2.19"
-springdocOpenapi = "2.5.0"
-flywayCore = "10.12.0"
-keycloak = "24.0.5"
+springdocOpenapi = "2.8.13"
+flywayCore = "11.12.0"
+keycloak = "26.0.6"
 bucket4j = "8.10.1"
-commonsCsv = "1.11.0"
-awsSdk = "2.21.1"
-openaiClient = "3.8.2"
-ktor = "2.0.3"
-restAssured = "5.4.0"
-testcontainers = "1.19.8"
+commonsCsv = "1.14.1"
+awsSdk = "2.33.4"
+openaiClient = "4.0.1"
+ktor = "3.2.3"
+restAssured = "5.5.6"
+gson = "2.13.1"
+testcontainers = "1.21.3"
 testcontainersKeycloak = "3.3.1"
-mockk = "1.13.11"
-owaspDependencyCheck = "12.1.1"
+mockk = "1.14.5"
 
 [libraries]
 # Spring Boot dependencies
@@ -38,7 +37,7 @@ spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spr
 spring-boot-starter-mail = { group = "org.springframework.boot", name = "spring-boot-starter-mail" }
 spring-boot-starter-cache = { group = "org.springframework.boot", name = "spring-boot-starter-cache" }
 spring-boot-starter-webflux = { group = "org.springframework.boot", name = "spring-boot-starter-webflux" }
-spring-boot-gradle-plugin = { group = "org.springframework.boot", name = "spring-boot-gradle-plugin", version.ref = "springBoot" }
+spring-boot-gradle-plugin = { group = "org.springframework.boot", name = "spring-boot-gradle-plugin", version.ref = "spring-boot" }
 spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor" }
 spring-boot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools" }
 spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
@@ -72,7 +71,6 @@ jackson-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-modul
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
 
 # Swagger
-swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swaggerAnnotations" }
 springdoc-openapi = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdocOpenapi" }
 
 # Lombok
@@ -103,6 +101,9 @@ aws-sts = { group = "software.amazon.awssdk", name = "sts" }
 openai-client = { group = "com.aallam.openai", name = "openai-client", version.ref = "openaiClient" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 
+# Gson
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
 # Testing
 rest-assured = { group = "io.rest-assured", name = "rest-assured", version.ref = "restAssured" }
 rest-assured-kotlin = { group = "io.rest-assured", name = "kotlin-extensions", version.ref = "restAssured" }
@@ -115,7 +116,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlinSpringPlugin" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
-spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
 flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }

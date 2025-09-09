@@ -34,6 +34,8 @@ fun Model.toDto(userDto: UserDto? = null, userCanEdit: Boolean? = null, isAdmin:
             test = this.testScores?.map { it.toDto() },
             crossValidation = this.crossValidationScores?.map { it.toDto() },
         ),
+        featurizers = this.featurizers.map { it.toDto() },
+        preprocessors = this.preprocessors.map { it.toDto() },
         dockerConfig = this.dockerConfig?.toDto(),
         archived = this.archived,
         archivedAt = this.archivedAt,

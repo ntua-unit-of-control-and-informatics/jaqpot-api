@@ -4,11 +4,11 @@ group = "org.jaqpot"
 version = "{{VERSION_PLACEHOLDER}}"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 configurations {
@@ -80,8 +80,10 @@ dependencies {
     implementation(libs.jackson.kotlin)
     implementation(libs.kotlin.reflect)
 
+    // Gson
+    implementation(libs.gson)
+
     // Swagger
-    implementation(libs.swagger.annotations)
     implementation(libs.springdoc.openapi)
 
     // Lombok
@@ -162,7 +164,7 @@ openApiGenerate {
 // Dockerize https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html
 tasks.named<BootBuildImage>("bootBuildImage") {
     environment.set(
-        mapOf("BP_JVM_VERSION" to "17")
+        mapOf("BP_JVM_VERSION" to "21")
     )
     imageName = "upcintua/jaqpot-api"
 }

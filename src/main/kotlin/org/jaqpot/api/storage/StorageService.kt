@@ -12,7 +12,6 @@ import org.jaqpot.api.storage.encoding.FileEncodingProcessor
 import org.jaqpot.api.storage.s3.AWSS3Config
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import java.util.*
 
 @Service
@@ -250,8 +249,22 @@ class StorageService(
         throw JaqpotRuntimeException("Failed to find raw model with id ${model.id}")
     }
 
-    fun readRawModelMetadata(model: Model): HeadObjectResponse {
-        return this.storage.getObjectMetadata(awsS3Config.modelsBucketName, getModelStorageKey(model))
+    fun readRawModelContentLength(model: Model): Long {
+        var rawModelContentLength = Optional.empty<Long>()
+        try {
+            rawModelContentLength =
+                this.storage.getObjectContentLength(awsS3Config.modelsBucketName, getModelStorageKey(model))
+
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to retrieve model metadata for ${model.id}" }
+        }
+
+        if (rawModelContentLength.isPresent) {
+            return rawModelContentLength.get()
+        }
+
+        throw JaqpotRuntimeException("Failed to retrieve model metadata for ${model.id}")
+
     }
 
     private fun getModelStorageKey(model: Model) = model.id.toString()
@@ -356,6 +369,18 @@ class StorageService(
 
     fun getPreSignedModelUploadUrl(model: Model, metadata: Map<String, String> = emptyMap()): String {
         return this.storage.getPreSignedUploadUrl(awsS3Config.modelsBucketName, model.id.toString(), metadata)
+    }
+
+    fun getPreSignedModelDownloadUrl(model: Model, expirationMinutes: Int = 10): String {
+        return this.storage.getPreSignedDownloadUrl(awsS3Config.modelsBucketName, getModelStorageKey(model), expirationMinutes)
+    }
+
+    fun getPreSignedPreprocessorDownloadUrl(model: Model, expirationMinutes: Int = 10): String {
+        return this.storage.getPreSignedDownloadUrl(awsS3Config.preprocessorsBucketName, getModelStorageKey(model), expirationMinutes)
+    }
+
+    fun getPreSignedDoaDownloadUrl(doa: Doa, expirationMinutes: Int = 10): String {
+        return this.storage.getPreSignedDownloadUrl(awsS3Config.doasBucketName, getDoaStorageKey(doa), expirationMinutes)
     }
 
     private fun getUserAvatarStorageKey(userId: String, extension: String): String {

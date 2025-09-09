@@ -2,11 +2,15 @@ openapi: 3.0.3
 tags:
   - name: model
     description: model operations
+  - name: admin
+    description: administrative operations
+  - name: model-download
+    description: model download operations using S3 presigned URLs
 x-stoplight:
   id: 4vb63zck1yndo
 info:
   title: Jaqpot API
-  version: 1.0.0
+  version: "0.0.0-dev"
   description: 'A modern RESTful API for model management and prediction services, built using Spring Boot and Kotlin. Supports seamless integration with machine learning workflows.'
   contact:
     name: Jaqpot
@@ -35,6 +39,194 @@ paths:
           description: JWT is valid
         '401':
           description: Unauthorized
+  /v1/admin/users:
+    get:
+      x-spring-paginated: true
+      summary: Get paginated users for admins
+      description: Retrieve a paginated list of users ordered by signup date descending. Only accessible by admin or UPCI users.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - admin
+      operationId: getUsers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "createdAt|desc" ]
+      responses:
+        '200':
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  pageable:
+                    type: object
+                    properties:
+                      sort:
+                        type: object
+                        properties:
+                          empty:
+                            type: boolean
+                          sorted:
+                            type: boolean
+                          unsorted:
+                            type: boolean
+                      offset:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      pageNumber:
+                        type: integer
+                      unpaged:
+                        type: boolean
+                      paged:
+                        type: boolean
+                  last:
+                    type: boolean
+                  totalPages:
+                    type: integer
+                  totalElements:
+                    type: integer
+                  size:
+                    type: integer
+                  number:
+                    type: integer
+                  sort:
+                    type: object
+                    properties:
+                      empty:
+                        type: boolean
+                      sorted:
+                        type: boolean
+                      unsorted:
+                        type: boolean
+                  first:
+                    type: boolean
+                  numberOfElements:
+                    type: integer
+                  empty:
+                    type: boolean
+        '401':
+          description: Unauthorized - user must be authenticated as admin or UPCI user
+        '403':
+          description: Forbidden - insufficient privileges
+  /v1/admin/models:
+    get:
+      x-spring-paginated: true
+      summary: Get all models for admins
+      description: Retrieve a paginated list of all models in the system. Only accessible by admin or UPCI users.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - admin
+      operationId: getAllModels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ "field1|asc", "field2|desc" ]
+      responses:
+        '200':
+          description: Paginated list of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelSummary'
+                  pageable:
+                    type: object
+                    properties:
+                      sort:
+                        type: object
+                        properties:
+                          empty:
+                            type: boolean
+                          sorted:
+                            type: boolean
+                          unsorted:
+                            type: boolean
+                      offset:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      pageNumber:
+                        type: integer
+                      unpaged:
+                        type: boolean
+                      paged:
+                        type: boolean
+                  last:
+                    type: boolean
+                  totalPages:
+                    type: integer
+                  totalElements:
+                    type: integer
+                  size:
+                    type: integer
+                  number:
+                    type: integer
+                  sort:
+                    type: object
+                    properties:
+                      empty:
+                        type: boolean
+                      sorted:
+                        type: boolean
+                      unsorted:
+                        type: boolean
+                  first:
+                    type: boolean
+                  numberOfElements:
+                    type: integer
+                  empty:
+                    type: boolean
+        '401':
+          description: Unauthorized - user must be authenticated as admin or UPCI user
+        '403':
+          description: Forbidden - insufficient privileges
   /v1/user/models:
     get:
       x-spring-paginated: true
@@ -88,57 +280,6 @@ paths:
         '400':
           description: Invalid input
   /v1/models:
-    get:
-      x-spring-paginated: true
-      summary: Get paginated models
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - model
-      operationId: getAllModels
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-            example: [ "field1|asc", "field2|desc" ]
-      responses:
-        '200':
-          description: Paginated list of models
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ModelSummary'
-                  totalElements:
-                    type: integer
-                  totalPages:
-                    type: integer
-                  pageSize:
-                    type: integer
-                  pageNumber:
-                    type: integer
-        '400':
-          description: Invalid input
     post:
       summary: Create a new model
       security:
@@ -285,6 +426,72 @@ paths:
           description: Model is not currently archived
         '403':
           description: Insufficient permissions to unarchive the model
+  /v1/models/{modelId}/download/urls:
+    get:
+      summary: Get all presigned download URLs for model assets
+      description: Get presigned URLs to download all available model assets (model file, preprocessor, and DOAs) directly from S3.
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - model-download
+      operationId: getModelDownloadUrls
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          description: The ID of the model to get download URLs for
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - name: expirationMinutes
+          in: query
+          required: false
+          description: URL expiration time in minutes (default 10, max 20)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+      responses:
+        '200':
+          description: Presigned download URLs generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  modelUrl:
+                    type: string
+                    format: uri
+                    description: Presigned S3 URL for downloading the model file
+                    nullable: true
+                  preprocessorUrl:
+                    type: string
+                    format: uri
+                    description: Presigned S3 URL for downloading the preprocessor
+                    nullable: true
+                  doaUrls:
+                    type: array
+                    description: Presigned S3 URLs for downloading DOA files
+                    items:
+                      type: object
+                      properties:
+                        method:
+                          type: string
+                          description: DOA method name
+                        downloadUrl:
+                          type: string
+                          format: uri
+                          description: Presigned S3 URL for downloading the DOA file
+                  expiresAt:
+                    type: string
+                    format: date-time
+                    description: URL expiration timestamp for all URLs
+        '404':
+          description: Model not found
+        '403':
+          description: Insufficient permissions to download the model
   /v1/user/shared-models:
     get:
       x-spring-paginated: true
@@ -1961,7 +2168,6 @@ components:
       enum:
         - SKLEARN_ONNX
         - TORCH_ONNX
-        - TORCH_SEQUENCE_ONNX
         - TORCH_GEOMETRIC_ONNX
         - TORCHSCRIPT
         - R_BNLEARN_DISCRETE
@@ -2637,6 +2843,11 @@ components:
           type: string
         canEdit:
           type: boolean
+        createdAt:
+          type: string
+          format: date-time
+          description: User signup date
+          readOnly: true
     UserSettings:
       type: object
       properties:
