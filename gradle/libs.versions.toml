@@ -2,7 +2,7 @@
 kotlin = "2.2.10"
 spring-boot = "3.5.5"
 springDependencyManagement = "1.1.7"
-kotlinSpringPlugin = "2.2.10"
+kotlinSpringPlugin = "2.2.20"
 openapiGenerator = "7.15.0"
 flyway = "11.12.0"
 caffeine = "3.2.2"
