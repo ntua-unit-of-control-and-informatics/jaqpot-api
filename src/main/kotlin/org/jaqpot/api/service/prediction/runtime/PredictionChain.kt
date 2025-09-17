@@ -6,6 +6,7 @@ import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.model.ModelTypeDto
 import org.jaqpot.api.model.PredictionModelDto
 import org.jaqpot.api.model.PredictionResponseDto
+import org.jaqpot.api.service.DatasetCachedPredictionService
 import org.jaqpot.api.service.model.QSARToolboxPredictionService
 import org.jaqpot.api.service.prediction.runtime.runtimes.RESTRuntime
 import org.jaqpot.api.service.prediction.runtime.runtimes.legacy.*
@@ -26,7 +27,8 @@ class PredictionChain(
     private val legacyPythonGeneric024Runtime: LegacyPythonGeneric024Runtime,
     private val legacyJaqpotInferenceRuntime: LegacyJaqpotInferenceRuntime,
     private val dockerRuntime: JaqpotDockerModelRuntime,
-    private val qsarToolboxPredictionService: QSARToolboxPredictionService
+    private val qsarToolboxPredictionService: QSARToolboxPredictionService,
+    private val datasetCachedPredictionService: DatasetCachedPredictionService
 ) {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -36,6 +38,13 @@ class PredictionChain(
         predictionModelDto: PredictionModelDto,
         datasetDto: DatasetDto
     ): PredictionResponseDto {
+        if (predictionModelDto.supportsPredictionCaching == true) {
+            val result = datasetCachedPredictionService.getPredictionResults(predictionModelDto, datasetDto)
+            if (result.isPresent) {
+                return result.get()
+            }
+        }
+
         if (predictionModelDto.isQsarModel()) {
             val predictions = qsarToolboxPredictionService.makePredictionRequest(
                 predictionModelDto,
