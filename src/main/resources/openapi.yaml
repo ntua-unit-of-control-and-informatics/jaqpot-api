@@ -776,7 +776,7 @@ paths:
                 description:
                   type: string
                   minLength: 3
-                  maxLength: 50000
+                  maxLength: 100000
                 visibility:
                   $ref: '#/components/schemas/ModelVisibility'
                 task:
@@ -1825,7 +1825,7 @@ components:
         description:
           type: string
           minLength: 3
-          maxLength: 50000
+          maxLength: 100000
           example: A description of your model
         type:
           $ref: '#/components/schemas/ModelType'
@@ -1962,7 +1962,7 @@ components:
         description:
           type: string
           minLength: 3
-          maxLength: 50000
+          maxLength: 100000
           example: A description of your model
         creator:
           $ref: '#/components/schemas/User'

@@ -24,7 +24,7 @@ class Model(
     @Column(nullable = false)
     var name: String,
 
-    @Size(min = 3, max = 50000)
+    @Size(min = 3, max = 100000)
     @Column(columnDefinition = "TEXT")
     var description: String?,
 
@@ -129,4 +129,3 @@ class Model(
         ModelType.QSAR_TOOLBOX_PROFILER
     )
 }
-
