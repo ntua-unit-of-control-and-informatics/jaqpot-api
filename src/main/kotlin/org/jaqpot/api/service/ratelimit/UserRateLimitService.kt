@@ -33,7 +33,7 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
         // do not rate limit public endpoints
         if (!authenticationFacade.isLoggedIn) return false
 
-        if (authenticationFacade.isAdmin) {
+        if (authenticationFacade.isAdmin || authenticationFacade.isUpciUser) {
             return false
         } else if (rateLimitedEndpointsByPlan.contains(methodName)) {
             if (authenticationFacade.isEnterpriseUser) {
