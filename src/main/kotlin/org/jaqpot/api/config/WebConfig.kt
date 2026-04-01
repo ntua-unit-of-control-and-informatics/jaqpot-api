@@ -4,21 +4,22 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver
 import org.springframework.data.web.SortHandlerMethodArgumentResolver
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebConfig {
+class WebConfig : WebMvcConfigurer {
 
     @Bean
     fun customSortArgumentResolver(): SortHandlerMethodArgumentResolver {
         return CustomSortArgumentResolver()
     }
 
-    @Bean
-    fun pageableResolver(sortResolver: SortHandlerMethodArgumentResolver): PageableHandlerMethodArgumentResolver {
-        val resolver = PageableHandlerMethodArgumentResolver(sortResolver)
-        // You can configure other properties of the PageableHandlerMethodArgumentResolver here if needed
-        // For example, resolver.setFallbackPageable(PageRequest.of(0, 20));
-        return resolver
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        val sortResolver = customSortArgumentResolver() // Get the custom sort resolver
+        val pageableResolver = PageableHandlerMethodArgumentResolver(sortResolver) // Create Pageable resolver with custom sort resolver
+        resolvers.add(pageableResolver) // Add our custom Pageable resolver first
+        // Spring will automatically add its default resolvers after this,
+        // but our custom one will take precedence for Pageable arguments.
     }
 }
