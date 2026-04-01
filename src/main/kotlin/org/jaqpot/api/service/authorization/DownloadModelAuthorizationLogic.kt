@@ -36,7 +36,7 @@ class DownloadModelAuthorizationLogic(
             }
 
             val modelOrganizations =
-                organizationRepository.findAllById(model.sharedWithOrganizations?.map { it.organization.id }).toList()
+                organizationRepository.findAllById(model.sharedWithOrganizations?.mapNotNull { it.organization.id } ?: emptyList()).toList()
 
             val allAllowedUserIds = allAllowedUserIdsForModel(modelOrganizations)
 

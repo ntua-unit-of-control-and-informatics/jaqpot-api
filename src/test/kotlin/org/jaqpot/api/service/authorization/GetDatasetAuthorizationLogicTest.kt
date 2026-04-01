@@ -2,8 +2,8 @@ package org.jaqpot.api.service.authorization
 
 import io.mockk.every
 import io.mockk.mockk
-import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.jaqpot.api.model.DatasetDto
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.junit.jupiter.api.BeforeEach

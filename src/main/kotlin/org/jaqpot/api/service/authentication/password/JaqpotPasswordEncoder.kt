@@ -11,7 +11,7 @@ class JaqpotPasswordEncoder : PasswordEncoder {
     }
 
     override fun encode(password: String): String {
-        return passwordEncoder.encode(password)
+        return passwordEncoder.encode(password)!!
     }
 
     override fun matches(password: String, encodedPassword: String): Boolean {

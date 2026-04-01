@@ -35,7 +35,7 @@ class PredictModelAuthorizationLogic(
             }
 
             val modelOrganizations =
-                organizationRepository.findAllById(modelDto.sharedWithOrganizations?.map { it.id }).toList()
+                organizationRepository.findAllById(modelDto.sharedWithOrganizations?.mapNotNull { it.id } ?: emptyList()).toList()
 
             val allAllowedUserIds = allAllowedUserIdsForModel(modelOrganizations)
 
