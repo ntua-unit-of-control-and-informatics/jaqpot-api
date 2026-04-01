@@ -22,7 +22,7 @@ class AuthenticationFacade {
     val isProUser: Boolean get() = authentication.authorities.any { it.authority == PRO_ROLE }
     val isUpciUser: Boolean get() = authentication.authorities.any { it.authority == UPCI_ROLE }
     val authentication: Authentication
-        get() = SecurityContextHolder.getContext().authentication
+        get() = SecurityContextHolder.getContext().authentication!!
 
     val userId: String get() = authentication.name
 

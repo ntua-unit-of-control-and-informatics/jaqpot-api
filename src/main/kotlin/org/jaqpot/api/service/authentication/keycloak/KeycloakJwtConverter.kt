@@ -22,7 +22,7 @@ class KeycloakJwtConverter : Converter<Jwt, AbstractAuthenticationToken> {
         const val ROLES_KEY = "roles"
     }
 
-    override fun convert(source: Jwt): AbstractAuthenticationToken? {
+    override fun convert(source: Jwt): AbstractAuthenticationToken {
         val defaultAuthorities = JwtGrantedAuthoritiesConverter().convert(source)
         val keycloakAuthorities = extractKeycloakAuthorities(source)
 

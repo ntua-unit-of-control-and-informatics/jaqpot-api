@@ -90,7 +90,7 @@ dependencies {
     annotationProcessor(libs.lombok)
 
     // Flyway
-    implementation(libs.flyway.core)
+    implementation(libs.flyway.starter)
     runtimeOnly(libs.flyway.postgresql)
 
     // Keycloak
@@ -145,7 +145,7 @@ openApiGenerate {
     invokerPackage.set("org.jaqpot.api")
     apiPackage.set("org.jaqpot.api")
     modelPackage.set("org.jaqpot.api.model")
-    outputDir.set("${buildDir}/openapi")
+    outputDir.set("${layout.buildDirectory.get()}/openapi")
     modelNameSuffix.set("Dto")
     ignoreFileOverride.set("$projectDir/.openapi-generator-ignore")
     // config options: https://openapi-generator.tech/docs/generators/kotlin-spring/
@@ -155,7 +155,8 @@ openApiGenerate {
             "useBeanValidation" to "true",
             "useTags" to "true",
             "delegatePattern" to "true",
-            "useSpringBoot3" to "true"
+            "useSpringBoot4" to "true",
+            "useJackson3" to "true"
         )
     )
 }
@@ -171,7 +172,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
 sourceSets {
     main {
         kotlin {
-            srcDir("${buildDir}/openapi")
+            srcDir("${layout.buildDirectory.get()}/openapi")
         }
     }
 }

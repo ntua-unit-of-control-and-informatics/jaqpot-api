@@ -22,12 +22,10 @@ import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
 import org.jaqpot.api.service.prediction.rest.RESTPredictionService
 import org.jaqpot.api.service.prediction.streaming.StreamingPredictionService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
-import org.jaqpot.api.service.util.SortUtil.Companion.parseSortParameters
 import org.jaqpot.api.storage.StorageService
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PostAuthorize
@@ -109,9 +107,8 @@ class ModelService(
         }
     }
 
-    override fun getModels(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetModels200ResponseDto> {
+    override fun getModels(pageable: Pageable): ResponseEntity<GetModels200ResponseDto> {
         val creatorId = authenticationFacade.userId
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val modelsPage = modelRepository.findAllByCreatorIdAndArchivedIsFalse(creatorId, pageable)
         val modelIdToUserMap = modelsPage.content.associateBy(
             { it.id!! },
@@ -122,13 +119,10 @@ class ModelService(
     }
 
     override fun getSharedModels(
-        page: Int,
-        size: Int,
-        sort: List<String>?,
-        organizationId: Long?
+        organizationId: Long?,
+        pageable: Pageable
     ): ResponseEntity<GetModels200ResponseDto> {
         val userId = authenticationFacade.userId
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
 
         val sharedModelsPage = if (organizationId == null) {
             modelRepository.findAllSharedWithUser(userId, pageable)
@@ -439,11 +433,9 @@ class ModelService(
     @Cacheable(CacheKeys.SEARCH_MODELS)
     override fun searchModels(
         query: String,
-        page: Int,
-        size: Int
+        pageable: Pageable
     ): ResponseEntity<GetModels200ResponseDto> {
         val transformedQuery = FullTextUtil.transformSearchQuery(query)
-        val pageable = PageRequest.of(page, size)
         val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
         val modelIdToUserMap = modelsPage.content.associateBy(
             { it.id!! },
@@ -453,13 +445,8 @@ class ModelService(
         return ResponseEntity.ok(modelsPage.toGetModels200ResponseDto(modelIdToUserMap))
     }
 
-    override fun getArchivedModels(
-        page: Int,
-        size: Int,
-        sort: List<String>?
-    ): ResponseEntity<GetModels200ResponseDto> {
+    override fun getArchivedModels(pageable: Pageable): ResponseEntity<GetModels200ResponseDto> {
         val userId = authenticationFacade.userId
-        val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
 
         val archivedModelsPage = modelRepository.findAllByCreatorIdAndArchivedIsTrue(userId, pageable)
 

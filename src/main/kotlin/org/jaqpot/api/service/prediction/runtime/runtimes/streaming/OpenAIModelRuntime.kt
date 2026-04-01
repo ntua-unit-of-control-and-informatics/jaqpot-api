@@ -48,7 +48,7 @@ class OpenAIModelRuntime(
             )
         val completions: Flow<ChatCompletionChunk> =
             openAIClient.chatCompletions(createRequestBody(predictionModelDto, datasetDto))
-        return completions.asFlux().map { it.choices[0].delta?.content }
+        return completions.asFlux().mapNotNull { it.choices[0].delta?.content }
     }
 
     override fun getRuntimeUrl(predictionModelDto: PredictionModelDto): String {

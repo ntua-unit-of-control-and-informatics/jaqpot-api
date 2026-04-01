@@ -1,13 +1,15 @@
 package org.jaqpot.api.integration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import dasniko.testcontainers.keycloak.KeycloakContainer
-import io.restassured.RestAssured
-import io.restassured.RestAssured.given
-import io.restassured.builder.RequestSpecBuilder
-import io.restassured.http.ContentType
-import io.restassured.parsing.Parser
-import io.restassured.specification.RequestSpecification
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import java.io.IOException
+import java.net.Proxy
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
@@ -18,10 +20,19 @@ import org.testcontainers.containers.PostgreSQLContainer
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [AbstractIntegrationTest.Initializer::class])
-@AutoConfigureMockMvc
 abstract class AbstractIntegrationTest {
 
     companion object {
+        init {
+            // RestAssured's Groovy proxy detection calls ProxySelector.getDefault() and can NPE
+            // on macOS / Java 21 when the system proxy selector returns entries with null keys.
+            // Replace the default selector with a direct (no-proxy) implementation.
+            ProxySelector.setDefault(object : ProxySelector() {
+                override fun select(uri: URI?) = listOf(Proxy.NO_PROXY)
+                override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {}
+            })
+        }
+
         const val TEST_DB_NAME = "jaqpot-test"
         const val TEST_DB_USERNAME = "test"
         const val TEST_DB_PASSWORD = "test"
@@ -58,24 +69,20 @@ abstract class AbstractIntegrationTest {
 
     fun getJaqpotUserAccessToken(): String {
         val keycloakUrl = "http://${keycloakContainer.host}:${keycloakContainer.firstMappedPort}"
+        val body = "client_id=jaqpot-local-test&grant_type=password&username=jaqpot&password=jaqpot"
 
-        RestAssured.defaultParser = Parser.JSON
-        val spec: RequestSpecification = RequestSpecBuilder()
-            .setBaseUri(keycloakUrl).build()
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("$keycloakUrl/realms/jaqpot-local/protocol/openid-connect/token"))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build()
 
-        val accessToken = given()
-            .spec(spec)
-            .contentType(ContentType.URLENC)
-            .formParam("client_id", "jaqpot-local-test")
-            .formParam("grant_type", "password")
-            .formParam("username", "jaqpot")
-            .formParam("password", "jaqpot")
-            .post("/realms/jaqpot-local/protocol/openid-connect/token")
-            .then()
-            .statusCode(200)
-            .extract().path<String>("access_token")
+        val response = HttpClient.newHttpClient()
+            .send(request, HttpResponse.BodyHandlers.ofString())
 
-        return accessToken
+        check(response.statusCode() == 200) { "Keycloak token request failed with status ${response.statusCode()}: ${response.body()}" }
+
+        return ObjectMapper().readTree(response.body()).get("access_token").asText()
     }
 
 

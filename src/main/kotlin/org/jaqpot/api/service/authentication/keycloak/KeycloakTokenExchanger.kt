@@ -35,7 +35,7 @@ class KeycloakTokenExchanger(private val keycloakConfig: KeycloakConfig) {
         val requestEntity: HttpEntity<MultiValueMap<String, String>> = HttpEntity(body, headers)
 
         // Send the request
-        val response: ResponseEntity<Map<*, *>?> = restTemplate.postForEntity(
+        val response: ResponseEntity<Map<*, *>> = restTemplate.postForEntity(
             "${keycloakConfig.serverUrl}/realms/${keycloakConfig.realm}/protocol/openid-connect/token",
             requestEntity,
             Map::class.java

@@ -103,7 +103,7 @@ class DatasetService(
         val expiredDatasets = datasetRepository.findAllByCreatedAtBefore(
             OffsetDateTime.now().minusDays(DATASET_EXPIRATION_DAYS)
         )
-        datasetRepository.deleteAllById(expiredDatasets.map { it.id })
+        datasetRepository.deleteAllById(expiredDatasets.mapNotNull { it.id })
 
         logger.info { "Purged ${expiredDatasets.size} expired datasets" }
     }

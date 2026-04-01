@@ -71,7 +71,7 @@ class RateLimitAspect(
         val responseEntity = joinPoint.proceed() as ResponseEntity<*>
 
         val newHeaders = LinkedMultiValueMap<String, String>()
-        newHeaders.addAll(responseEntity.headers)
+        responseEntity.headers.forEach { key, values -> newHeaders.addAll(key, values) }
         newHeaders.add("X-Rate-Limit-Limit", limit.toString())
         newHeaders.add("X-Rate-Limit-Remaining", consumptionProbe.remainingTokens.toString())
         newHeaders.add(
