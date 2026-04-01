@@ -1,9 +1,9 @@
 [versions]
 kotlin = "2.2.20"
-spring-boot = "3.5.7"
+spring-boot = "4.0.5"
 springDependencyManagement = "1.1.7"
 kotlinSpringPlugin = "2.2.20"
-openapiGenerator = "7.15.0"
+openapiGenerator = "7.21.0"
 flyway = "11.12.0"
 caffeine = "3.2.2"
 freemarker = "2.3.34"
@@ -12,7 +12,7 @@ slf4j = "2.0.17"
 kotlinLogging = "7.0.13"
 logbackJson = "0.1.5"
 janino = "3.1.12"
-springdocOpenapi = "2.8.13"
+springdocOpenapi = "3.0.2"
 flywayCore = "11.12.0"
 keycloak = "26.0.6"
 bucket4j = "8.10.1"
@@ -77,6 +77,7 @@ springdoc-openapi = { group = "org.springdoc", name = "springdoc-openapi-starter
 lombok = { group = "org.projectlombok", name = "lombok" }
 
 # Flyway
+flyway-starter = { group = "org.springframework.boot", name = "spring-boot-starter-flyway" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayCore" }
 flyway-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flywayCore" }
 

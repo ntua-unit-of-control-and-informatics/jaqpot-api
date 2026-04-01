@@ -13,6 +13,6 @@ class FreemarkerTemplateEngine(private val freemarkerConfigurer: FreeMarkerConfi
     override fun convertToHTML(template: FreemarkerTemplate, model: Map<String, Any>?): String {
         val freemarkerTemplate: Template = freemarkerConfigurer.configuration
             .getTemplate(template.path)
-        return FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, model)
+        return FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, model ?: emptyMap<String, Any>())
     }
 }
