@@ -42,12 +42,12 @@ class Model(
     val doas: MutableList<Doa>,
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @OrderColumn(name = "sort_order")
+    @OrderBy("id ASC")
     @SQLRestriction("feature_dependency = 'DEPENDENT'")
     val dependentFeatures: MutableList<Feature>,
 
     @OneToMany(mappedBy = "model", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @OrderColumn(name = "sort_order")
+    @OrderBy("id ASC")
     @SQLRestriction("feature_dependency = 'INDEPENDENT'")
     val independentFeatures: MutableList<Feature>,
 

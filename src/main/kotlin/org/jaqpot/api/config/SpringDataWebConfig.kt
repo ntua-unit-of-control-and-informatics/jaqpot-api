@@ -125,7 +125,11 @@ class CustomSortArgumentResolver : SortArgumentResolver {
                 direction = Sort.DEFAULT_DIRECTION
             }
 
-            orders.add(Sort.Order(direction, propertyName))
+            orders.add(if (direction == Sort.Direction.DESC) {
+                Sort.Order.desc(propertyName)
+            } else {
+                Sort.Order.asc(propertyName)
+            })
         }
 
         return Sort.by(orders)

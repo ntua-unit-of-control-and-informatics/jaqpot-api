@@ -17,9 +17,11 @@ class SortUtil {
                     val parts = sortParam.split(SORT_DELIMITER).dropLastWhile { it.isEmpty() }
                         .toTypedArray()
                     if (parts.size == 2) {
-                        return@map Order(Sort.Direction.fromString(parts[1]), parts[0])
+                        val direction = Sort.Direction.fromString(parts[1])
+                        val property = parts[0]
+                        return@map if (direction == Sort.Direction.DESC) Order.desc(property) else Order.asc(property)
                     } else {
-                        return@map Order(Sort.Direction.ASC, parts[0]) // Default to ascending
+                        return@map Order.asc(parts[0])
                     }
                 }
         }
