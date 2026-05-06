@@ -436,7 +436,8 @@ class ModelService(
         pageable: Pageable
     ): ResponseEntity<GetModels200ResponseDto> {
         val transformedQuery = FullTextUtil.transformSearchQuery(query)
-        val modelsPage = modelRepository.searchModelsBy(transformedQuery, pageable)
+        val transformedPageable = FullTextUtil.transformPageableForNative(pageable)
+        val modelsPage = modelRepository.searchModelsBy(transformedQuery, transformedPageable)
         val modelIdToUserMap = modelsPage.content.associateBy(
             { it.id!! },
             { userService.getUserById(it.creatorId).orElse(UserDto(it.creatorId)) }
