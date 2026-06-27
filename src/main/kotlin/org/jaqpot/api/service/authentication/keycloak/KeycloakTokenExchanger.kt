@@ -12,14 +12,15 @@ import org.springframework.web.client.RestTemplate
 
 
 @Component
-class KeycloakTokenExchanger(private val keycloakConfig: KeycloakConfig) {
+class KeycloakTokenExchanger(
+    private val keycloakConfig: KeycloakConfig,
+    private val restTemplate: RestTemplate
+) {
     /**
      * Exchange a user token for an impersonation token
      * @see <a href="https://www.keycloak.org/docs/24.0.3/securing_apps/index.html#direct-naked-impersonation">https://www.keycloak.org/docs/24.0.3/securing_apps/index.html#direct-naked-impersonation</a>
      */
     fun exchangeToken(userId: String): String {
-        val restTemplate = RestTemplate()
-
         // Set headers
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
