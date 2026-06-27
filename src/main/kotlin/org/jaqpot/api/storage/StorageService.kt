@@ -53,55 +53,118 @@ class StorageService(
                 )
             }
 
+            logger.info {
+                "Offloaded dataset ${dataset.id} to storage bucket '${awsS3Config.datasetsBucketName}' " +
+                    "(result offloaded: ${dataset.result != null})"
+            }
             return true
         } catch (e: Exception) {
-            logger.error(e) { "Failed to store dataset with id ${dataset.id}" }
+            logger.error(e) {
+                "Failed to store dataset with id ${dataset.id} to bucket '${awsS3Config.datasetsBucketName}'"
+            }
             return false
         }
     }
 
     fun readRawDatasetInputs(datasets: List<Dataset>): Map<String, List<Any>> {
-        var rawDatasetsFromStorage = mutableMapOf<String, ByteArray>()
-        try {
-            rawDatasetsFromStorage =
-                this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/input" })
-                    .mapKeys { it.key.substringBefore("/") }.toMutableMap()
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to read datasets" }
+        val rawDatasetsFromStorage = readRawObjectsFromStorage(datasets, "input")
+
+        val servedFromDb = mutableListOf<String>()
+        val missing = mutableListOf<String>()
+
+        val inputs = datasets.associateTo(LinkedHashMap<String, List<Any>>()) { dataset ->
+            val key = dataset.id.toString()
+            val fromStorage = rawDatasetsFromStorage[key]?.let { parseRawList(it, key, "input") }
+            val value = when {
+                fromStorage != null -> fromStorage
+                dataset.input != null -> {
+                    servedFromDb.add(key)
+                    dataset.input!!
+                }
+
+                else -> {
+                    missing.add(key)
+                    emptyList()
+                }
+            }
+            key to value
         }
 
-        return if (rawDatasetsFromStorage.isNotEmpty()) {
-            rawDatasetsFromStorage.mapValues { (_, value) ->
-                val type = object : TypeToken<List<Any>>() {}.type
-                val input: List<Any> = Gson().fromJson(value.decodeToString(), type)
-                input
-            }
-        } else {
-            return datasets.associateBy({ it.id.toString() }, { it.input!! })
-        }
+        logBatchFallbacks("input", datasets.size, servedFromDb, missing)
+        return inputs
     }
 
 
     fun readRawDatasetResults(datasets: List<Dataset>): Map<String, List<Any>?> {
-        var rawDatasetsFromStorage = mutableMapOf<String, ByteArray>()
-        try {
-            rawDatasetsFromStorage =
-                this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/result" })
-                    .mapKeys { it.key.substringBefore("/") }.toMutableMap()
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to read datasets" }
+        val rawDatasetsFromStorage = readRawObjectsFromStorage(datasets, "result")
+
+        val servedFromDb = mutableListOf<String>()
+
+        val results = datasets.associateTo(LinkedHashMap<String, List<Any>?>()) { dataset ->
+            val key = dataset.id.toString()
+            val fromStorage = rawDatasetsFromStorage[key]?.let { parseRawList(it, key, "result") }
+            val value: List<Any>? = when {
+                fromStorage != null -> fromStorage
+                dataset.result != null -> {
+                    servedFromDb.add(key)
+                    dataset.result
+                }
+                // A null result is a legitimate state (e.g. prediction not finished), so do not warn.
+                else -> null
+            }
+            key to value
         }
 
-        return if (rawDatasetsFromStorage.isNotEmpty()) {
-            rawDatasetsFromStorage.mapValues { (_, value) ->
-                val type = object : TypeToken<List<Any>>() {}.type
-                val result: List<Any> = Gson().fromJson(value.decodeToString(), type)
-                result
+        logBatchFallbacks("result", datasets.size, servedFromDb, emptyList())
+        return results
+    }
+
+    /**
+     * Batch-reads the given [suffix] (`input`/`result`) objects for [datasets] from storage, keyed by
+     * dataset id. A storage failure is logged and treated as "nothing found" so callers fall back to
+     * the database per row instead of failing the whole batch.
+     */
+    private fun readRawObjectsFromStorage(datasets: List<Dataset>, suffix: String): Map<String, ByteArray> {
+        if (datasets.isEmpty()) {
+            return emptyMap()
+        }
+        return try {
+            this.storage.getObjects(awsS3Config.datasetsBucketName, datasets.map { "${it.id.toString()}/$suffix" })
+                .mapKeys { it.key.substringBefore("/") }
+        } catch (e: Exception) {
+            logger.warn(e) {
+                "Failed to batch read dataset ${suffix}s from storage for ${datasets.size} dataset(s); " +
+                    "falling back to database per row"
             }
-        } else {
-            return datasets.associateBy({ it.id.toString() }, { it.result })
+            emptyMap()
         }
     }
+
+    private fun parseRawList(raw: ByteArray, datasetId: String, suffix: String): List<Any>? {
+        return try {
+            val type = object : TypeToken<List<Any>>() {}.type
+            Gson().fromJson(raw.decodeToString(), type)
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to parse stored $suffix for dataset $datasetId; falling back to database" }
+            null
+        }
+    }
+
+    private fun logBatchFallbacks(
+        suffix: String,
+        total: Int,
+        servedFromDb: List<String>,
+        missing: List<String>
+    ) {
+        if (servedFromDb.isEmpty() && missing.isEmpty()) {
+            return
+        }
+        logger.warn {
+            "Dataset $suffix not found in storage for ${servedFromDb.size + missing.size}/$total dataset(s). " +
+                "Served from database: $servedFromDb. Missing in both storage and database: $missing."
+        }
+    }
+
 
     fun readRawDatasetInput(dataset: Dataset): List<Any> {
         var rawDatasetFromStorage = Optional.empty<ByteArray>()

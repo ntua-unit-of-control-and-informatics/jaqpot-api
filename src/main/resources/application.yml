@@ -34,6 +34,8 @@ spring:
   docker:
     compose:
       lifecycle-management: none
+  lifecycle:
+    timeout-per-shutdown-phase: 60s
 #  cache:
 #    type: none
 
@@ -69,6 +71,7 @@ aws:
     images-distribution-url:
 
 server:
+  shutdown: graceful
   error:
     include-message: always
     include-binding-errors: always

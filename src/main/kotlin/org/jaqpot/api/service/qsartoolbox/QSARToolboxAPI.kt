@@ -10,7 +10,10 @@ import org.springframework.web.client.RestTemplate
 
 
 @Component
-class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
+class QSARToolboxAPI(
+    private val qsartoolboxConfig: QsartoolboxConfig,
+    private val restTemplate: RestTemplate
+) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -22,7 +25,6 @@ class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
 
         val url = "${qsartoolboxConfig.url}/api/v6/search/smiles/${registerUnknown}/${ignoreStereo}?smiles={smiles}"
 
-        val restTemplate = RestTemplate()
         val response = restTemplate.getForEntity(url, Array<QSARSearchSmilesResponse>::class.java, smiles)
 
         return response.body
@@ -34,7 +36,6 @@ class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
     ): Map<*, *>? {
         val url = "${qsartoolboxConfig.url}/api/v6/qsar/apply/${qsarGuid}/${chemId}"
 
-        val restTemplate = RestTemplate()
         val response = restTemplate.getForEntity(url, Map::class.java)
 
         return response.body
@@ -46,7 +47,6 @@ class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
     ): List<String>? {
         val url = "${qsartoolboxConfig.url}/api/v6/profiling/${profilerGuid}/${chemId}"
 
-        val restTemplate = RestTemplate()
         val response =
             restTemplate.exchange(
                 url,
@@ -65,7 +65,6 @@ class QSARToolboxAPI(private val qsartoolboxConfig: QsartoolboxConfig) {
     ): Map<*, *>? {
         val url = "${qsartoolboxConfig.url}/api/v6/calculation/${calculatorId}/${chemId}"
 
-        val restTemplate = RestTemplate()
         val response = restTemplate.getForEntity(url, Map::class.java)
 
         return response.body

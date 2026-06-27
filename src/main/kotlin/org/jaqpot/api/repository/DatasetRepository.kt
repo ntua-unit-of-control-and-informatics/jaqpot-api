@@ -20,6 +20,15 @@ interface DatasetRepository : CrudRepository<Dataset, Long> {
 
     fun findByIdAndModelId(id: Long, modelId: Long): Optional<Dataset>
 
+    /**
+     * Datasets whose input is still stored in the database (i.e. never offloaded to object storage)
+     * and that are older than [cutoff]. The model association is fetched eagerly so the results can
+     * be offloaded outside of a transaction. Used by the reconciliation job to recover datasets whose
+     * asynchronous offload never completed.
+     */
+    @Query("SELECT d FROM Dataset d JOIN FETCH d.model WHERE d.input IS NOT NULL AND d.createdAt < :cutoff")
+    fun findDatasetsWithInputNotOffloaded(@Param("cutoff") cutoff: OffsetDateTime, pageable: Pageable): List<Dataset>
+
     @Modifying
     @Transactional
     @Query("UPDATE Dataset d SET d.input = NULL, d.result = NULL WHERE d.id = :id")
