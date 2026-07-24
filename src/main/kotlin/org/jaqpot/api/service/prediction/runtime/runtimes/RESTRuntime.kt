@@ -13,6 +13,7 @@ import org.jaqpot.api.service.model.dto.legacy.LegacyDataEntryDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyDatasetDto
 import org.jaqpot.api.service.model.dto.legacy.LegacyPredictionRequestDto
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.awaitBody
@@ -20,6 +21,7 @@ import reactor.netty.http.client.HttpClient
 import java.net.URI
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 
@@ -35,7 +37,21 @@ abstract class RESTRuntime : RuntimeBase() {
                 conn.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
                     .addHandlerLast(WriteTimeoutHandler(60, TimeUnit.SECONDS))
             }
+
+        // Shared across all runtime instances so the cap applies to total outbound
+        // inference concurrency, not per-subclass. Initialized once from config.
+        @Volatile
+        private var concurrencyLimiter: Semaphore? = null
+
+        private fun limiter(permits: Int): Semaphore {
+            return concurrencyLimiter ?: synchronized(this) {
+                concurrencyLimiter ?: Semaphore(permits, true).also { concurrencyLimiter = it }
+            }
+        }
     }
+
+    @Value("\${jaqpot.prediction.max-concurrent-requests:8}")
+    private var maxConcurrentRequests: Int = 8
 
     fun sendPredictionRequest(
         predictionModelDto: PredictionModelDto,
@@ -47,6 +63,10 @@ abstract class RESTRuntime : RuntimeBase() {
             .build()
         val inferenceUrl = "${getRuntimeUrl(predictionModelDto)}${getRuntimePath(predictionModelDto)}"
 
+        val semaphore = limiter(maxConcurrentRequests)
+        // Bounds concurrent serialization of request bodies (incl. base64 model) into
+        // Netty direct buffers, preventing MaxDirectMemorySize exhaustion under load.
+        semaphore.acquire()
         try {
             // uncomment to test request json
 //            val objectMapper = ObjectMapper()
@@ -74,6 +94,8 @@ abstract class RESTRuntime : RuntimeBase() {
                 logger.warn(e) { "Prediction failed for ${getRuntimeUrl(predictionModelDto)} for model ${predictionModelDto.id}" }
             }
             return@runBlocking Optional.empty()
+        } finally {
+            semaphore.release()
         }
     }
 

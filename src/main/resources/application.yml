@@ -89,6 +89,11 @@ jaqpot:
   model:
     max-input-prediction-rows: 100
     max-size-bytes: 104857600 # 100MB
+  prediction:
+    # Caps concurrent outbound inference requests. Each request serializes the full
+    # (base64) model into Netty direct buffers, so unbounded concurrency can exhaust
+    # MaxDirectMemorySize and OOM the WebClient. Keep aligned with direct-memory budget.
+    max-concurrent-requests: 8
   frontend:
     url: http://localhost.jaqpot.org:3000
   runtime:
