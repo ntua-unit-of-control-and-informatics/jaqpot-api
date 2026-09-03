@@ -61,6 +61,24 @@ This is a Spring Boot REST API for machine learning model management and predict
 - Method-level security with custom authorization logic
 - Rate limiting with Bucket4j
 
+## External Dependency: QSAR Toolbox
+
+The QSAR Toolbox is a **third-party Windows application** (OECD/LMC), not a Jaqpot service. It runs
+on a dedicated Windows EC2 instance (`windows-qsar`, plus `windows-qsar-backup`) in the production
+`vpc-main`, serving its REST API over IIS on port 80.
+
+- Config: `jaqpot.qsartoolbox.url` (`QsartoolboxConfig`), env `JAQPOT_QSARTOOLBOX_URL`. Base URL only
+  — paths are built in `QSARToolboxAPI` as `/api/v6/...`. Empty by default in `application.yml`.
+- Client: `service/qsartoolbox/QSARToolboxAPI.kt` — plain `RestTemplate`, four endpoints
+  (`search/smiles`, `qsar/apply`, `profiling`, `calculation`).
+- Called from `QSARToolboxPredictionService`, reached via `PredictionChain` for the
+  `QSAR_TOOLBOX_*` model types (`ModelType.kt`).
+- Timeouts are bounded in `RestTemplateConfig` (10s connect / 60s read). This is load-bearing: the
+  QSAR Toolbox has historically accepted connections and never responded, and predictions run on the
+  shared `@Async` pool, so unbounded waits saturate it and stall all dataset offloading.
+- `jaqpot-api` is the **only** consumer of this URL. The frontend never calls the Toolbox directly —
+  it only renders model metadata. Nothing in the DB or migrations stores a Toolbox host.
+
 ## Configuration Notes
 - Main config in `application.yml` with environment-specific overrides
 - Keycloak realm: `jaqpot-local` for development
