@@ -14,14 +14,15 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 
 
 @Service
 class ApiKeyService(
     private val apiKeyRepository: ApiKeyRepository,
     private val authenticationFacade: AuthenticationFacade,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val apiKeyAuthCache: ApiKeyAuthCache,
+    private val apiKeyUsageService: ApiKeyUsageService
 ) : ApiKeysApiDelegate {
 
     override fun getAllApiKeysForUser(): ResponseEntity<List<GetAllApiKeysForUser200ResponseInnerDto>> {
@@ -80,6 +81,7 @@ class ApiKeyService(
         updateApiKeyRequestDto.enabled?.let { existingApiKey.enabled = it }
 
         apiKeyRepository.save(existingApiKey)
+        apiKeyAuthCache.evictByClientKey(key)
 
         return ResponseEntity.ok().body(UpdateApiKey200ResponseDto(key, existingApiKey.note, existingApiKey.enabled))
     }
@@ -92,6 +94,7 @@ class ApiKeyService(
             "Api key not found"
         )
         apiKeyRepository.delete(existingApiKey)
+        apiKeyAuthCache.evictByClientKey(key)
         return ResponseEntity.noContent().build()
     }
 
@@ -105,31 +108,42 @@ class ApiKeyService(
         return randomAlphanumeric
     }
 
-    fun validateApiKey(clientKey: String, clientSecret: String, ip: String): ApiKey {
-        val todayStart = getStartOfToday()
-        return apiKeyRepository.findByClientKey(clientKey)?.let { apiKey ->
-            if (!apiKey.enabled) {
-                throw InvalidApiKeyException("API key is disabled")
-            } else if (apiKey.expiresAt.isBefore(todayStart)) {
-                throw ExpiredApiKeyException("API key has expired")
-            } else if (passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
-                apiKeyRepository.updateLastUsed(apiKey.id, OffsetDateTime.now(), ip)
-                return apiKey
-            }
-            throw InvalidApiKeyException("Invalid API key")
-        } ?: throw InvalidApiKeyException("Invalid API key")
-    }
-
     /**
-     * Using this to properly cache the start of today for the rate limiting.
+     * Validates an API key. Successful validations are served from [ApiKeyAuthCache] (which honors
+     * the key's own `expiresAt`, see [ApiKeyAuthCache.isExpired]); failures always hit the database
+     * so unknown, wrong, disabled or expired keys are evaluated fresh on every attempt.
+     *
+     * Usage tracking is recorded asynchronously and throttled (see [ApiKeyUsageService]).
      */
-    private fun getStartOfToday(): OffsetDateTime {
-        return OffsetDateTime.now(ZoneOffset.UTC)
-            .withHour(0)
-            .withMinute(0)
-            .withSecond(0)
-            .withNano(0)
+    fun validateApiKey(
+        clientKey: String,
+        clientSecret: String,
+        ip: String
+    ): ApiKeyAuthCache.CachedApiKey {
+        apiKeyAuthCache.get(clientKey, clientSecret)?.let { cached ->
+            apiKeyUsageService.recordUsage(cached.keyId, ip)
+            return cached
+        }
+
+        val apiKey = apiKeyRepository.findByClientKey(clientKey)
+            ?: throw InvalidApiKeyException("Invalid API key")
+        if (!apiKey.enabled) {
+            throw InvalidApiKeyException("API key is disabled")
+        }
+        if (ApiKeyAuthCache.isExpired(apiKey.expiresAt)) {
+            throw ExpiredApiKeyException("API key has expired")
+        }
+        if (!passwordEncoder.matches(clientSecret, apiKey.clientSecret)) {
+            throw InvalidApiKeyException("Invalid API key")
+        }
+
+        val validated = ApiKeyAuthCache.CachedApiKey(
+            keyId = apiKey.id,
+            userId = apiKey.userId,
+            expiresAt = apiKey.expiresAt
+        )
+        apiKeyAuthCache.put(clientKey, clientSecret, validated)
+        apiKeyUsageService.recordUsage(apiKey.id, ip)
+        return validated
     }
-
-
 }

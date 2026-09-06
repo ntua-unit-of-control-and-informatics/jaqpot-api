@@ -6,9 +6,11 @@ import jakarta.servlet.http.HttpServletResponse
 import org.jaqpot.api.service.authentication.keycloak.KeycloakJwtConverter
 import org.jaqpot.api.service.authentication.keycloak.KeycloakTokenExchanger
 import org.jaqpot.api.service.util.IPUtil
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.JwtException
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.util.*
@@ -41,18 +43,43 @@ class ApiKeyAuthFilter(
             val apiKey = try {
                 apiKeyService.validateApiKey(clientKey, clientSecret, ip)
             } catch (e: InvalidApiKeyException) {
+                // Covers unknown/disabled/wrong-secret keys as well as expired ones
+                // (ExpiredApiKeyException extends InvalidApiKeyException).
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.message)
                 return
             }
 
-            val token: String = keycloakTokenExchanger.exchangeToken(apiKey.userId)
-            val jwt: Jwt = jwtDecoder.decode(token)
-            val authentication = keycloakJwtConverter.convert(jwt)
-
-            SecurityContextHolder.getContext().authentication = authentication
+            try {
+                SecurityContextHolder.getContext().authentication = authenticate(apiKey.userId)
+            } catch (e: Exception) {
+                // Keycloak/JWT failures are server-side problems: 500, but with a clean status
+                // instead of an unhandled filter exception.
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Authentication failed")
+                return
+            }
         }
 
         filterChain.doFilter(request, response)
+    }
+
+    /**
+     * Builds the Spring authentication from a cached-or-fresh Keycloak impersonation token.
+     * If a cached token goes stale between fetch and decode, it is dropped and exchanged once
+     * more. Exchange failures (Keycloak down, user gone) propagate immediately without retry.
+     */
+    private fun authenticate(userId: String): Authentication {
+        val token = keycloakTokenExchanger.getOrExchangeToken(userId)
+        try {
+            return convert(token)
+        } catch (e: JwtException) {
+            keycloakTokenExchanger.evict(userId)
+            return convert(keycloakTokenExchanger.getOrExchangeToken(userId))
+        }
+    }
+
+    private fun convert(token: String): Authentication {
+        val jwt: Jwt = jwtDecoder.decode(token)
+        return keycloakJwtConverter.convert(jwt)
     }
 
     private fun extractApiKey(request: HttpServletRequest): Optional<String> {
