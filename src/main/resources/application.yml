@@ -110,6 +110,15 @@ jaqpot:
       generic-python-1: http://localhost.jaqpot.org:8825
   qsartoolbox:
     url:
+    # Stricter per-user hourly allowance for QSAR Toolbox predictions (generic
+    # prediction limit is 30/h). The toolbox runs on a single small Windows EC2
+    # host and restarts under flood, so keep this low. Override via
+    # JAQPOT_QSARTOOLBOX_RATE-LIMIT-PER-HOUR.
+    rate-limit-per-hour: 10
+    # Max concurrent outbound calls to the toolbox per API instance; excess calls
+    # get 429 instead of piling onto the toolbox. Override via
+    # JAQPOT_QSARTOOLBOX_MAX-CONCURRENT-REQUESTS.
+    max-concurrent-requests: 2
 
 
 

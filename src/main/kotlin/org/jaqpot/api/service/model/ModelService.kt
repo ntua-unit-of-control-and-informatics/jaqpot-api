@@ -21,6 +21,8 @@ import org.jaqpot.api.service.model.config.ModelConfiguration
 import org.jaqpot.api.service.model.dto.StreamPredictRequestDto
 import org.jaqpot.api.service.prediction.rest.RESTPredictionService
 import org.jaqpot.api.service.prediction.streaming.StreamingPredictionService
+import org.jaqpot.api.service.qsartoolbox.config.QsartoolboxConfig
+import org.jaqpot.api.service.ratelimit.UserRateLimitService
 import org.jaqpot.api.service.ratelimit.WithRateLimitProtectionByUser
 import org.jaqpot.api.storage.StorageService
 import org.springframework.cache.annotation.CacheEvict
@@ -55,7 +57,9 @@ class ModelService(
     private val storageService: StorageService,
     private val doaService: DoaService,
     private val modelConfiguration: ModelConfiguration,
-    private val streamingPredictionService: StreamingPredictionService
+    private val streamingPredictionService: StreamingPredictionService,
+    private val userRateLimitService: UserRateLimitService,
+    private val qsartoolboxConfig: QsartoolboxConfig
 ) : ModelApiDelegate {
 
     companion object {
@@ -197,6 +201,21 @@ class ModelService(
         return authenticationFacade.userId == model.creatorId
     }
 
+    /**
+     * Second, stricter per-user rate limit applied only to QSAR Toolbox models.
+     * Runs after the generic predict bucket (annotation) and only when the model
+     * is known to target the single-host toolbox backend.
+     */
+    private fun enforceQsarToolboxRateLimit(model: Model) {
+        if (!model.isQsarToolboxModel()) return
+        userRateLimitService.incrementMethodUsage(
+            UserRateLimitService.QSAR_TOOLBOX_PREDICT_KEY,
+            qsartoolboxConfig.rateLimitPerHour,
+            60 * 60
+        )
+        logger.info { "QSAR Toolbox prediction authorized for model ${model.id} (quota ${qsartoolboxConfig.rateLimitPerHour}/h)" }
+    }
+
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")
     @WithRateLimitProtectionByUser(
         limit = 30,
@@ -213,6 +232,8 @@ class ModelService(
             if (model.archived) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Model with id $modelId is archived")
             }
+
+            enforceQsarToolboxRateLimit(model)
 
             val userId = authenticationFacade.userId
             val toEntity = datasetDto.toEntity(
@@ -254,6 +275,7 @@ class ModelService(
             val model = modelRepository.findById(modelId).orElseThrow {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Model with id $modelId not found")
             }
+            enforceQsarToolboxRateLimit(model)
             val userId = authenticationFacade.userId
             // TODO once there are no models with rawModel in the database, remove this
             storeRawModelToStorage(model, storageService, modelRepository)

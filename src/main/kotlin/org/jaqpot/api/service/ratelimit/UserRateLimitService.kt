@@ -23,10 +23,19 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
     private val rateLimitedEndpointsByPlan = listOf(
         "ModelService.predictWithModel",
         "ModelService.predictWithModelCSV",
+        QSAR_TOOLBOX_PREDICT_KEY,
     )
 
     companion object {
         private val logger = KotlinLogging.logger {}
+
+        /**
+         * Distinct bucket for QSAR Toolbox predictions. QSAR models go through the
+         * generic predict endpoints (and their generic bucket) first; once the model
+         * is known to be a QSAR Toolbox model, [ModelService] consumes from this
+         * second, stricter bucket to protect the single-host toolbox backend.
+         */
+        const val QSAR_TOOLBOX_PREDICT_KEY = "ModelService.predictQsarToolbox"
     }
 
     private fun isUserRateLimited(methodName: String): Boolean {

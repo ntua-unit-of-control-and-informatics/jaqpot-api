@@ -7,12 +7,13 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.query.Param
 import java.time.OffsetDateTime
 import java.util.*
 
 
-interface DatasetRepository : CrudRepository<Dataset, Long> {
+interface DatasetRepository : PagingAndSortingRepository<Dataset, Long>, CrudRepository<Dataset, Long> {
     fun findAllByUserId(userId: String, pageable: Pageable): Page<Dataset>
     fun findAllByUserIdAndModelId(userId: String, modelId: Long, pageable: Pageable): Page<Dataset>
 

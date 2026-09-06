@@ -9,7 +9,7 @@ import org.jaqpot.api.mapper.toDto
 import org.jaqpot.api.mapper.toEntity
 import org.jaqpot.api.mapper.toGetDatasets200ResponseDto
 import org.jaqpot.api.model.DatasetDto
-import org.jaqpot.api.model.GetDatasets200ResponseDto
+import org.jaqpot.api.model.GetAllDatasets200ResponseDto
 import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
@@ -73,7 +73,7 @@ class DatasetService(
             .orElse(ResponseEntity.notFound().build())
     }
 
-    override fun getDatasets(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetDatasets200ResponseDto> {
+    override fun getDatasets(page: Int, size: Int, sort: List<String>?): ResponseEntity<GetAllDatasets200ResponseDto> {
         val userId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val datasets = datasetRepository.findAllByUserId(userId, pageable)
@@ -95,7 +95,7 @@ class DatasetService(
         page: Int,
         size: Int,
         sort: List<String>?
-    ): ResponseEntity<GetDatasets200ResponseDto> {
+    ): ResponseEntity<GetAllDatasets200ResponseDto> {
         val userId = authenticationFacade.userId
         val pageable = PageRequest.of(page, size, Sort.by(parseSortParameters(sort)))
         val datasets = datasetRepository.findAllByUserIdAndModelId(userId, modelId, pageable)

@@ -2,8 +2,8 @@ package org.jaqpot.api.mapper
 
 import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.model.GetAllDatasets200ResponseDto
 import org.jaqpot.api.model.GetAllModels200ResponseDto
-import org.jaqpot.api.model.GetDatasets200ResponseDto
 import org.jaqpot.api.model.GetModels200ResponseDto
 import org.jaqpot.api.model.GetUsers200ResponsePageableDto
 import org.jaqpot.api.model.GetUsers200ResponsePageableSortDto
@@ -54,16 +54,31 @@ fun Page<Model>.toGetAllModels200ResponseDto(modelToUserMap: Map<Long, UserDto>?
 fun Page<Dataset>.toGetDatasets200ResponseDto(
     inputs: Map<String, List<Any>>,
     results: Map<String, List<Any>?>
-): GetDatasets200ResponseDto {
+): GetAllDatasets200ResponseDto {
 
 
-    return GetDatasets200ResponseDto(
+    return GetAllDatasets200ResponseDto(
         this.content.map {
             it.toDto(
                 inputs[it.id.toString()] ?: emptyList(),
                 results[it.id.toString()] ?: emptyList()
             )
         }, // return empty input and result for datasets page
+        this.totalElements.toInt(),
+        this.totalPages,
+        this.pageable.pageSize,
+        this.pageable.pageNumber
+    )
+}
+
+/**
+ * Admin variant of the datasets page: input/result payloads are omitted (they
+ * live in object storage and would make the listing heavy); only request
+ * metadata is returned.
+ */
+fun Page<Dataset>.toGetAllDatasets200ResponseDto(): GetAllDatasets200ResponseDto {
+    return GetAllDatasets200ResponseDto(
+        this.content.map { it.toDto(emptyList(), emptyList()) },
         this.totalElements.toInt(),
         this.totalPages,
         this.pageable.pageSize,

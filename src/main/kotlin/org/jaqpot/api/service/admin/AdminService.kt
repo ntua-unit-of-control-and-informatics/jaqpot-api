@@ -3,10 +3,13 @@ package org.jaqpot.api.service.admin
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jaqpot.api.AdminApiDelegate
 import org.jaqpot.api.mapper.UserMapper
+import org.jaqpot.api.mapper.toGetAllDatasets200ResponseDto
 import org.jaqpot.api.mapper.toGetAllModels200ResponseDto
+import org.jaqpot.api.model.GetAllDatasets200ResponseDto
 import org.jaqpot.api.model.GetAllModels200ResponseDto
 import org.jaqpot.api.model.GetUsers200ResponseDto
 import org.jaqpot.api.model.UserDto
+import org.jaqpot.api.repository.DatasetRepository
 import org.jaqpot.api.repository.ModelRepository
 import org.jaqpot.api.service.authentication.AuthenticationFacade
 import org.jaqpot.api.service.authentication.UserService
@@ -25,6 +28,7 @@ class AdminService(
     private val keycloakUserService: KeycloakUserService,
     private val userMapper: UserMapper,
     private val modelRepository: ModelRepository,
+    private val datasetRepository: DatasetRepository,
     private val userService: UserService
 ) : AdminApiDelegate {
 
@@ -104,6 +108,25 @@ class AdminService(
         } catch (e: Exception) {
             logger.error(e) { "Error retrieving all models for admin ${authenticationFacade.userId}" }
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve models")
+        }
+    }
+
+    @PreAuthorize("@authenticationFacade.isAdmin or @authenticationFacade.isUpciUser")
+    @WithRateLimitProtectionByUser(limit = 20, intervalInSeconds = 60)
+    override fun getAllDatasets(pageable: Pageable): ResponseEntity<GetAllDatasets200ResponseDto> {
+        logger.info { "Admin user ${authenticationFacade.userId} requested all datasets page ${pageable.pageNumber} with size ${pageable.pageSize}" }
+
+        try {
+            val datasetsPage = datasetRepository.findAll(pageable)
+
+            // Payloads intentionally omitted (input/result live in object storage and
+            // would make the admin listing heavy); the table only needs request
+            // metadata: who (userId), where (modelId/modelName), what (type/status)
+            // and when (createdAt/executedAt).
+            return ResponseEntity.ok().body(datasetsPage.toGetAllDatasets200ResponseDto())
+        } catch (e: Exception) {
+            logger.error(e) { "Error retrieving all datasets for admin ${authenticationFacade.userId}" }
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve datasets")
         }
     }
 }
