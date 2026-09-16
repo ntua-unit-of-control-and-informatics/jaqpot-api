@@ -110,11 +110,15 @@ jaqpot:
       generic-python-1: http://localhost.jaqpot.org:8825
   qsartoolbox:
     url:
-    # Stricter per-user hourly allowance for QSAR Toolbox predictions (generic
-    # prediction limit is 30/h). The toolbox runs on a single small Windows EC2
-    # host and restarts under flood, so keep this low. Override via
-    # JAQPOT_QSARTOOLBOX_RATE-LIMIT-PER-HOUR.
-    rate-limit-per-hour: 10
+    # Stricter per-user allowance for QSAR Toolbox predictions (generic
+    # prediction limit is 30/h). Dual bucket: burst cap + hourly quota. The
+    # toolbox runs on a single small Windows EC2 host and restarts under
+    # flood, so keep this low. Override via JAQPOT_QSARTOOLBOX_* env vars.
+    rate-limit-per-hour: 5
+    # Burst cap: 1 request per 120s per user. This is what stops the
+    # every-minute spam pattern that hourly buckets alone still allow.
+    rate-limit-per-minute: 1
+    rate-limit-per-minute-window-seconds: 120
     # Max concurrent outbound calls to the toolbox per API instance; excess calls
     # get 429 instead of piling onto the toolbox. Override via
     # JAQPOT_QSARTOOLBOX_MAX-CONCURRENT-REQUESTS.

@@ -24,6 +24,7 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
         "ModelService.predictWithModel",
         "ModelService.predictWithModelCSV",
         QSAR_TOOLBOX_PREDICT_KEY,
+        QSAR_TOOLBOX_PREDICT_PER_MINUTE_KEY,
     )
 
     companion object {
@@ -36,6 +37,12 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
          * second, stricter bucket to protect the single-host toolbox backend.
          */
         const val QSAR_TOOLBOX_PREDICT_KEY = "ModelService.predictQsarToolbox"
+        /**
+         * Burst bucket for QSAR Toolbox predictions, checked before
+         * [QSAR_TOOLBOX_PREDICT_KEY]. Stops the every-minute spam pattern that
+         * hourly buckets alone still allow.
+         */
+        const val QSAR_TOOLBOX_PREDICT_PER_MINUTE_KEY = "ModelService.predictQsarToolboxPerMinute"
     }
 
     private fun isUserRateLimited(methodName: String): Boolean {

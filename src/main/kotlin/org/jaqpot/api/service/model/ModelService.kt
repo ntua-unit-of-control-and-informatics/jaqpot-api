@@ -204,16 +204,22 @@ class ModelService(
     /**
      * Second, stricter per-user rate limit applied only to QSAR Toolbox models.
      * Runs after the generic predict bucket (annotation) and only when the model
-     * is known to target the single-host toolbox backend.
+     * is known to target the single-host toolbox backend. Dual bucket: a tight
+     * per-minute burst cap first, then the hourly quota.
      */
     private fun enforceQsarToolboxRateLimit(model: Model) {
         if (!model.isQsarToolboxModel()) return
+        userRateLimitService.incrementMethodUsage(
+            UserRateLimitService.QSAR_TOOLBOX_PREDICT_PER_MINUTE_KEY,
+            qsartoolboxConfig.rateLimitPerMinute,
+            qsartoolboxConfig.rateLimitPerMinuteWindowSeconds
+        )
         userRateLimitService.incrementMethodUsage(
             UserRateLimitService.QSAR_TOOLBOX_PREDICT_KEY,
             qsartoolboxConfig.rateLimitPerHour,
             60 * 60
         )
-        logger.info { "QSAR Toolbox prediction authorized for model ${model.id} (quota ${qsartoolboxConfig.rateLimitPerHour}/h)" }
+        logger.info { "QSAR Toolbox prediction authorized for model ${model.id} (quota ${qsartoolboxConfig.rateLimitPerMinute}/${qsartoolboxConfig.rateLimitPerMinuteWindowSeconds}s, ${qsartoolboxConfig.rateLimitPerHour}/h)" }
     }
 
     @PreAuthorize("@predictModelAuthorizationLogic.decide(#root, #modelId)")

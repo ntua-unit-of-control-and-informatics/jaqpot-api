@@ -10,7 +10,14 @@ data class QsartoolboxConfig(
      * The toolbox runs on a single small Windows EC2 host and restarts under
      * flood, so this is intentionally lower than the generic prediction limit.
      */
-    val rateLimitPerHour: Long = 10,
+    val rateLimitPerHour: Long = 5,
+    /**
+     * Burst cap for QSAR Toolbox predictions. Blocks the every-minute spam
+     * pattern: hourly buckets alone still allow bursts. Checked first in
+     * [ModelService.enforceQsarToolboxRateLimit] before the hourly quota.
+     */
+    val rateLimitPerMinute: Long = 1,
+    val rateLimitPerMinuteWindowSeconds: Long = 120,
     /**
      * Max concurrent outbound HTTP calls to the toolbox across the whole instance.
      * Excess calls are rejected with 429 instead of piling onto the toolbox.
