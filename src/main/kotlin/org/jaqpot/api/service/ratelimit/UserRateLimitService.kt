@@ -71,7 +71,8 @@ class UserRateLimitService(private val authenticationFacade: AuthenticationFacad
 
         val consumptionProbe = userBucket.tryConsumeAndReturnRemaining(1)
 
-        if (consumptionProbe.remainingTokens <= 0) {
+        if (!consumptionProbe.isConsumed) {
+            logger.warn { "Rate limit exceeded for method $methodName by user ${authenticationFacade.userId}" }
             throw RateLimitException("Rate limit exceeded for method $methodName by user ${authenticationFacade.userId}")
         }
 
