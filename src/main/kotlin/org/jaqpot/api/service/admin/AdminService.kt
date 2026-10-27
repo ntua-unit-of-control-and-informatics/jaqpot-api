@@ -118,12 +118,16 @@ class AdminService(
 
         try {
             val datasetsPage = datasetRepository.findAll(pageable)
+            val userIdToUserMap = datasetsPage.content
+                .map { it.userId }
+                .distinct()
+                .associateWith { userService.getUserById(it).orElse(UserDto(it)) }
 
             // Payloads intentionally omitted (input/result live in object storage and
             // would make the admin listing heavy); the table only needs request
-            // metadata: who (userId), where (modelId/modelName), what (type/status)
-            // and when (createdAt/executedAt).
-            return ResponseEntity.ok().body(datasetsPage.toGetAllDatasets200ResponseDto())
+            // metadata: who (userId/user name), where (modelId/modelName),
+            // what (type/status) and when (createdAt/executedAt).
+            return ResponseEntity.ok().body(datasetsPage.toGetAllDatasets200ResponseDto(userIdToUserMap))
         } catch (e: Exception) {
             logger.error(e) { "Error retrieving all datasets for admin ${authenticationFacade.userId}" }
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve datasets")

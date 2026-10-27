@@ -269,7 +269,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Dataset'
+                      $ref: '#/components/schemas/AdminDataset'
                   totalElements:
                     type: integer
                   totalPages:
@@ -2605,6 +2605,14 @@ components:
         updatedAt:
           type: string
           format: date-time
+    AdminDataset:
+      description: Dataset request metadata enriched with the requesting user's details. Only returned to administrators.
+      allOf:
+        - $ref: '#/components/schemas/Dataset'
+        - type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
     DatasetCSV:
       type: object
       required:

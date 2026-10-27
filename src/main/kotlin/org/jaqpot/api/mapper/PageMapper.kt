@@ -4,6 +4,7 @@ import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.Model
 import org.jaqpot.api.model.GetAllDatasets200ResponseDto
 import org.jaqpot.api.model.GetAllModels200ResponseDto
+import org.jaqpot.api.model.GetDatasets200ResponseDto
 import org.jaqpot.api.model.GetModels200ResponseDto
 import org.jaqpot.api.model.GetUsers200ResponsePageableDto
 import org.jaqpot.api.model.GetUsers200ResponsePageableSortDto
@@ -54,10 +55,10 @@ fun Page<Model>.toGetAllModels200ResponseDto(modelToUserMap: Map<Long, UserDto>?
 fun Page<Dataset>.toGetDatasets200ResponseDto(
     inputs: Map<String, List<Any>>,
     results: Map<String, List<Any>?>
-): GetAllDatasets200ResponseDto {
+): GetDatasets200ResponseDto {
 
 
-    return GetAllDatasets200ResponseDto(
+    return GetDatasets200ResponseDto(
         this.content.map {
             it.toDto(
                 inputs[it.id.toString()] ?: emptyList(),
@@ -76,9 +77,11 @@ fun Page<Dataset>.toGetDatasets200ResponseDto(
  * live in object storage and would make the listing heavy); only request
  * metadata is returned.
  */
-fun Page<Dataset>.toGetAllDatasets200ResponseDto(): GetAllDatasets200ResponseDto {
+fun Page<Dataset>.toGetAllDatasets200ResponseDto(
+    userToUserDtoMap: Map<String, UserDto>
+): GetAllDatasets200ResponseDto {
     return GetAllDatasets200ResponseDto(
-        this.content.map { it.toDto(emptyList(), emptyList()) },
+        this.content.map { it.toAdminDatasetDto(emptyList(), emptyList(), userToUserDtoMap[it.userId]) },
         this.totalElements.toInt(),
         this.totalPages,
         this.pageable.pageSize,

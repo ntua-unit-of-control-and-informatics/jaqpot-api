@@ -4,8 +4,10 @@ import org.jaqpot.api.entity.Dataset
 import org.jaqpot.api.entity.DatasetEntryType
 import org.jaqpot.api.entity.DatasetStatus
 import org.jaqpot.api.entity.Model
+import org.jaqpot.api.model.AdminDatasetDto
 import org.jaqpot.api.model.DatasetCSVDto
 import org.jaqpot.api.model.DatasetDto
+import org.jaqpot.api.model.UserDto
 
 
 fun Dataset.toDto(input: List<Any>, result: List<Any>?): DatasetDto {
@@ -26,6 +28,33 @@ fun Dataset.toDto(input: List<Any>, result: List<Any>?): DatasetDto {
         executionFinishedAt = this.executionFinishedAt,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
+    )
+}
+
+/**
+ * Admin-only variant of [toDto]. The requesting user's details are attached
+ * here so they are never exposed through the regular dataset endpoints.
+ */
+fun Dataset.toAdminDatasetDto(input: List<Any>, result: List<Any>?, user: UserDto?): AdminDatasetDto {
+    val dto = toDto(input, result)
+    return AdminDatasetDto(
+        type = dto.type,
+        entryType = AdminDatasetDto.EntryType.valueOf(dto.entryType.name),
+        input = dto.input,
+        id = dto.id,
+        name = dto.name,
+        result = dto.result,
+        resultTypes = dto.resultTypes,
+        status = dto.status?.let { AdminDatasetDto.Status.valueOf(it.name) },
+        failureReason = dto.failureReason,
+        userId = dto.userId,
+        modelId = dto.modelId,
+        modelName = dto.modelName,
+        executedAt = dto.executedAt,
+        executionFinishedAt = dto.executionFinishedAt,
+        createdAt = dto.createdAt,
+        updatedAt = dto.updatedAt,
+        user = user
     )
 }
 
